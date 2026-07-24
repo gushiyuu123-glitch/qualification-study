@@ -116,3 +116,28 @@ svg {
 #root .notice {
   font-size: 14px;
 }
+
+/* マーケティング検定TOPの試験概要 */
+#root .app-shell[data-qualification='marketing'] .qualification-hero > p:last-child {
+  max-width: none;
+  margin-top: 24px;
+  padding: 17px 18px 18px 20px;
+  border-top: 1px solid #d5e1f8;
+  border-bottom: 1px solid #d5e1f8;
+  background: linear-gradient(90deg, var(--accent-soft), #ffffff);
+  color: #30405d;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+#root .app-shell[data-qualification='marketing'] .qualification-hero > p:last-child::before {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--accent);
+  content: '試験概要';
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}

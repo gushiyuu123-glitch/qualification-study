@@ -3,7 +3,8 @@ export const qualifications = [
     id: 'marketing',
     code: 'MARKETING',
     name: 'マーケティング検定3級',
-    note: '公式問題集を9テーマで整理し、誤答とひっかけを蓄積する',
+    note: `30問・多肢選択式 / 60分 / 合格基準70%以上
+出題範囲10領域・評価6セクション / 公式問題集9テーマ構成`,
     resources: [
       {
         id: 'official-workbook',
