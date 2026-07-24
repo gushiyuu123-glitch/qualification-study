@@ -20,4 +20,6 @@ npm run dev
 npm run build
 ```
 
+`main`への反映をVercelの本番デプロイへ接続しています。
+
 教材データと画像を追加する前に、GitHubリポジトリとVercelデプロイのアクセス制限を有効にします。
