@@ -53,3 +53,66 @@ svg {
   background: #171717;
   color: #ffffff;
 }
+
+/* SPで本文を読みやすくする。大見出しのサイズは維持する。 */
+#root .intro-copy,
+#root .qualification-hero > p:last-child,
+#root .page-title > p:last-child {
+  font-size: 16px;
+}
+
+#root .qualification-body small,
+#root .resource-copy small {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+#root .card-progress,
+#root .summary-strip span {
+  font-size: 12px;
+}
+
+#root .quick-grid span,
+#root .option-grid button span,
+#root .select-row button {
+  font-size: 13px;
+}
+
+#root .secondary-action,
+#root .setup-group h2 {
+  font-size: 16px;
+}
+
+#root .category-summary,
+#root .explanation,
+#root .empty-state p {
+  font-size: 15px;
+}
+
+#root .note-block p,
+#root .caution-block p,
+#root .answer-caution p,
+#root .quiet-copy,
+#root .data-actions button {
+  font-size: 14px;
+}
+
+#root .choice-content,
+#root .weak-list strong {
+  font-size: 16px;
+}
+
+#root .weak-list small,
+#root .compact-list small {
+  font-size: 12px;
+}
+
+#root .record-grid span,
+#root .reason-summary span {
+  font-size: 13px;
+}
+
+#root .compact-list strong,
+#root .notice {
+  font-size: 14px;
+}
