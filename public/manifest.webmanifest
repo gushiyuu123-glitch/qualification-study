@@ -1,0 +1,18 @@
+{
+  "name": "QUALIFY - 資格学習",
+  "short_name": "QUALIFY",
+  "description": "個人用の資格学習アプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
