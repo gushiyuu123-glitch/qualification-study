@@ -2,7 +2,7 @@ export const qualifications = [
   {
     id: 'marketing',
     code: 'MARKETING',
-    name: 'マーケティング検定',
+    name: 'マーケティング検定3級',
     note: '過去問をカテゴリー別に整理して学ぶ',
     resources: [
       {
@@ -25,7 +25,7 @@ export const qualifications = [
   {
     id: 'web-design',
     code: 'WEB DESIGN',
-    name: 'Webデザイン技能検定',
+    name: 'ウェブデザイン技能検定3級',
     note: '問題集を分野別に整理して学ぶ',
     resources: [
       {
