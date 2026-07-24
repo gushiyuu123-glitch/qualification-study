@@ -1,16 +1,23 @@
-# React + Vite
+# QUALIFY
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+スマートフォン中心で使う個人用の資格学習アプリです。
 
-Currently, two official plugins are available:
+## 現在の基盤
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- マーケティング検定、Webデザイン技能検定、色彩検定2級を共通構造で管理
+- 1〜4のタップ回答、正誤判定、解説表示
+- ランダム、誤答、要注意、未回答からの出題
+- 回答履歴、正答率、誤答原因、要注意フラグを端末内へ保存
+- 教材、カテゴリー、文章問題、コード問題、画像・色見本問題に対応
+- 学習データのバックアップと復元
+- PWA・オフライン再利用用の基盤
 
-## React Compiler
+## 開発
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+npm run build
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+教材データと画像を追加する前に、GitHubリポジトリとVercelデプロイのアクセス制限を有効にします。
