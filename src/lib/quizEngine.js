@@ -21,28 +21,55 @@ export function shuffle(items) {
   return copied
 }
 
+function normalizeConfig(questions, config) {
+  const qualificationQuestions = config.qualificationId
+    ? questions.filter(
+        (question) => question.qualificationId === config.qualificationId,
+      )
+    : questions
+
+  const sourceExists = qualificationQuestions.some(
+    (question) => question.sourceId === config.sourceId,
+  )
+  const categoryExists = qualificationQuestions.some(
+    (question) => question.categoryId === config.categoryId,
+  )
+
+  return {
+    ...config,
+    sourceId:
+      config.sourceId === 'all' || sourceExists ? config.sourceId : 'all',
+    categoryId:
+      config.categoryId === 'all' || categoryExists
+        ? config.categoryId
+        : 'all',
+  }
+}
+
 export function filterQuestions(questions, studyData, config) {
+  const safeConfig = normalizeConfig(questions, config)
+
   return questions.filter((question) => {
     if (
-      config.qualificationId &&
-      question.qualificationId !== config.qualificationId
+      safeConfig.qualificationId &&
+      question.qualificationId !== safeConfig.qualificationId
     ) {
       return false
     }
 
-    if (config.sourceId && config.sourceId !== 'all') {
-      if (question.sourceId !== config.sourceId) return false
+    if (safeConfig.sourceId && safeConfig.sourceId !== 'all') {
+      if (question.sourceId !== safeConfig.sourceId) return false
     }
 
-    if (config.categoryId && config.categoryId !== 'all') {
-      if (question.categoryId !== config.categoryId) return false
+    if (safeConfig.categoryId && safeConfig.categoryId !== 'all') {
+      if (question.categoryId !== safeConfig.categoryId) return false
     }
 
     const record = getRecord(studyData, question.id)
 
-    if (config.mode === 'mistakes' && record.wrong === 0) return false
-    if (config.mode === 'flagged' && !record.flagged) return false
-    if (config.mode === 'unanswered' && record.attempts > 0) return false
+    if (safeConfig.mode === 'mistakes' && record.wrong === 0) return false
+    if (safeConfig.mode === 'flagged' && !record.flagged) return false
+    if (safeConfig.mode === 'unanswered' && record.attempts > 0) return false
 
     return true
   })
