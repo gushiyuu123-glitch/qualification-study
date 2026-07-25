@@ -117,26 +117,33 @@ svg {
   font-size: 14px;
 }
 
-/* マーケティング検定TOPの試験概要 */
-#root .app-shell[data-qualification='marketing'] .qualification-hero > p:last-child {
+/* 資格一覧では説明を短く保ち、資格TOPでは日程まで展開する。 */
+#root .qualification-card .qualification-body small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+#root .qualification-hero > p:last-child {
   max-width: none;
   margin-top: 24px;
   padding: 17px 18px 18px 20px;
-  border-top: 1px solid #d5e1f8;
-  border-bottom: 1px solid #d5e1f8;
+  border-top: 1px solid #d9dfe9;
+  border-bottom: 1px solid #d9dfe9;
   background: linear-gradient(90deg, var(--accent-soft), #ffffff);
-  color: #30405d;
+  color: #374151;
   font-size: 14px;
   font-weight: 650;
-  line-height: 1.8;
+  line-height: 1.85;
   white-space: pre-line;
 }
 
-#root .app-shell[data-qualification='marketing'] .qualification-hero > p:last-child::before {
+#root .qualification-hero > p:last-child::before {
   display: block;
   margin-bottom: 7px;
   color: var(--accent);
-  content: '試験概要';
+  content: '試験概要・日程';
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.14em;
