@@ -1,35 +1,49 @@
 .intro {
   position: relative;
   isolation: isolate;
-  min-height: 292px;
-  margin: -30px -20px 30px;
-  padding: 54px 20px 46px;
-  overflow: hidden;
+  min-height: 274px;
+  margin: -30px 0 30px;
+  padding: 54px 0 42px;
   background: #ffffff;
 }
 
 .intro::before {
   position: absolute;
   z-index: -2;
-  inset: -10px;
+  top: 0;
+  right: -20px;
+  bottom: 0;
+  left: -20px;
   content: '';
   background-image: url('/qualification-hero.jpg');
   background-repeat: no-repeat;
   background-position: center bottom;
-  background-size: cover;
-  filter: blur(1.5px) saturate(0.78) contrast(0.92);
-  opacity: 0.5;
-  transform: scale(1.025);
+  background-size: 100% auto;
+  filter: blur(0.6px) saturate(0.9) contrast(0.98);
+  opacity: 0.72;
 }
 
 .intro::after {
   position: absolute;
   z-index: -1;
-  inset: 0;
+  top: 0;
+  right: -20px;
+  bottom: 0;
+  left: -20px;
   content: '';
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 48%, rgba(255, 255, 255, 0.52) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.9) 100%);
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.8) 46%,
+      rgba(255, 255, 255, 0.28) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.04) 58%,
+      rgba(255, 255, 255, 0.56) 100%
+    );
 }
 
 .intro .eyebrow,
@@ -41,28 +55,34 @@
 
 .intro h1 {
   max-width: 360px;
-  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.82);
 }
 
 .intro-copy {
   max-width: 340px;
-  color: #4f4f4f;
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.92);
+  color: #4b4b4b;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.94);
+}
+
+@media (max-width: 390px) {
+  .intro {
+    min-height: 260px;
+    padding-top: 50px;
+  }
+
+  .intro::before {
+    background-size: 100% auto;
+    background-position: center bottom;
+  }
 }
 
 @media (min-width: 520px) {
   .intro {
-    min-height: 330px;
-    padding-top: 68px;
+    min-height: 310px;
+    padding-top: 66px;
   }
 
   .intro::before {
-    background-position: center 62%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .intro::before {
-    transform: none;
+    background-position: center bottom;
   }
 }
