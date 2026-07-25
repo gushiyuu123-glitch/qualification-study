@@ -1,0 +1,68 @@
+.intro {
+  position: relative;
+  isolation: isolate;
+  min-height: 292px;
+  margin: -30px -20px 30px;
+  padding: 54px 20px 46px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.intro::before {
+  position: absolute;
+  z-index: -2;
+  inset: -10px;
+  content: '';
+  background-image: url('/qualification-hero.jpg');
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  filter: blur(1.5px) saturate(0.78) contrast(0.92);
+  opacity: 0.5;
+  transform: scale(1.025);
+}
+
+.intro::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 48%, rgba(255, 255, 255, 0.52) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+.intro .eyebrow,
+.intro h1,
+.intro-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.intro h1 {
+  max-width: 360px;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.75);
+}
+
+.intro-copy {
+  max-width: 340px;
+  color: #4f4f4f;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.92);
+}
+
+@media (min-width: 520px) {
+  .intro {
+    min-height: 330px;
+    padding-top: 68px;
+  }
+
+  .intro::before {
+    background-position: center 62%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro::before {
+    transform: none;
+  }
+}
