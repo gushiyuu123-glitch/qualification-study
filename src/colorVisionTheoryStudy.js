@@ -122,7 +122,7 @@ const content = {
     {
       title: '段階説',
       page: 'P.12',
-      focusTerms: ['段階説'],
+      focusTerms: [],
       intro: [
         '段階説は、三色説と反対色説を異なる処理段階として組み合わせる考え方。',
       ],
