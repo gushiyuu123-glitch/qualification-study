@@ -151,6 +151,18 @@ const chapters = [
       },
     ],
   },
+  {
+    title: 'ファッション',
+    summary: 'ファッションカラー、スタイル分類、イメージ、配色技法を学ぶ。',
+    children: [
+      {
+        title: 'ファッションの色彩と配色',
+        summary: 'ベーシックカラー、6つのイメージ、ファッション特有の配色事例を整理する。',
+        sourceLabel: 'ファッション',
+        actions: [{ readerKey: 'fashion', startIndex: 0 }],
+      },
+    ],
+  },
 ]
 
 function createElement(tag, className, text) {
@@ -364,7 +376,7 @@ function applyTextbookStructure() {
     )
     if (!firstSourcePanel) return
 
-    const anchor = document.createComment('color-textbook-seven-parent-structure')
+    const anchor = document.createComment('color-textbook-eight-parent-structure')
     stack.insertBefore(anchor, firstSourcePanel)
 
     const fragment = document.createDocumentFragment()
