@@ -163,6 +163,33 @@ const chapters = [
       },
     ],
   },
+  {
+    title: 'インテリア',
+    summary: '住空間の用途・利用者・ゾーニングと、エレメントの面積に応じた配色を学ぶ。',
+    children: [
+      {
+        title: '住空間のインテリアとは',
+        summary: '開放型・閉鎖型、生活様式の変化、インテリア概念の成立を整理する。',
+        sourceLabel: 'インテリア',
+        actions: [{ readerKey: 'interior', startIndex: 0 }],
+      },
+      {
+        title: '住空間のインテリアカラーコーディネーション',
+        summary: '色彩の4条件、3つのゾーン、部屋別に求められる色彩を整理する。',
+        actions: [{ readerKey: 'interior', startIndex: 1 }],
+      },
+      {
+        title: '住空間におけるインテリアの配色構成',
+        summary: 'ベース・アソート・アクセントと、各エレメントの配色を整理する。',
+        actions: [{ readerKey: 'interior', startIndex: 7 }],
+      },
+      {
+        title: 'インテリアスタイルと色彩',
+        summary: 'ナチュラルからモダンまで、形態・素材・色彩の特徴を比較する。',
+        actions: [{ readerKey: 'interior', startIndex: 10 }],
+      },
+    ],
+  },
 ]
 
 function createElement(tag, className, text) {
@@ -376,7 +403,7 @@ function applyTextbookStructure() {
     )
     if (!firstSourcePanel) return
 
-    const anchor = document.createComment('color-textbook-eight-parent-structure')
+    const anchor = document.createComment('color-textbook-nine-parent-structure')
     stack.insertBefore(anchor, firstSourcePanel)
 
     const fragment = document.createDocumentFragment()
