@@ -10,7 +10,7 @@ function clickNextUntil(startIndex) {
   const advance = () => {
     if (remaining <= 0) return
 
-    const actions = document.querySelector('.study-reader-actions')
+    const actions = document.querySelector('.study-reader-navigation')
     const buttons = actions ? [...actions.querySelectorAll('button')] : []
     const next = buttons.at(-1)
 
