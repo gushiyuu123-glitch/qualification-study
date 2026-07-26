@@ -41,11 +41,7 @@ const chapters = [
         summary: '視細胞、順応、明所視・暗所視、プルキンエ現象、色の恒常性を整理する。',
         sourceLabel: '視覚系の構造と色',
         actions: [
-          {
-            readerKey: 'visual-system-color',
-            startIndex: 0,
-            label: '前半 P.18〜21',
-          },
+          { readerKey: 'visual-system-color', startIndex: 0, label: '前半 P.18〜21' },
           {
             readerKey: 'visual-system-color-continuation',
             startIndex: 0,
@@ -151,6 +147,18 @@ const chapters = [
       },
     ],
   },
+  {
+    title: 'ファッション',
+    summary: 'ファッションカラー、スタイル分類、イメージ、配色技法を学ぶ。',
+    children: [
+      {
+        title: 'ファッションの色彩と配色',
+        summary: 'ベーシックカラー、6つのイメージ、ファッション特有の配色事例を整理する。',
+        sourceLabel: 'ファッション',
+        actions: [{ readerKey: 'fashion', startIndex: 0 }],
+      },
+    ],
+  },
 ]
 
 function createElement(tag, className, text) {
@@ -162,75 +170,23 @@ function createElement(tag, className, text) {
 
 function ensureStyles() {
   if (document.getElementById(STYLE_ID)) return
-
   const style = document.createElement('style')
   style.id = STYLE_ID
   style.textContent = `
-    .textbook-parent-chapter {
-      margin: 0 0 34px;
-      padding-top: 18px;
-      border-top: 2px solid #161616;
-    }
-
-    .textbook-parent-heading {
-      margin-bottom: 14px;
-    }
-
-    .textbook-parent-heading h2 {
-      margin: 0;
-      color: #111;
-      font-size: clamp(1.45rem, 4.8vw, 2rem);
-      line-height: 1.25;
-    }
-
-    .textbook-parent-heading p {
-      margin: 9px 0 0;
-      color: #555;
-      font-size: 0.9rem;
-      line-height: 1.75;
-    }
-
-    .textbook-child-stack {
-      display: grid;
-      gap: 12px;
-    }
-
-    .textbook-child-panel.category-panel {
-      margin: 0;
-      padding: 18px;
-      border-top-width: 1px;
-    }
-
-    .textbook-child-panel .category-title {
-      margin-bottom: 8px;
-    }
-
-    .textbook-child-panel .category-title h2 {
-      font-size: 1.14rem;
-      line-height: 1.4;
-    }
-
-    .textbook-child-panel .category-title span {
-      color: #888;
-      font-size: 0.64rem;
-      letter-spacing: 0.1em;
-    }
-
-    .textbook-child-panel .category-summary {
-      margin-bottom: 0;
-      font-size: 0.86rem;
-      line-height: 1.75;
-    }
-
+    .textbook-parent-chapter{margin:0 0 34px;padding-top:18px;border-top:2px solid #161616}
+    .textbook-parent-heading{margin-bottom:14px}
+    .textbook-parent-heading h2{margin:0;color:#111;font-size:clamp(1.45rem,4.8vw,2rem);line-height:1.25}
+    .textbook-parent-heading p{margin:9px 0 0;color:#555;font-size:.9rem;line-height:1.75}
+    .textbook-child-stack{display:grid;gap:12px}
+    .textbook-child-panel.category-panel{margin:0;padding:18px;border-top-width:1px}
+    .textbook-child-panel .category-title{margin-bottom:8px}
+    .textbook-child-panel .category-title h2{font-size:1.14rem;line-height:1.4}
+    .textbook-child-panel .category-title span{color:#888;font-size:.64rem;letter-spacing:.1em}
+    .textbook-child-panel .category-summary{margin-bottom:0;font-size:.86rem;line-height:1.75}
     .textbook-child-panel .note-block,
     .textbook-child-panel .caution-block,
-    .textbook-child-panel .category-title > button {
-      display: none;
-    }
-
-    .textbook-child-panel .study-action-row {
-      margin-top: 14px;
-    }
+    .textbook-child-panel .category-title>button{display:none}
+    .textbook-child-panel .study-action-row{margin-top:14px}
   `
   document.head.appendChild(style)
 }
@@ -244,7 +200,6 @@ function allReadersReady() {
   const readerKeys = chapters.flatMap((chapter) =>
     chapter.children.flatMap((child) => child.actions.map((action) => action.readerKey)),
   )
-
   return [...new Set(readerKeys)].every(
     (readerKey) => typeof registry[readerKey]?.open === 'function',
   )
@@ -262,55 +217,37 @@ function createActionRow(child) {
   row.style.gridTemplateColumns = `repeat(${child.actions.length}, minmax(0, 1fr))`
 
   child.actions.forEach((action) => {
-    const button = createElement(
-      'button',
-      'study-action-button is-content',
-      action.label ?? '内容を見る',
-    )
+    const label = action.label ?? '内容を見る'
+    const button = createElement('button', 'study-action-button is-content', label)
     button.type = 'button'
     button.setAttribute('aria-label', `${child.title}の${action.label ?? '内容'}を見る`)
     button.addEventListener('click', () => openReader(action))
     row.appendChild(button)
   })
-
   return row
 }
 
 function prepareSourcePanel(panel, child) {
   panel.classList.add('textbook-child-panel', 'is-compact-category')
-
   const title = panel.querySelector('.category-title h2')
   if (title) title.textContent = child.title
-
   const meta = panel.querySelector('.category-title span')
   if (meta) meta.textContent = 'OFFICIAL TEXTBOOK'
-
   const summary = panel.querySelector('.category-summary')
   if (summary) summary.textContent = child.summary
-
   panel.querySelectorAll(':scope > .study-action-row').forEach((row) => row.remove())
   const actionRow = createActionRow(child)
   if (summary) summary.insertAdjacentElement('afterend', actionRow)
   else panel.appendChild(actionRow)
-
   return panel
 }
 
 function createGeneratedPanel(child) {
   const panel = createElement('article', 'category-panel textbook-child-panel is-compact-category')
-
-  if (child.title === '色のユニバーサルデザイン') {
-    panel.dataset.colorReferenceActions = 'true'
-  }
-
   const titleRow = createElement('div', 'category-title')
   const titleCopy = createElement('div')
-  titleCopy.append(
-    createElement('span', '', 'OFFICIAL TEXTBOOK'),
-    createElement('h2', '', child.title),
-  )
+  titleCopy.append(createElement('span', '', 'OFFICIAL TEXTBOOK'), createElement('h2', '', child.title))
   titleRow.appendChild(titleCopy)
-
   const summary = createElement('p', 'category-summary', child.summary)
   panel.append(titleRow, summary, createActionRow(child))
   return panel
@@ -319,12 +256,9 @@ function createGeneratedPanel(child) {
 function createParentChapter(chapter, panelMap) {
   const parent = createElement('section', 'textbook-parent-chapter')
   const heading = createElement('div', 'textbook-parent-heading')
-  heading.append(
-    createElement('h2', '', chapter.title),
-    createElement('p', '', chapter.summary),
-  )
-
+  heading.append(createElement('h2', '', chapter.title), createElement('p', '', chapter.summary))
   const childStack = createElement('div', 'textbook-child-stack')
+
   chapter.children.forEach((child) => {
     const panel = child.sourceLabel
       ? prepareSourcePanel(panelMap.get(child.sourceLabel), child)
@@ -364,14 +298,10 @@ function applyTextbookStructure() {
     )
     if (!firstSourcePanel) return
 
-    const anchor = document.createComment('color-textbook-seven-parent-structure')
+    const anchor = document.createComment('color-textbook-eight-parent-structure')
     stack.insertBefore(anchor, firstSourcePanel)
-
     const fragment = document.createDocumentFragment()
-    chapters.forEach((chapter) => {
-      fragment.appendChild(createParentChapter(chapter, panelMap))
-    })
-
+    chapters.forEach((chapter) => fragment.appendChild(createParentChapter(chapter, panelMap)))
     stack.insertBefore(fragment, anchor)
     anchor.remove()
     stack.dataset[STRUCTURE_FLAG] = 'true'
@@ -380,7 +310,6 @@ function applyTextbookStructure() {
 
 ensureStyles()
 applyTextbookStructure()
-
 const root = document.getElementById('root')
 if (root) {
   const observer = new MutationObserver(applyTextbookStructure)
