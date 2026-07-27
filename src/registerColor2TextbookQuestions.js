@@ -4,8 +4,6 @@ import { color2Questions } from './data/color-2/questions'
 
 const RESOURCE_ID = 'color2-textbook-generated'
 const RESOURCE_LABEL = '参考書問題'
-const TEXTBOOK_STRUCTURE_FLAG = 'colorTextbookRestored'
-const STYLE_ID = 'color2-textbook-question-resource-style'
 const colorQualification = qualifications.find(
   (qualification) => qualification.id === 'color-2',
 )
@@ -17,7 +15,7 @@ if (colorQualification) {
       type: 'generated-questions',
       label: RESOURCE_LABEL,
       description:
-        '公式テキスト本編から厳選した200問。章ごとの「問題を解く」から開始できます。実際の過去問・本試験問題ではありません。',
+        '公式テキスト本編から厳選した200問。押すと参考書問題の5問ランダムを開始します。実際の過去問・本試験問題ではありません。',
       official: false,
       important: true,
     })
@@ -32,92 +30,69 @@ if (colorQualification) {
   })
 }
 
-function isQuestionResourceOpen() {
-  return [...document.querySelectorAll('.screen .page-title h1')].some(
-    (heading) => heading.textContent?.trim() === RESOURCE_LABEL,
+function findButtonByText(container, text) {
+  return [...container.querySelectorAll('button')].find(
+    (button) => button.textContent?.replace(/\s+/g, '').includes(text),
   )
 }
 
-function guardTextbookReaderRegistry() {
-  const registry = window.__QUALIFY_TEXTBOOK_READERS__
-  if (!registry || registry.__color2QuestionGuarded) return
-
-  window.__QUALIFY_TEXTBOOK_READERS__ = new Proxy(registry, {
-    get(target, property, receiver) {
-      if (property === '__color2QuestionGuarded') return true
-      if (isQuestionResourceOpen() && typeof property === 'string') return undefined
-      return Reflect.get(target, property, receiver)
-    },
-    set(target, property, value, receiver) {
-      return Reflect.set(target, property, value, receiver)
-    },
-  })
+function clickSetupOption(screen, groupTitle, optionText) {
+  const group = [...screen.querySelectorAll('.setup-group')].find(
+    (section) => section.querySelector('h2')?.textContent?.trim() === groupTitle,
+  )
+  const button = group ? findButtonByText(group, optionText) : null
+  button?.click()
 }
 
-function ensureQuestionResourceStyles() {
-  if (document.getElementById(STYLE_ID)) return
+function openReferenceQuestions() {
+  const questionNav = [...document.querySelectorAll('.bottom-nav button')].find(
+    (button) => button.textContent?.replace(/\s+/g, '').includes('問題'),
+  )
+  if (!questionNav || questionNav.disabled) return
 
-  const style = document.createElement('style')
-  style.id = STYLE_ID
-  style.textContent = `
-    .screen[data-color2-question-resource="true"] .category-panel .note-block,
-    .screen[data-color2-question-resource="true"] .category-panel .caution-block {
-      display: none;
+  questionNav.click()
+
+  let attempts = 0
+  const prepareAndStart = () => {
+    const setupHeading = [...document.querySelectorAll('.screen .page-title h1')].find(
+      (heading) => heading.textContent?.trim() === '出題条件',
+    )
+
+    if (!setupHeading) {
+      attempts += 1
+      if (attempts < 60) window.requestAnimationFrame(prepareAndStart)
+      return
     }
 
-    .screen[data-color2-question-resource="true"] .category-panel .category-title {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
+    const screen = setupHeading.closest('.screen')
+    if (!screen) return
 
-    .screen[data-color2-question-resource="true"] .category-panel .category-title > button {
-      width: 100%;
-      min-height: 46px;
-      border: 1px solid currentColor;
-      background: #fff5f9;
-      color: #a12f67;
-      font-weight: 700;
-      text-align: left;
-    }
+    clickSetupOption(screen, 'モード', '全問題')
+    clickSetupOption(screen, '資料', RESOURCE_LABEL)
+    clickSetupOption(screen, 'カテゴリー', '全範囲')
+    clickSetupOption(screen, '問題数', '5問')
 
-    .screen[data-color2-question-resource="true"] .category-panel .category-title > button::first-letter {
-      letter-spacing: 0;
-    }
-  `
-  document.head.appendChild(style)
-}
-
-function protectQuestionResourceLayout() {
-  document.querySelectorAll('.screen').forEach((screen) => {
-    const resourceTitle = screen.querySelector('.page-title h1')?.textContent?.trim()
-    const isQuestionResource = resourceTitle === RESOURCE_LABEL
-    screen.dataset.color2QuestionResource = isQuestionResource ? 'true' : 'false'
-
-    if (!isQuestionResource) return
-
-    const categoryStack = screen.querySelector('.category-stack')
-    if (categoryStack) {
-      categoryStack.dataset[TEXTBOOK_STRUCTURE_FLAG] = 'true'
-    }
-
-    screen.querySelectorAll('.category-title > button').forEach((button) => {
-      if (button.textContent?.trim() === '解く →') {
-        button.textContent = 'この範囲の問題を解く →'
-      }
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        screen.querySelector('.primary-action')?.click()
+      })
     })
-  })
+  }
+
+  window.requestAnimationFrame(prepareAndStart)
 }
 
-guardTextbookReaderRegistry()
-ensureQuestionResourceStyles()
-protectQuestionResourceLayout()
+function interceptReferenceResource(event) {
+  const row = event.target.closest?.('.resource-row')
+  if (!row) return
 
-const root = document.getElementById('root')
-if (root) {
-  const observer = new MutationObserver(() => {
-    guardTextbookReaderRegistry()
-    protectQuestionResourceLayout()
-  })
-  observer.observe(root, { childList: true, subtree: true })
+  const label = row.querySelector('.resource-copy strong')?.textContent?.trim()
+  if (label !== RESOURCE_LABEL) return
+
+  event.preventDefault()
+  event.stopPropagation()
+  event.stopImmediatePropagation()
+  openReferenceQuestions()
 }
+
+document.addEventListener('click', interceptReferenceResource, true)
