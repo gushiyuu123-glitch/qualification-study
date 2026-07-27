@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generateColor2TextbookQuestions.mjs",
+    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs",
     "build": "node scripts/validateColor2Questions.mjs && eslint . && vite build",
     "lint": "eslint .",
-    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/validateColor2Questions.mjs",
+    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/validateColor2Questions.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
