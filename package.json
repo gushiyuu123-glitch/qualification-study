@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generateColor2TextbookQuestions.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs",
-    "build": "eslint . && vite build",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs",
+    "build": "node scripts/validateColor2Questions.mjs && eslint . && vite build",
     "lint": "eslint .",
+    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/validateColor2Questions.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
