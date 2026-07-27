@@ -16,6 +16,7 @@ const textbookReaderFiles = new Map([
   ['fashionStudy.js', 'fashion'],
   ['interiorStudy.js', 'interior'],
   ['landscapeColorStudy.js', 'landscape-color'],
+  ['conventionalColorNamesStudy.js', 'conventional-color-names'],
 ])
 
 function exposeTextbookReaders() {
