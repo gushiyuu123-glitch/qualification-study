@@ -23,20 +23,40 @@ const chapterTargets = {
   '慣用色名': 74,
 }
 
+const standardTypeCycle = [
+  'definition',
+  'caution',
+  'sequence',
+  'identification',
+  'visual-color',
+  'reverse',
+]
+
+const conventionalTypeCycle = [
+  'visual-color',
+  'origin',
+  'classification',
+  'origin',
+  'visual-color',
+  'classification',
+  'reading',
+  'english-name',
+]
+
 const typePriority = {
-  'visual-color': 120,
-  sequence: 112,
-  identification: 108,
-  origin: 106,
-  classification: 104,
-  caution: 100,
-  definition: 96,
-  matching: 92,
-  application: 90,
-  comparison: 88,
-  reverse: 62,
-  reading: 58,
-  'english-name': 56,
+  sequence: 120,
+  'visual-color': 116,
+  origin: 112,
+  classification: 110,
+  caution: 108,
+  definition: 106,
+  matching: 100,
+  application: 98,
+  comparison: 96,
+  identification: 88,
+  reverse: 72,
+  reading: 66,
+  'english-name': 64,
   term: 48,
 }
 
@@ -63,7 +83,20 @@ function spreadIndexes(length, count) {
   return [...result]
 }
 
-function curateChapter(questions, target) {
+function preferredCycleForChapter(chapter) {
+  return chapter === '慣用色名' ? conventionalTypeCycle : standardTypeCycle
+}
+
+function chooseForGroup(group, preferredType, usedIds) {
+  return (
+    group.entries.find(
+      (question) =>
+        question.questionType === preferredType && !usedIds.has(question.id),
+    ) ?? group.entries.find((question) => !usedIds.has(question.id))
+  )
+}
+
+function curateChapter(chapter, questions, target) {
   const bySubcategory = new Map()
 
   questions.forEach((question) => {
@@ -81,22 +114,29 @@ function curateChapter(questions, target) {
 
   const selected = []
   const usedIds = new Set()
+  const cycle = preferredCycleForChapter(chapter)
   const firstPassIndexes = spreadIndexes(groups.length, Math.min(target, groups.length))
 
-  firstPassIndexes.forEach((groupIndex) => {
-    const question = groups[groupIndex]?.entries[0]
-    if (!question || usedIds.has(question.id)) return
+  firstPassIndexes.forEach((groupIndex, selectedIndex) => {
+    const group = groups[groupIndex]
+    if (!group) return
+    const preferredType = cycle[selectedIndex % cycle.length]
+    const question = chooseForGroup(group, preferredType, usedIds)
+    if (!question) return
     selected.push(question)
     usedIds.add(question.id)
   })
 
-  let depth = 1
+  let round = 1
   while (selected.length < target) {
     let added = false
 
-    for (const group of groups) {
-      const question = group.entries[depth]
-      if (!question || usedIds.has(question.id)) continue
+    for (let groupIndex = 0; groupIndex < groups.length; groupIndex += 1) {
+      const group = groups[groupIndex]
+      const preferredType = cycle[(groupIndex + round) % cycle.length]
+      const question = chooseForGroup(group, preferredType, usedIds)
+      if (!question) continue
+
       selected.push(question)
       usedIds.add(question.id)
       added = true
@@ -104,7 +144,7 @@ function curateChapter(questions, target) {
     }
 
     if (!added) break
-    depth += 1
+    round += 1
   }
 
   if (selected.length < target) {
@@ -127,7 +167,7 @@ async function main() {
     const source = color2TextbookQuestions.filter(
       (question) => question.parentCategoryLabel === chapter,
     )
-    const selected = curateChapter(source, target)
+    const selected = curateChapter(chapter, source, target)
 
     if (selected.length !== target) {
       throw new Error(
