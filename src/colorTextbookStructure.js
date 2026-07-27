@@ -309,16 +309,6 @@ function ensureStyles() {
     .textbook-child-panel .study-action-row {
       margin-top: 14px;
     }
-
-    @media (max-width: 640px) {
-      .textbook-parent-chapter {
-        margin-bottom: 30px;
-      }
-
-      .textbook-child-panel.category-panel {
-        padding: 16px;
-      }
-    }
   `
   document.head.appendChild(style)
 }
