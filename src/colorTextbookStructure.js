@@ -190,6 +190,33 @@ const chapters = [
       },
     ],
   },
+  {
+    title: '景観色彩',
+    summary: '地域の気候風土、自然・人工要素、周辺環境との調和から景観色彩を学ぶ。',
+    children: [
+      {
+        title: '景観と色彩',
+        summary: '景観の定義・公共性・構成要素と、景観色彩設計の役割を整理する。',
+        sourceLabel: '景観色彩',
+        actions: [{ readerKey: 'landscape-color', startIndex: 0 }],
+      },
+      {
+        title: '地域の気候風土がつくりだす景観色彩',
+        summary: '地域固有の基調色と、国内外の街並み事例を比較する。',
+        actions: [{ readerKey: 'landscape-color', startIndex: 3 }],
+      },
+      {
+        title: '景観色彩における色彩の基礎知識',
+        summary: '自然と人工の共存、長いライフサイクル、大面積・太陽光・季節変化を整理する。',
+        actions: [{ readerKey: 'landscape-color', startIndex: 5 }],
+      },
+      {
+        title: '生活環境における景観色彩設計',
+        summary: '地と図、向こう三軒両隣、設計プロセス、配色計画と色彩管理を整理する。',
+        actions: [{ readerKey: 'landscape-color', startIndex: 9 }],
+      },
+    ],
+  },
 ]
 
 function createElement(tag, className, text) {
@@ -403,7 +430,7 @@ function applyTextbookStructure() {
     )
     if (!firstSourcePanel) return
 
-    const anchor = document.createComment('color-textbook-nine-parent-structure')
+    const anchor = document.createComment('color-textbook-ten-parent-structure')
     stack.insertBefore(anchor, firstSourcePanel)
 
     const fragment = document.createDocumentFragment()
