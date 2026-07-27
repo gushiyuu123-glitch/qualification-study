@@ -50,6 +50,7 @@ export function defineColor2PastExamQuestions(sourceId, entries) {
     }
 
     return {
+      ...entry,
       qualificationId: 'color-2',
       sourceId: source.id,
       sourceLabel: source.label,
@@ -63,7 +64,6 @@ export function defineColor2PastExamQuestions(sourceId, entries) {
       number: `${source.year}年度 ${seasonLabel} 問${originalQuestionNumber}`,
       type: 'choice',
       status: 'active',
-      ...entry,
       sourcePages: {
         question: entry.questionPage ?? null,
         answer: entry.answerPage ?? null,
@@ -74,6 +74,8 @@ export function defineColor2PastExamQuestions(sourceId, entries) {
 
 // 画像を分割して受け取っている途中では追加しない。
 // ユーザーが「これで全部」と明言した後、該当する配列だけへ登録する。
+// 登録時は元の問題番号、正式な出典名、問題ページ、解答ページを必ず保持する。
+// 問題図版は image、解答ページの参照画像は answerImage に入れられる。
 const summer2025Entries = []
 const winter2025Entries = []
 
