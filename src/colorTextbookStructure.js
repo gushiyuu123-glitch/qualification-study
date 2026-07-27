@@ -217,6 +217,18 @@ const chapters = [
       },
     ],
   },
+  {
+    title: '慣用色名',
+    summary: 'JISの慣用色名を、色の方向・由来・似た色との違いから学ぶ。',
+    children: [
+      {
+        title: '慣用色名（JISの慣用色名より）',
+        summary: '和色名31色と外来色名32色を、色チップと記憶フックで整理する。',
+        sourceLabel: '慣用色名',
+        actions: [{ readerKey: 'conventional-color-names', startIndex: 0 }],
+      },
+    ],
+  },
 ]
 
 function createElement(tag, className, text) {
@@ -296,6 +308,16 @@ function ensureStyles() {
 
     .textbook-child-panel .study-action-row {
       margin-top: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .textbook-parent-chapter {
+        margin-bottom: 30px;
+      }
+
+      .textbook-child-panel.category-panel {
+        padding: 16px;
+      }
     }
   `
   document.head.appendChild(style)
@@ -430,7 +452,7 @@ function applyTextbookStructure() {
     )
     if (!firstSourcePanel) return
 
-    const anchor = document.createComment('color-textbook-ten-parent-structure')
+    const anchor = document.createComment('color-textbook-eleven-parent-structure')
     stack.insertBefore(anchor, firstSourcePanel)
 
     const fragment = document.createDocumentFragment()
