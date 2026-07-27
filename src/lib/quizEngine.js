@@ -75,14 +75,35 @@ export function filterQuestions(questions, studyData, config) {
   })
 }
 
+function shouldKeepPastExamOrder(filtered, config) {
+  return (
+    config.mode === 'all' &&
+    config.count === 'all' &&
+    config.sourceId !== 'all' &&
+    filtered.length > 0 &&
+    filtered.every((question) => question.sourceKind === 'past-exam')
+  )
+}
+
+function sortByOriginalQuestionNumber(items) {
+  return [...items].sort(
+    (left, right) =>
+      Number(left.originalQuestionNumber ?? 0) -
+      Number(right.originalQuestionNumber ?? 0),
+  )
+}
+
 export function createQuizSession(questions, studyData, config) {
   const filtered = filterQuestions(questions, studyData, config)
   const limit =
     config.count === 'all'
       ? filtered.length
       : Math.min(Number(config.count), filtered.length)
+  const candidates = shouldKeepPastExamOrder(filtered, config)
+    ? sortByOriginalQuestionNumber(filtered)
+    : shuffle(filtered)
 
-  return shuffle(filtered).slice(0, limit)
+  return candidates.slice(0, limit)
 }
 
 export function summarizeStudyData(studyData, questions) {

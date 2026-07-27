@@ -1,6 +1,6 @@
 import { qualifications } from './data/qualifications'
 import { questions } from './data/questions'
-import { color2Questions } from './data/color-2/questions'
+import { color2TextbookQuestions } from './data/color-2/questions/textbook'
 
 const RESOURCE_ID = 'color2-textbook-generated'
 const RESOURCE_LABEL = '参考書問題'
@@ -22,7 +22,7 @@ if (colorQualification) {
   }
 
   const registeredIds = new Set(questions.map((question) => question.id))
-  color2Questions.forEach((question) => {
+  color2TextbookQuestions.forEach((question) => {
     if (!registeredIds.has(question.id)) {
       questions.push(question)
       registeredIds.add(question.id)
