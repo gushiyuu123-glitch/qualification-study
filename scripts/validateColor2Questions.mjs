@@ -230,6 +230,20 @@ if (clearPromptCount !== EXPECTED_TOTAL) {
   fail(`明確な問題文の検証件数が不足しています。現在${clearPromptCount}問です。`)
 }
 
+const identificationCount = typeCounts.identification ?? 0
+const definitionCount = typeCounts.definition ?? 0
+const cautionCount = typeCounts.caution ?? 0
+
+if (identificationCount !== 0) {
+  fail(`説明から項目名を当てる問題が${identificationCount}問残っています。`)
+}
+if (definitionCount < 120) {
+  fail(`内容理解・定義問題が不足しています。現在${definitionCount}問です。`)
+}
+if (cautionCount > 50) {
+  fail(`注意点だけを選ぶ問題が多すぎます。現在${cautionCount}問です。`)
+}
+
 const minCorrectIndex = Math.min(...correctIndexCounts)
 const maxCorrectIndex = Math.max(...correctIndexCounts)
 if (maxCorrectIndex - minCorrectIndex > 1) {
