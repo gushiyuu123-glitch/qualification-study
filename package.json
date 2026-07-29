@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs",
+    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs",
     "build": "node scripts/validateColor2Questions.mjs && node scripts/validateColor2PastExams.mjs && eslint . && vite build",
     "lint": "eslint .",
-    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/validateColor2Questions.mjs && node scripts/validateColor2PastExams.mjs",
+    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/validateColor2Questions.mjs && node scripts/validateColor2PastExams.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,8 +22,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^10.6.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^17.7.0",
     "vite": "^8.1.1"
   }
