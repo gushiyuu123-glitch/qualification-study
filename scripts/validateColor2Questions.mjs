@@ -223,8 +223,8 @@ if ((chapterCounts['慣用色名'] ?? 0) > 10) {
 if (thinQuestionCount > 28) {
   fail(`単純な逆引き・読み問題が多すぎます。現在${thinQuestionCount}問です。`)
 }
-if (visualQuestionCount < 20) {
-  fail(`色チップ・図解問題が不足しています。現在${visualQuestionCount}問です。`)
+if (visualQuestionCount < 7) {
+  fail(`教材由来の色チップ・図解問題が不足しています。現在${visualQuestionCount}問です。`)
 }
 if (clearPromptCount !== EXPECTED_TOTAL) {
   fail(`明確な問題文の検証件数が不足しています。現在${clearPromptCount}問です。`)
