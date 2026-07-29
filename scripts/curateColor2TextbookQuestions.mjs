@@ -29,13 +29,17 @@ const chapterTargets = {
 
 const standardTypeCycle = [
   'definition',
-  'caution',
-  'sequence',
-  'visual-color',
   'identification',
   'definition',
   'caution',
-  'reverse',
+  'definition',
+  'visual-color',
+  'definition',
+  'identification',
+  'definition',
+  'caution',
+  'definition',
+  'sequence',
 ]
 
 const conventionalTypeCycle = [
@@ -176,17 +180,35 @@ function preferredCycleForChapter(chapter) {
 }
 
 function chooseForGroup(group, preferredType, usedIds) {
-  return (
-    group.entries.find(
-      (question) =>
-        question.questionType === preferredType && !usedIds.has(question.id),
-    ) ??
-    group.entries.find(
-      (question) =>
-        !thinQuestionTypes.has(question.questionType) && !usedIds.has(question.id),
-    ) ??
-    group.entries.find((question) => !usedIds.has(question.id))
-  )
+  const fallbackTypes =
+    group.categoryKey === 'conventional-color-names'
+      ? [
+          'visual-color',
+          'classification',
+          'origin',
+          'matching',
+          'reading',
+          'english-name',
+        ]
+      : [
+          'definition',
+          'identification',
+          'caution',
+          'visual-color',
+          'sequence',
+          'reverse',
+          'term',
+        ]
+
+  const typeOrder = uniqueTexts([preferredType, ...fallbackTypes])
+  for (const type of typeOrder) {
+    const question = group.entries.find(
+      (entry) => entry.questionType === type && !usedIds.has(entry.id),
+    )
+    if (question) return question
+  }
+
+  return group.entries.find((question) => !usedIds.has(question.id))
 }
 
 function curateChapter(chapter, questions, target) {
