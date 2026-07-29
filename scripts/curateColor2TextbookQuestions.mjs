@@ -9,11 +9,12 @@ const outputPath = path.join(
   'src/data/color-2/questions/textbook/generatedTextbookQuestions.js',
 )
 
-const TARGET_TOTAL = 200
+const CORE_TOTAL = 200
+const EXPANSION_TOTAL = 100
+const TARGET_TOTAL = CORE_TOTAL + EXPANSION_TOTAL
 
-// 11章すべてを扱いつつ、概念理解・比較・判断が必要な章を厚くする。
-// 慣用色名は全体学習を圧迫しない補助枠へ下げる。
-const chapterTargets = {
+// 既存200問の配分は維持し、回答履歴と学習の連続性を守る。
+const coreChapterTargets = {
   '色のユニバーサルデザイン': 15,
   '光と色': 28,
   '色の表示': 18,
@@ -27,7 +28,29 @@ const chapterTargets = {
   '慣用色名': 10,
 }
 
-const standardTypeCycle = [
+// 追加100問は全11章へ配分し、理解・比較・判断が必要な範囲を厚くする。
+const expansionChapterTargets = {
+  '色のユニバーサルデザイン': 7,
+  '光と色': 12,
+  '色の表示': 12,
+  '色彩心理': 8,
+  '色彩調和': 13,
+  '配色イメージ': 12,
+  'ビジュアル': 6,
+  'ファッション': 10,
+  'インテリア': 8,
+  '景観色彩': 7,
+  '慣用色名': 5,
+}
+
+const finalChapterTargets = Object.fromEntries(
+  Object.keys(coreChapterTargets).map((chapter) => [
+    chapter,
+    coreChapterTargets[chapter] + expansionChapterTargets[chapter],
+  ]),
+)
+
+const coreTypeCycle = [
   'definition',
   'identification',
   'definition',
@@ -42,13 +65,35 @@ const standardTypeCycle = [
   'sequence',
 ]
 
-const conventionalTypeCycle = [
+const expansionTypeCycle = [
+  'definition',
+  'identification',
+  'definition',
+  'reverse',
+  'definition',
+  'sequence',
+  'identification',
+  'visual-color',
+  'definition',
+  'caution',
+  'term',
+]
+
+const conventionalCoreCycle = [
   'visual-color',
   'classification',
   'origin',
   'matching',
   'visual-color',
   'classification',
+]
+
+const conventionalExpansionCycle = [
+  'origin',
+  'classification',
+  'visual-color',
+  'matching',
+  'origin',
 ]
 
 const typePriority = {
@@ -175,8 +220,11 @@ function buildGroups(questions) {
     }))
 }
 
-function preferredCycleForChapter(chapter) {
-  return chapter === '慣用色名' ? conventionalTypeCycle : standardTypeCycle
+function typeCycleForChapter(chapter, phase) {
+  if (chapter === '慣用色名') {
+    return phase === 'core' ? conventionalCoreCycle : conventionalExpansionCycle
+  }
+  return phase === 'core' ? coreTypeCycle : expansionTypeCycle
 }
 
 function chooseForGroup(group, preferredType, usedIds) {
@@ -211,12 +259,12 @@ function chooseForGroup(group, preferredType, usedIds) {
   return group.entries.find((question) => !usedIds.has(question.id))
 }
 
-function curateChapter(chapter, questions, target) {
+function curateChapter(chapter, questions, target, excludedIds, phase) {
   const categories = buildGroups(questions)
   const groups = interleaveGroups(categories)
   const selected = []
-  const usedIds = new Set()
-  const cycle = preferredCycleForChapter(chapter)
+  const usedIds = new Set(excludedIds)
+  const cycle = typeCycleForChapter(chapter, phase)
 
   const firstPassIndexes = spreadIndexes(groups.length, Math.min(target, groups.length))
   firstPassIndexes.forEach((groupIndex, selectedIndex) => {
@@ -436,7 +484,7 @@ function placeCorrectAt(question, distractors, targetIndex) {
   return { choices, correctIndex: targetIndex }
 }
 
-function refineQuestion(question, allQuestions, finalIndex) {
+function refineQuestion(question, allQuestions, finalIndex, studySet) {
   const answer = correctChoice(question)
   const sequenceDistractors =
     question.questionType === 'sequence' ? makeSequenceDistractors(answer) : []
@@ -447,6 +495,7 @@ function refineQuestion(question, allQuestions, finalIndex) {
 
   return {
     ...question,
+    studySet,
     prompt: rewritePrompt(question),
     ...placeCorrectAt(question, distractors, finalIndex % 4),
     explanation: refineExplanation(question),
@@ -460,43 +509,82 @@ function refineQuestion(question, allQuestions, finalIndex) {
   }
 }
 
+function selectPhase(allQuestions, targets, excludedIds, phase) {
+  const selected = []
+  const usedIds = new Set(excludedIds)
+
+  for (const [chapter, target] of Object.entries(targets)) {
+    const source = allQuestions.filter(
+      (question) => question.parentCategoryLabel === chapter,
+    )
+    const chapterQuestions = curateChapter(
+      chapter,
+      source,
+      target,
+      usedIds,
+      phase,
+    )
+
+    if (chapterQuestions.length !== target) {
+      throw new Error(
+        `${chapter}: ${target}問を${phase}へ選抜できませんでした。選択${chapterQuestions.length}問。`,
+      )
+    }
+
+    chapterQuestions.forEach((question) => usedIds.add(question.id))
+    selected.push(...chapterQuestions)
+  }
+
+  return selected
+}
+
 async function main() {
   const moduleUrl = `${pathToFileURL(outputPath).href}?curate=${Date.now()}`
   const { color2TextbookQuestions } = await import(moduleUrl)
 
-  const selected = []
+  const coreSelected = selectPhase(
+    color2TextbookQuestions,
+    coreChapterTargets,
+    new Set(),
+    'core',
+  )
+  const coreIds = new Set(coreSelected.map((question) => question.id))
+  const expansionSelected = selectPhase(
+    color2TextbookQuestions,
+    expansionChapterTargets,
+    coreIds,
+    'expansion',
+  )
 
-  for (const [chapter, target] of Object.entries(chapterTargets)) {
-    const source = color2TextbookQuestions.filter(
-      (question) => question.parentCategoryLabel === chapter,
-    )
-    const chapterQuestions = curateChapter(chapter, source, target)
-
-    if (chapterQuestions.length !== target) {
-      throw new Error(
-        `${chapter}: ${target}問へ再構成できませんでした。選択${chapterQuestions.length}問。`,
-      )
-    }
-
-    selected.push(...chapterQuestions)
+  if (coreSelected.length !== CORE_TOTAL) {
+    throw new Error(`既存核は${CORE_TOTAL}問固定です。現在${coreSelected.length}問です。`)
+  }
+  if (expansionSelected.length !== EXPANSION_TOTAL) {
+    throw new Error(`追加分は${EXPANSION_TOTAL}問固定です。現在${expansionSelected.length}問です。`)
   }
 
-  if (selected.length !== TARGET_TOTAL) {
-    throw new Error(
-      `参考書問題は${TARGET_TOTAL}問固定です。現在${selected.length}問です。`,
-    )
+  const selected = [...coreSelected, ...expansionSelected]
+  if (new Set(selected.map((question) => question.id)).size !== TARGET_TOTAL) {
+    throw new Error('既存200問と追加100問の間にID重複があります。')
   }
 
   const refined = selected.map((question, index) =>
-    refineQuestion(question, color2TextbookQuestions, index),
+    refineQuestion(
+      question,
+      color2TextbookQuestions,
+      index,
+      index < CORE_TOTAL ? 'core-200' : 'expanded-100',
+    ),
   )
 
-  const output = `// scripts/generateColor2TextbookQuestions.mjs で本編11章から候補を生成し、\n// scripts/curateColor2TextbookQuestions.mjs で範囲・重要度・文章品質を基準に${TARGET_TOTAL}問へ再構成します。\n// 参考書問題のみ。過去問・試験用紙のデータを追加しないでください。\n\nexport const color2TextbookQuestions = ${JSON.stringify(refined, null, 2)}\n`
+  const output = `// scripts/generateColor2TextbookQuestions.mjs で本編11章から候補を生成し、\n// scripts/curateColor2TextbookQuestions.mjs で既存200問を維持しながら100問を追加します。\n// 参考書問題のみ。過去問・試験用紙のデータを追加しないでください。\n\nexport const color2TextbookQuestions = ${JSON.stringify(refined, null, 2)}\n`
 
   await fs.writeFile(outputPath, output, 'utf8')
 
-  console.log(`色彩検定2級 参考書問題を${TARGET_TOTAL}問へ再構成`)
-  for (const [chapter, target] of Object.entries(chapterTargets)) {
+  console.log(`色彩検定2級 参考書問題を${TARGET_TOTAL}問へ拡張`)
+  console.log(`- 既存核: ${coreSelected.length}問`)
+  console.log(`- 追加: ${expansionSelected.length}問`)
+  for (const [chapter, target] of Object.entries(finalChapterTargets)) {
     console.log(`- ${chapter}: ${target}問`)
   }
 }
