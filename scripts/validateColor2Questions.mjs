@@ -127,7 +127,9 @@ for (const [index, question] of color2TextbookQuestions.entries()) {
   if (prompts.has(prompt)) fail(`${prefix}: 問題文が重複しています。`)
   prompts.add(prompt)
 
-  if (!prompt.includes('どれか')) {
+  const hasClearQuestionEnding =
+    prompt.includes('どれか') || /どの.+を説明しているか。/.test(prompt)
+  if (!hasClearQuestionEnding) {
     fail(`${prefix}: 問いの終点が不明です。問題文を明確な選択式にしてください。`)
   }
   if (prompt.length > 230) {
