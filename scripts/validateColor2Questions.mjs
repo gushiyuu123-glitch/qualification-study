@@ -19,6 +19,9 @@ const requiredCategories = new Set([
   'lighting','munsell-color-system','color-psychology','color-harmony','color-image',
   'visual-design','fashion','interior','landscape-color','conventional-color-names',
 ])
+const minimumCategoryCounts = {
+  lighting: 10,
+}
 const forbiddenFragments = ['過去問','本試験','試験用紙','解答例の読み取り','画像圧縮','基調色の白色化','エレガンスとエレガント','あなたが育った家','江戸の街並み','ジャパン・ブルー']
 const awkwardPromptFragments = ['について、「','次の説明が指す学習項目','と最も直接結びつく重要語句','の注意点として適切なもの','を判断するときの注意点']
 const thinTypes = new Set(['reverse','term','reading','english-name'])
@@ -65,6 +68,9 @@ for (const [index, question] of color2TextbookQuestions.entries()) {
 
 for (const [chapter, expected] of Object.entries(expectedChapterCounts)) if ((chapterCounts[chapter] ?? 0) !== expected) fail(`${chapter}: ${expected}問ではありません。`)
 for (const categoryId of requiredCategories) if (!categoryCounts[categoryId]) fail(`カテゴリー${categoryId}が欠落しています。`)
+for (const [categoryId, minimum] of Object.entries(minimumCategoryCounts)) {
+  if ((categoryCounts[categoryId] ?? 0) < minimum) fail(`${categoryId}は最低${minimum}問必要です。現在${categoryCounts[categoryId] ?? 0}問です。`)
+}
 if (studySetCounts['core-200'] !== 200 || studySetCounts['expanded-100'] !== 100) fail('既存200問と追加100問の分離が不正です。')
 if ((chapterCounts['慣用色名'] ?? 0) > 15 || thinCount > 50 || visualCount < 7) fail('出題タイプの配分が基準外です。')
 if ((typeCounts.identification ?? 0) !== 0 || (typeCounts.definition ?? 0) < 160 || (typeCounts.caution ?? 0) > 80) fail(`問題タイプが基準外です。${JSON.stringify(typeCounts)}`)
@@ -77,6 +83,7 @@ console.log(`既存核 / 追加: ${studySetCounts['core-200']} / ${studySetCount
 console.log(`正解位置分布: ${correctIndexCounts.join(' / ')}`)
 console.log(`視覚問題: ${visualCount}問 / 逆引き・読み: ${thinCount}問`)
 for (const [chapter, count] of Object.entries(chapterCounts)) console.log(`- ${chapter}: ${count}問`)
+console.log(`カテゴリー内訳: ${JSON.stringify(categoryCounts)}`)
 console.log(`カテゴリー数: ${Object.keys(categoryCounts).length}`)
 console.log(`小項目数: ${Object.keys(subcategoryCounts).length}`)
 console.log(`問題タイプ: ${JSON.stringify(typeCounts)}`)
