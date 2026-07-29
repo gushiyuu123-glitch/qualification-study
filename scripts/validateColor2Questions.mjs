@@ -19,8 +19,8 @@ const requiredCategories = new Set([
   'lighting','munsell-color-system','color-psychology','color-harmony','color-image',
   'visual-design','fashion','interior','landscape-color','conventional-color-names',
 ])
-const minimumCategoryCounts = {
-  lighting: 10,
+const expectedCategoryCounts = {
+  lighting: 14,
 }
 const forbiddenFragments = ['過去問','本試験','試験用紙','解答例の読み取り','画像圧縮','基調色の白色化','エレガンスとエレガント','あなたが育った家','江戸の街並み','ジャパン・ブルー']
 const awkwardPromptFragments = ['について、「','次の説明が指す学習項目','と最も直接結びつく重要語句','の注意点として適切なもの','を判断するときの注意点']
@@ -68,8 +68,8 @@ for (const [index, question] of color2TextbookQuestions.entries()) {
 
 for (const [chapter, expected] of Object.entries(expectedChapterCounts)) if ((chapterCounts[chapter] ?? 0) !== expected) fail(`${chapter}: ${expected}問ではありません。`)
 for (const categoryId of requiredCategories) if (!categoryCounts[categoryId]) fail(`カテゴリー${categoryId}が欠落しています。`)
-for (const [categoryId, minimum] of Object.entries(minimumCategoryCounts)) {
-  if ((categoryCounts[categoryId] ?? 0) < minimum) fail(`${categoryId}は最低${minimum}問必要です。現在${categoryCounts[categoryId] ?? 0}問です。`)
+for (const [categoryId, expected] of Object.entries(expectedCategoryCounts)) {
+  if ((categoryCounts[categoryId] ?? 0) !== expected) fail(`${categoryId}は${expected}問固定です。現在${categoryCounts[categoryId] ?? 0}問です。`)
 }
 if (studySetCounts['core-200'] !== 200 || studySetCounts['expanded-100'] !== 100) fail('既存200問と追加100問の分離が不正です。')
 if ((chapterCounts['慣用色名'] ?? 0) > 15 || thinCount > 50 || visualCount < 7) fail('出題タイプの配分が基準外です。')
