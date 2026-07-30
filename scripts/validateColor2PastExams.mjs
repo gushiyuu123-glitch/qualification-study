@@ -1,6 +1,9 @@
 import {
   color2PastExamQuestions,
   color2PastExamSources,
+  color2Practice2025Questions,
+  color2PracticeSources,
+  color2QuestionSourceQuestions,
 } from '../src/data/color-2/questions/past-exams/index.js'
 
 function normalize(value) {
@@ -12,10 +15,11 @@ function choiceText(choice) {
 }
 
 function fail(message) {
-  throw new Error(`色彩検定2級 過去問検証エラー: ${message}`)
+  throw new Error(`色彩検定2級 過去問・練習問題検証エラー: ${message}`)
 }
 
-const sourceIds = new Set(color2PastExamSources.map((source) => source.id))
+const allSources = [...color2PastExamSources, ...color2PracticeSources]
+const sourceIds = new Set(allSources.map((source) => source.id))
 const questionIds = new Set()
 const sourceQuestionParts = new Set()
 
@@ -32,9 +36,24 @@ for (const source of color2PastExamSources) {
   if (!['summer', 'winter'].includes(source.season)) {
     fail(`${source.label ?? source.id}: 夏期・冬期の指定が不正です。`)
   }
+  if (source.status !== 'active') {
+    fail(`${source.label ?? source.id}: statusはactive固定です。`)
+  }
 }
 
-for (const question of color2PastExamQuestions) {
+for (const source of color2PracticeSources) {
+  if (!source.id?.startsWith('color2-practice-')) {
+    fail(`${source.label ?? source.id}: 練習問題sourceId接頭辞が不正です。`)
+  }
+  if (source.type !== 'practice') {
+    fail(`${source.label ?? source.id}: typeはpractice固定です。`)
+  }
+  if (source.official !== false) {
+    fail(`${source.label ?? source.id}: 練習問題を実物過去問として扱わないでください。`)
+  }
+}
+
+for (const question of color2QuestionSourceQuestions) {
   const prefix = question.id ?? '(IDなし)'
 
   if (question.qualificationId !== 'color-2') {
@@ -43,15 +62,18 @@ for (const question of color2PastExamQuestions) {
   if (!sourceIds.has(question.sourceId)) {
     fail(`${prefix}: 未登録のsourceIdです。`)
   }
-  if (question.sourceKind !== 'past-exam') {
-    fail(`${prefix}: sourceKindはpast-exam固定です。`)
+  if (question.sourceKind === 'past-exam') {
+    if (question.official !== true || !question.id?.startsWith('color2-pe-')) {
+      fail(`${prefix}: 過去問の公式区分またはID接頭辞が不正です。`)
+    }
+  } else if (question.sourceKind === 'practice') {
+    if (question.official !== false || !question.id?.startsWith('color2-pr-')) {
+      fail(`${prefix}: 練習問題の公式区分またはID接頭辞が不正です。`)
+    }
+  } else {
+    fail(`${prefix}: sourceKindが不正です。`)
   }
-  if (question.official !== true) {
-    fail(`${prefix}: 実物過去問はofficial=trueで保持してください。`)
-  }
-  if (!question.id?.startsWith('color2-pe-')) {
-    fail(`${prefix}: 問題ID接頭辞が不正です。`)
-  }
+
   if (questionIds.has(question.id)) {
     fail(`${prefix}: 問題IDが重複しています。`)
   }
@@ -69,7 +91,7 @@ for (const question of color2PastExamQuestions) {
 
   const partKey = `${question.sourceId}:${question.originalQuestionNumber}:${question.originalQuestionPart}`
   if (sourceQuestionParts.has(partKey)) {
-    fail(`${prefix}: 同じ年度・期・大問で枝問記号が重複しています。`)
+    fail(`${prefix}: 同じ資料・大問で枝問記号が重複しています。`)
   }
   sourceQuestionParts.add(partKey)
 
@@ -110,55 +132,54 @@ for (const question of color2PastExamQuestions) {
   if (question.status !== 'active') fail(`${prefix}: statusはactive固定です。`)
 }
 
-const summerSourceId = 'color2-past-exam-2025-summer'
-const summerQuestions = color2PastExamQuestions.filter(
-  (question) => question.sourceId === summerSourceId,
-)
-const summerSource = color2PastExamSources.find(
-  (source) => source.id === summerSourceId,
-)
+function validatePastExamSource(sourceId, expectedCount, expectedPoints) {
+  const source = color2PastExamSources.find((item) => item.id === sourceId)
+  const sourceQuestions = color2PastExamQuestions.filter(
+    (question) => question.sourceId === sourceId,
+  )
 
-if (!summerSource || summerSource.status !== 'active') {
-  fail('2025年度夏期の資料状態がactiveではありません。')
-}
-if (summerQuestions.length !== 105) {
-  fail(`2025年度夏期は105設問である必要があります。現在${summerQuestions.length}設問です。`)
-}
-const summerPoints = summerQuestions.reduce(
-  (total, question) => total + question.points,
-  0,
-)
-if (summerPoints !== 200) {
-  fail(`2025年度夏期の配点合計は200点である必要があります。現在${summerPoints}点です。`)
-}
-const originalQuestionNumbers = new Set(
-  summerQuestions.map((question) => question.originalQuestionNumber),
-)
-for (let number = 1; number <= 17; number += 1) {
-  if (!originalQuestionNumbers.has(number)) {
-    fail(`2025年度夏期の問${number}がありません。`)
+  if (!source) fail(`${sourceId}: 資料情報がありません。`)
+  if (sourceQuestions.length !== expectedCount) {
+    fail(`${source.label}は${expectedCount}設問である必要があります。現在${sourceQuestions.length}設問です。`)
+  }
+  const points = sourceQuestions.reduce(
+    (total, question) => total + question.points,
+    0,
+  )
+  if (points !== expectedPoints) {
+    fail(`${source.label}の配点合計は${expectedPoints}点である必要があります。現在${points}点です。`)
+  }
+
+  const originalQuestionNumbers = new Set(
+    sourceQuestions.map((question) => question.originalQuestionNumber),
+  )
+  for (let number = 1; number <= 17; number += 1) {
+    if (!originalQuestionNumbers.has(number)) {
+      fail(`${source.label}の問${number}がありません。`)
+    }
   }
 }
 
-const winterSourceId = 'color2-past-exam-2025-winter'
-const winterQuestions = color2PastExamQuestions.filter(
-  (question) => question.sourceId === winterSourceId,
-)
-const winterSource = color2PastExamSources.find(
-  (source) => source.id === winterSourceId,
-)
-if (!winterSource || winterSource.status !== 'awaiting-images') {
-  fail('2025年度冬期は画像受領前のawaiting-imagesで保持してください。')
+validatePastExamSource('color2-past-exam-2025-summer', 105, 200)
+validatePastExamSource('color2-past-exam-2025-winter', 104, 200)
+
+if (color2Practice2025Questions.length !== 18) {
+  fail(`2025年度版練習問題は18設問である必要があります。現在${color2Practice2025Questions.length}設問です。`)
 }
-if (winterQuestions.length !== 0) {
-  fail('2025年度冬期はユーザーの「これで全部」まで登録しないでください。')
+const practiceNumbers = new Set(
+  color2Practice2025Questions.map((question) => question.originalQuestionNumber),
+)
+for (let number = 1; number <= 3; number += 1) {
+  if (!practiceNumbers.has(number)) {
+    fail(`2025年度版練習問題の問${number}がありません。`)
+  }
 }
 
 console.log(
-  `色彩検定2級 過去問検証OK: ${color2PastExamQuestions.length}設問 / ${color2PastExamSources.length}資料`,
+  `色彩検定2級 過去問・練習問題検証OK: ${color2QuestionSourceQuestions.length}設問 / ${allSources.length}資料`,
 )
-for (const source of color2PastExamSources) {
-  const sourceQuestions = color2PastExamQuestions.filter(
+for (const source of allSources) {
+  const sourceQuestions = color2QuestionSourceQuestions.filter(
     (question) => question.sourceId === source.id,
   )
   const points = sourceQuestions.reduce(

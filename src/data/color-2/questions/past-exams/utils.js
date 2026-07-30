@@ -1,4 +1,4 @@
-export function defineSummerGroup({
+export function defineExamGroup({
   number,
   questionPage,
   answerPage,
@@ -23,3 +23,7 @@ export function defineSummerGroup({
     ...(item.image ? { image: item.image } : {}),
   }))
 }
+
+export const defineSummerGroup = defineExamGroup
+export const defineWinterGroup = defineExamGroup
+export const definePracticeGroup = defineExamGroup
