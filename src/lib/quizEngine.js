@@ -86,11 +86,18 @@ function shouldKeepPastExamOrder(filtered, config) {
 }
 
 function sortByOriginalQuestionNumber(items) {
-  return [...items].sort(
-    (left, right) =>
+  return [...items].sort((left, right) => {
+    const questionDifference =
       Number(left.originalQuestionNumber ?? 0) -
-      Number(right.originalQuestionNumber ?? 0),
-  )
+      Number(right.originalQuestionNumber ?? 0)
+
+    if (questionDifference !== 0) return questionDifference
+
+    return (
+      Number(left.originalQuestionOrder ?? 0) -
+      Number(right.originalQuestionOrder ?? 0)
+    )
+  })
 }
 
 export function createQuizSession(questions, studyData, config) {
