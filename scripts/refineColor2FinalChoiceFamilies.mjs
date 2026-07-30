@@ -17,6 +17,15 @@ const finalFamilies = [
   ['basic-color-attribute', ['色相', '明度', '彩度', 'トーン']],
   ['photometric-quantity', ['光束', '光度', '照度', '輝度']],
   ['lighting-property', ['色温度', '演色性', '分光分布', '発光効率']],
+  [
+    'lamp-emission-class',
+    [
+      '白熱電球・ハロゲン電球',
+      '水銀・メタルハライド・高圧ナトリウム',
+      '低圧ナトリウム・蛍光ランプ',
+      '蛍光ランプ・LED',
+    ],
+  ],
 ]
 
 const familyByAnswer = new Map()
@@ -68,7 +77,7 @@ async function main() {
     return question.choices !== before.choices
   }).length
 
-  const output = `// 本編11章から生成した300問を、問題内容に近い4択へ再構成します。\n// 人物名・理論名・測光量などは同一概念群で比較します。\n// 参考書問題のみ。過去問・試験用紙のデータを追加しないでください。\n\nexport const color2TextbookQuestions = ${JSON.stringify(refined, null, 2)}\n`
+  const output = `// 本編11章から生成した300問を、問題内容に近い4択へ再構成します。\n// 人物名・理論名・測光量・ランプ分類などは同一概念群で比較します。\n// 参考書問題のみ。過去問・試験用紙のデータを追加しないでください。\n\nexport const color2TextbookQuestions = ${JSON.stringify(refined, null, 2)}\n`
 
   await fs.writeFile(outputPath, output, 'utf8')
   console.log(`色彩検定2級 専門概念ファミリーを適用: ${refinedCount}問`)
