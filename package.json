@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs",
+    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs",
     "build": "node scripts/validateColor2Questions.mjs && node scripts/validateColor2ChoiceQuality.mjs && node scripts/validateColor2PastExams.mjs && eslint . && vite build",
     "lint": "eslint .",
-    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/validateColor2Questions.mjs && node scripts/validateColor2ChoiceQuality.mjs && node scripts/validateColor2PastExams.mjs",
+    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs && node scripts/validateColor2Questions.mjs && node scripts/validateColor2ChoiceQuality.mjs && node scripts/validateColor2PastExams.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
