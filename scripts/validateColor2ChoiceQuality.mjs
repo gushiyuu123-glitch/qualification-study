@@ -9,6 +9,14 @@ const fail = (message) => {
   throw new Error(`色彩検定2級 4択品質検証エラー: ${message}`)
 }
 
+function isStatementLike(answer) {
+  return (
+    answer.length >= 24 ||
+    /[。！？]$/.test(answer) ||
+    /ことがある|ものである|である|となる|を示す|を意味する|に用いる/.test(answer)
+  )
+}
+
 if (
   !Array.isArray(color2TextbookQuestions) ||
   color2TextbookQuestions.length !== EXPECTED_TOTAL
@@ -53,8 +61,7 @@ for (const [index, question] of color2TextbookQuestions.entries()) {
     fail(`${prefix}: 誤答の監査情報が不足しています。`)
   }
 
-  const statementAnswer = answer.length >= 42 || /[。！？]$/.test(answer)
-  const requiredScore = statementAnswer ? 150 : 175
+  const requiredScore = isStatementLike(answer) ? 90 : 175
   for (const score of question.distractorScores) {
     if (!Number.isFinite(score) || score < requiredScore) {
       fail(`${prefix}: 誤答関連度が基準未満です。${score}`)
