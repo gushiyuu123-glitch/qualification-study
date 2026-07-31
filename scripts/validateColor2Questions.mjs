@@ -1,6 +1,7 @@
 import { color2TextbookQuestions } from '../src/data/color-2/questions/textbook/generatedTextbookQuestions.js'
 
 const EXPECTED_TOTAL = 300
+const EXPECTED_SUBCATEGORY_TOTAL = 142
 const expectedChapterCounts = {
   '色のユニバーサルデザイン': 22,
   '光と色': 40,
@@ -45,7 +46,7 @@ for (const [index, question] of color2TextbookQuestions.entries()) {
   studySetCounts[question.studySet] = (studySetCounts[question.studySet] ?? 0) + 1
 
   const prompt = normalize(question.prompt)
-  if (!prompt || prompts.has(prompt) || !prompt.startsWith('次の') || !prompt.includes('どれか') || prompt.length > 230 || question.examStyle !== true) fail(`${prefix}: 問題文が試験形式になっていません。`)
+  if (!prompt || prompts.has(prompt) || !prompt.startsWith('次の') || !prompt.endsWith('選べ。') || !prompt.includes('①〜④') || prompt.length > 250 || question.examStyle !== true) fail(`${prefix}: 問題文が試験形式になっていません。`)
   prompts.add(prompt)
   for (const fragment of awkwardPromptFragments) if (prompt.includes(fragment)) fail(`${prefix}: 旧式の問題文が残っています。`)
 
@@ -75,6 +76,7 @@ if (studySetCounts['core-200'] !== 200 || studySetCounts['expanded-100'] !== 100
 if ((chapterCounts['慣用色名'] ?? 0) > 15 || thinCount > 50 || visualCount < 7) fail('出題タイプの配分が基準外です。')
 if ((typeCounts.identification ?? 0) !== 0 || (typeCounts.definition ?? 0) < 160 || (typeCounts.caution ?? 0) > 80) fail(`問題タイプが基準外です。${JSON.stringify(typeCounts)}`)
 if (Math.max(...correctIndexCounts) - Math.min(...correctIndexCounts) > 1) fail(`正解位置が偏っています。${correctIndexCounts.join(', ')}`)
+if (Object.keys(subcategoryCounts).length !== EXPECTED_SUBCATEGORY_TOTAL) fail(`本編小項目は${EXPECTED_SUBCATEGORY_TOTAL}項目必要です。現在${Object.keys(subcategoryCounts).length}項目です。`)
 const overused = Object.entries(subcategoryCounts).filter(([, count]) => count > 7)
 if (overused.length) fail(`同じ小項目への集中があります。${overused.map(([id,count]) => `${id}:${count}`).join(', ')}`)
 

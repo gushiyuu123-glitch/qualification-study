@@ -7,6 +7,10 @@ export const quizModes = [
   { id: 'unanswered', label: '未回答だけ' },
 ]
 
+const TEXTBOOK_SOURCE_ID = 'color2-textbook-generated'
+const MOCK_EXAM_SETS = new Set(['A', 'B', 'C'])
+const RUNTIME_MOCK_SET_KEY = '__QUALIFY_COLOR2_MOCK_SET__'
+
 export function shuffle(items) {
   const copied = [...items]
 
@@ -19,6 +23,18 @@ export function shuffle(items) {
   }
 
   return copied
+}
+
+function runtimeMockExamSet() {
+  if (typeof globalThis === 'undefined') return 'random'
+  const value = globalThis[RUNTIME_MOCK_SET_KEY]
+  return MOCK_EXAM_SETS.has(value) ? value : 'random'
+}
+
+function resolveMockExamSet(config, sourceId) {
+  if (sourceId !== TEXTBOOK_SOURCE_ID) return 'random'
+  if (MOCK_EXAM_SETS.has(config.mockExamSet)) return config.mockExamSet
+  return runtimeMockExamSet()
 }
 
 function normalizeConfig(questions, config) {
@@ -34,21 +50,21 @@ function normalizeConfig(questions, config) {
   const categoryExists = qualificationQuestions.some(
     (question) => question.categoryId === config.categoryId,
   )
+  const sourceId =
+    config.sourceId === 'all' || sourceExists ? config.sourceId : 'all'
 
   return {
     ...config,
-    sourceId:
-      config.sourceId === 'all' || sourceExists ? config.sourceId : 'all',
+    sourceId,
     categoryId:
       config.categoryId === 'all' || categoryExists
         ? config.categoryId
         : 'all',
+    mockExamSet: resolveMockExamSet(config, sourceId),
   }
 }
 
-export function filterQuestions(questions, studyData, config) {
-  const safeConfig = normalizeConfig(questions, config)
-
+function filterWithNormalizedConfig(questions, studyData, safeConfig) {
   return questions.filter((question) => {
     if (
       safeConfig.qualificationId &&
@@ -65,6 +81,13 @@ export function filterQuestions(questions, studyData, config) {
       if (question.categoryId !== safeConfig.categoryId) return false
     }
 
+    if (
+      safeConfig.mockExamSet !== 'random' &&
+      question.mockExamSet !== safeConfig.mockExamSet
+    ) {
+      return false
+    }
+
     const record = getRecord(studyData, question.id)
 
     if (safeConfig.mode === 'mistakes' && record.wrong === 0) return false
@@ -75,14 +98,42 @@ export function filterQuestions(questions, studyData, config) {
   })
 }
 
-function shouldKeepOriginalSourceOrder(filtered, config) {
+export function filterQuestions(questions, studyData, config) {
+  const safeConfig = normalizeConfig(questions, config)
+  return filterWithNormalizedConfig(questions, studyData, safeConfig)
+}
+
+function shouldKeepPastExamOrder(filtered, config) {
   return (
     config.mode === 'all' &&
     config.count === 'all' &&
     config.sourceId !== 'all' &&
     filtered.length > 0 &&
-    filtered.every((question) =>
-      ['past-exam', 'exam-paper'].includes(question.sourceKind),
+    filtered.every((question) => question.sourceKind === 'past-exam')
+  )
+}
+
+function shouldKeepExamPaperOrder(filtered, config) {
+  return (
+    config.mode === 'all' &&
+    config.count === 'all' &&
+    config.sourceId !== 'all' &&
+    filtered.length > 0 &&
+    filtered.every((question) => question.sourceKind === 'exam-paper')
+  )
+}
+
+function shouldKeepTextbookMockOrder(filtered, config) {
+  return (
+    config.mode === 'all' &&
+    config.count === 'all' &&
+    config.sourceId === TEXTBOOK_SOURCE_ID &&
+    MOCK_EXAM_SETS.has(config.mockExamSet) &&
+    filtered.length > 0 &&
+    filtered.every(
+      (question) =>
+        question.sourceKind === 'textbook-generated' &&
+        question.mockExamSet === config.mockExamSet,
     )
   )
 }
@@ -102,15 +153,32 @@ function sortByOriginalQuestionNumber(items) {
   })
 }
 
+function sortByMockExamOrder(items) {
+  return [...items].sort(
+    (left, right) =>
+      Number(left.mockExamOrder ?? 0) - Number(right.mockExamOrder ?? 0),
+  )
+}
+
 export function createQuizSession(questions, studyData, config) {
-  const filtered = filterQuestions(questions, studyData, config)
+  const safeConfig = normalizeConfig(questions, config)
+  const filtered = filterWithNormalizedConfig(questions, studyData, safeConfig)
   const limit =
-    config.count === 'all'
+    safeConfig.count === 'all'
       ? filtered.length
-      : Math.min(Number(config.count), filtered.length)
-  const candidates = shouldKeepOriginalSourceOrder(filtered, config)
-    ? sortByOriginalQuestionNumber(filtered)
-    : shuffle(filtered)
+      : Math.min(Number(safeConfig.count), filtered.length)
+
+  let candidates
+  if (shouldKeepTextbookMockOrder(filtered, safeConfig)) {
+    candidates = sortByMockExamOrder(filtered)
+  } else if (
+    shouldKeepPastExamOrder(filtered, safeConfig) ||
+    shouldKeepExamPaperOrder(filtered, safeConfig)
+  ) {
+    candidates = sortByOriginalQuestionNumber(filtered)
+  } else {
+    candidates = shuffle(filtered)
+  }
 
   return candidates.slice(0, limit)
 }
