@@ -75,13 +75,15 @@ export function filterQuestions(questions, studyData, config) {
   })
 }
 
-function shouldKeepPastExamOrder(filtered, config) {
+function shouldKeepOriginalSourceOrder(filtered, config) {
   return (
     config.mode === 'all' &&
     config.count === 'all' &&
     config.sourceId !== 'all' &&
     filtered.length > 0 &&
-    filtered.every((question) => question.sourceKind === 'past-exam')
+    filtered.every((question) =>
+      ['past-exam', 'exam-paper'].includes(question.sourceKind),
+    )
   )
 }
 
@@ -106,7 +108,7 @@ export function createQuizSession(questions, studyData, config) {
     config.count === 'all'
       ? filtered.length
       : Math.min(Number(config.count), filtered.length)
-  const candidates = shouldKeepPastExamOrder(filtered, config)
+  const candidates = shouldKeepOriginalSourceOrder(filtered, config)
     ? sortByOriginalQuestionNumber(filtered)
     : shuffle(filtered)
 

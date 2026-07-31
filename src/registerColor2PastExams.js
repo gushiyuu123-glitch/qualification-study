@@ -4,20 +4,34 @@ import {
   color2QuestionSourceQuestions,
   color2QuestionSourceResources,
 } from './data/color-2/questions/past-exams'
+import {
+  color2ExamPaperQuestions,
+  color2ExamPaperSources,
+} from './data/color-2/questions/exam-papers'
+
+const color2QuestionSources = [
+  ...color2QuestionSourceResources,
+  ...color2ExamPaperSources,
+]
+
+const color2QuestionsForRegistration = [
+  ...color2QuestionSourceQuestions,
+  ...color2ExamPaperQuestions,
+]
 
 const colorQualification = qualifications.find(
   (qualification) => qualification.id === 'color-2',
 )
 
 if (colorQualification) {
-  color2QuestionSourceResources.forEach((source) => {
+  color2QuestionSources.forEach((source) => {
     if (!colorQualification.resources.some((resource) => resource.id === source.id)) {
       colorQualification.resources.push(source)
     }
   })
 
   const registeredIds = new Set(questions.map((question) => question.id))
-  color2QuestionSourceQuestions.forEach((question) => {
+  color2QuestionsForRegistration.forEach((question) => {
     if (!registeredIds.has(question.id)) {
       questions.push(question)
       registeredIds.add(question.id)
@@ -54,7 +68,7 @@ function showNotice(message) {
 }
 
 function openQuestionSource(source) {
-  const sourceQuestions = color2QuestionSourceQuestions.filter(
+  const sourceQuestions = color2QuestionsForRegistration.filter(
     (question) => question.sourceId === source.id,
   )
 
@@ -105,7 +119,7 @@ function interceptQuestionSourceResource(event) {
   if (!row) return
 
   const label = row.querySelector('.resource-copy strong')?.textContent?.trim()
-  const source = color2QuestionSourceResources.find((item) => item.label === label)
+  const source = color2QuestionSources.find((item) => item.label === label)
   if (!source) return
 
   event.preventDefault()
@@ -124,7 +138,9 @@ function clarifyColor2ResourceHeading() {
   const resourceHeading = [...screen.querySelectorAll('.section-heading h2')].find(
     (heading) => heading.textContent?.trim() === '教材',
   )
-  if (resourceHeading) resourceHeading.textContent = '教材・過去問・練習問題を解く'
+  if (resourceHeading) {
+    resourceHeading.textContent = '教材・過去問・試験用紙・練習問題を解く'
+  }
 }
 
 document.addEventListener('click', interceptQuestionSourceResource, true)
