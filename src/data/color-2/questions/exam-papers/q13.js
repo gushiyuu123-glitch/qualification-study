@@ -31,8 +31,8 @@ export const q13 = {
       part: 'D',
       prompt: 'リビング以外のパブリック空間として一般的なものはどれか。',
       choices: ['ベッドルーム', '和室', '子ども部屋', 'キッチン'],
-      correctIndex: 3,
-      explanation: '家族が共用するキッチンやダイニングはパブリック空間に分類される。'
+      correctIndex: 1,
+      explanation: '来客対応にも使われる和室は、リビングと同様にパブリック空間として扱われる。'
     },
     {
       part: 'E',
