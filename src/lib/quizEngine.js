@@ -25,6 +25,38 @@ export function shuffle(items) {
   return copied
 }
 
+function mistakeWeight(record) {
+  const reasonCount = Object.values(record.reasons ?? {}).reduce(
+    (sum, count) => sum + Number(count ?? 0),
+    0,
+  )
+  const unresolved = Math.max(0, record.wrong - record.correct)
+
+  return Math.max(
+    1,
+    1 +
+      record.wrong * 4 +
+      unresolved * 2 +
+      (record.flagged ? 3 : 0) +
+      Math.min(3, reasonCount),
+  )
+}
+
+function weightedMistakeOrder(items, studyData) {
+  return items
+    .map((question) => {
+      const record = getRecord(studyData, question.id)
+      const weight = mistakeWeight(record)
+      const random = Math.max(Number.EPSILON, Math.random())
+      return {
+        question,
+        key: Math.log(random) / weight,
+      }
+    })
+    .sort((left, right) => right.key - left.key)
+    .map((entry) => entry.question)
+}
+
 function runtimeMockExamSet() {
   if (typeof globalThis === 'undefined') return 'random'
   const value = globalThis[RUNTIME_MOCK_SET_KEY]
@@ -169,7 +201,9 @@ export function createQuizSession(questions, studyData, config) {
       : Math.min(Number(safeConfig.count), filtered.length)
 
   let candidates
-  if (shouldKeepTextbookMockOrder(filtered, safeConfig)) {
+  if (safeConfig.mode === 'mistakes') {
+    candidates = weightedMistakeOrder(filtered, studyData)
+  } else if (shouldKeepTextbookMockOrder(filtered, safeConfig)) {
     candidates = sortByMockExamOrder(filtered)
   } else if (
     shouldKeepPastExamOrder(filtered, safeConfig) ||
