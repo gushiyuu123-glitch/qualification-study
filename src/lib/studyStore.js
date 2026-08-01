@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'qualify-study-v1'
+const DAY_MS = 24 * 60 * 60 * 1000
 
 export const mistakeReasons = [
   { id: 'knowledge', label: '知識不足' },
@@ -67,6 +68,31 @@ function emptyRecord() {
 
 export function getRecord(data, questionId) {
   return data.records[questionId] ?? emptyRecord()
+}
+
+export function getReviewIntervalDays(record) {
+  if (!record || record.attempts <= 0 || !record.lastAnsweredAt) return null
+  if (record.flagged) return 0
+  if (record.lastResult === 'wrong') return 1
+  if (record.streak >= 3) return 14
+  if (record.streak === 2) return 7
+  return 3
+}
+
+export function getReviewDueAt(record) {
+  const intervalDays = getReviewIntervalDays(record)
+  if (intervalDays === null) return null
+
+  const answeredAt = new Date(record.lastAnsweredAt)
+  if (Number.isNaN(answeredAt.getTime())) return null
+
+  return new Date(answeredAt.getTime() + intervalDays * DAY_MS)
+}
+
+export function isReviewDue(record, now = new Date()) {
+  const dueAt = getReviewDueAt(record)
+  if (!dueAt) return false
+  return dueAt.getTime() <= now.getTime()
 }
 
 export function recordAnswer(data, questionId, selectedIndex, isCorrect) {
