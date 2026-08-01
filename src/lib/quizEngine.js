@@ -1,4 +1,4 @@
-import { getRecord } from './studyStore'
+import { getRecord, isReviewDue } from './studyStore'
 
 export const quizModes = [
   { id: 'all', label: '全問題' },
@@ -10,6 +10,7 @@ export const quizModes = [
 const TEXTBOOK_SOURCE_ID = 'color2-textbook-generated'
 const MOCK_EXAM_SETS = new Set(['A', 'B', 'C'])
 const RUNTIME_MOCK_SET_KEY = '__QUALIFY_COLOR2_MOCK_SET__'
+const RUNTIME_REVIEW_KEY = '__QUALIFY_COLOR2_REVIEW_ONLY__'
 
 export function shuffle(items) {
   const copied = [...items]
@@ -63,13 +64,20 @@ function runtimeMockExamSet() {
   return MOCK_EXAM_SETS.has(value) ? value : 'random'
 }
 
+function consumeRuntimeReviewOnly() {
+  if (typeof globalThis === 'undefined') return false
+  const active = globalThis[RUNTIME_REVIEW_KEY] === true
+  globalThis[RUNTIME_REVIEW_KEY] = false
+  return active
+}
+
 function resolveMockExamSet(config, sourceId) {
   if (sourceId !== TEXTBOOK_SOURCE_ID) return 'random'
   if (MOCK_EXAM_SETS.has(config.mockExamSet)) return config.mockExamSet
   return runtimeMockExamSet()
 }
 
-function normalizeConfig(questions, config) {
+function normalizeConfig(questions, config, { consumeRuntime = false } = {}) {
   const qualificationQuestions = config.qualificationId
     ? questions.filter(
         (question) => question.qualificationId === config.qualificationId,
@@ -93,6 +101,9 @@ function normalizeConfig(questions, config) {
         ? config.categoryId
         : 'all',
     mockExamSet: resolveMockExamSet(config, sourceId),
+    reviewOnly:
+      config.reviewOnly === true ||
+      (consumeRuntime ? consumeRuntimeReviewOnly() : false),
   }
 }
 
@@ -122,6 +133,7 @@ function filterWithNormalizedConfig(questions, studyData, safeConfig) {
 
     const record = getRecord(studyData, question.id)
 
+    if (safeConfig.reviewOnly && !isReviewDue(record)) return false
     if (safeConfig.mode === 'mistakes' && record.wrong === 0) return false
     if (safeConfig.mode === 'flagged' && !record.flagged) return false
     if (safeConfig.mode === 'unanswered' && record.attempts > 0) return false
@@ -193,7 +205,9 @@ function sortByMockExamOrder(items) {
 }
 
 export function createQuizSession(questions, studyData, config) {
-  const safeConfig = normalizeConfig(questions, config)
+  const safeConfig = normalizeConfig(questions, config, {
+    consumeRuntime: true,
+  })
   const filtered = filterWithNormalizedConfig(questions, studyData, safeConfig)
   const limit =
     safeConfig.count === 'all'
@@ -201,7 +215,7 @@ export function createQuizSession(questions, studyData, config) {
       : Math.min(Number(safeConfig.count), filtered.length)
 
   let candidates
-  if (safeConfig.mode === 'mistakes') {
+  if (safeConfig.reviewOnly || safeConfig.mode === 'mistakes') {
     candidates = weightedMistakeOrder(filtered, studyData)
   } else if (shouldKeepTextbookMockOrder(filtered, safeConfig)) {
     candidates = sortByMockExamOrder(filtered)
