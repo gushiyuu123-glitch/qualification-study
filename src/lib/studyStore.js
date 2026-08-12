@@ -5,6 +5,8 @@ export const mistakeReasons = [
   { id: 'knowledge', label: '知識不足' },
   { id: 'confusion', label: '用語混同' },
   { id: 'misread', label: '読み違い' },
+  { id: 'detail-skip', label: '細部見落とし' },
+  { id: 'early-stop', label: '早合点' },
   { id: 'overthink', label: '深読み' },
   { id: 'careless', label: 'ケアレス' },
 ]

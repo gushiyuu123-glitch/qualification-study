@@ -1,27 +1,43 @@
 import { qualifications } from './data/qualifications'
 import { questions } from './data/questions'
+import { getRecord, loadStudyData } from './lib/studyStore'
 import './color2PersonalWeakness.css'
 
 const COLOR2_ID = 'color-2'
 const SOURCE_ID = 'color2-personal-weakness'
 const SOURCE_LABEL = '俺の弱点問題'
+const ANSWER_CHECK =
+  '正しい要素を1つ見つけても止めない。主語・条件・文末まで読み、4択すべてを最後に1回確認する。'
 
 const weaknessProfile = [
+  {
+    rank: '本番補正',
+    title: '早決め・細部見落とし',
+    subtitle: '知っている単語を見つけた瞬間が一番危ない',
+    categoryIds: [],
+    keys: ['主語 → 条件 → 文末', '4択を最後まで読む', '正しい要素1個で止めない'],
+    traps: [
+      '数字や専門用語が1つ正しくても、文章全体が正しいとは限らない。',
+      '2026夏は「大枠は正しい＋1語だけズレる」選択肢を重点警戒する。',
+    ],
+  },
   {
     rank: '最優先',
     title: '光・照明・分光',
     subtitle: '光源 / 物体 / 眼を混ぜない',
+    categoryIds: ['light-properties-color', 'lighting', 'visual-system-color'],
     keys: ['分光分布＝光源が出す', '分光反射率＝物体が返す', '照度＝面に届く光 / lx'],
     traps: [
       '見える色は「光源が出す波長」と「物体が返せる波長」の共通部分で決まる。',
       '白色LEDは青の鋭いピーク＋蛍光体の広い山。白熱電球は連続スペクトル。',
-      'グラフの形だけでなく、縦軸が光の強さか反射率かを確認する。',
+      'グラフでは形だけでなく、縦軸が光の強さか反射率かを確認する。',
     ],
   },
   {
     rank: '最優先',
     title: 'マンセル表色系',
     subtitle: '仕組みは分かる。数字と用語で落とさない',
+    categoryIds: ['munsell-color-system'],
     keys: ['マンセル＝物体色', 'Value＝明度 / Chroma＝彩度', '無彩色＝N＋明度'],
     traps: [
       '理想的な黒は明度0、理想的な白は明度10。',
@@ -33,38 +49,64 @@ const weaknessProfile = [
     rank: '最優先',
     title: '配色技法',
     subtitle: '見た目ではなく「何の条件を聞いているか」',
-    keys: ['トライアド＝色相環3等分', 'トーンオントーン＝同系色相＋明度差', 'トーンイントーン＝同一・類似トーン'],
+    categoryIds: ['color-harmony'],
+    keys: ['トライアド＝色相環3等分', 'オン＝同系色相＋明度差', 'イン＝同一・類似トーン'],
     traps: [
-      '配色名は条件セット。別の条件を同時に満たすこともある。',
+      '配色名は条件セット。色相の条件とトーンの条件は同じ配色内で同時に成立しうる。',
       'トーナルは中明度・中低彩度で、代表トーンはd・sf・ltg・g。',
       'ナチュラルは黄側を明るく青紫側を暗く、コンプレックスは逆。',
     ],
   },
   {
     rank: '要注意',
+    title: '用語境界',
+    subtitle: '似た日本語を雰囲気でまとめない',
+    categoryIds: ['color-universal-design', 'color-psychology'],
+    keys: ['誘目性＝注意してなくても目を引く', '視認性＝探して見つけやすい', '彩度＝鮮やかさ'],
+    traps: [
+      '誘目性・視認性・可読性・識別性は似ているが、何をしやすくするかが違う。',
+      '明度は明るさ、彩度は鮮やかさ。高明度・低彩度は明るく落ち着いた方向。',
+    ],
+  },
+  {
+    rank: '要注意',
     title: 'ビジュアル・色空間',
     subtitle: '数字が合っていても主語を最後まで読む',
+    categoryIds: ['visual-design'],
     keys: ['RGB＝光', 'CMYK＝印刷・色料', 'HSB＝色相・彩度・明るさ'],
     traps: [
       '256×256×256の数字だけ見て正解にしない。媒体が光か色料かまで確認する。',
-      '正しい要素を1つ見つけた瞬間に判定を止めず、文章全体を読む。',
+      'RGBは加法、CMYは減法。「混ぜるほど白 / 黒」をセットで固定する。',
+    ],
+  },
+  {
+    rank: '要注意',
+    title: 'ファッション・配色イメージ',
+    subtitle: '雰囲気ではなく代表条件を1本持つ',
+    categoryIds: ['fashion', 'color-image'],
+    keys: ['ロマンチック＝p・lt＋淡い暖色', 'カジュアル＝ベーシックカラーが中心', 'エレガント＝気品・低い明度差'],
+    traps: [
+      '似たイメージ語は「かわいい / 気品 / 都会的」など中心語を先に固定する。',
+      '素材や写真の雰囲気だけで決めず、色相・トーン・配色関係を見る。',
     ],
   },
   {
     rank: '要注意',
     title: 'インテリア',
     subtitle: '常識より教科書の役割分担',
+    categoryIds: ['interior'],
     keys: ['ベース＝大面積', 'アソート＝補助', 'アクセント＝小面積で目立つ'],
     traps: [
-      'キッチンはサービス空間。リビングなどのパブリック空間と混同しない。',
-      '壁・天井は高明度・低彩度を基本に「明るく、派手すぎない」。',
-      '家具やカーテンは面積と使い方によってアソートにもアクセントにもなりうる。',
+      'キッチンはサービス空間。リビング・ダイニング・和室はパブリック空間。',
+      'リビングの壁・天井は高明度・低彩度を基本に「明るく、派手すぎない」。',
+      '家具やカーテンは名称だけで役割を固定せず、面積と使い方を見る。',
     ],
   },
   {
     rank: '暗記枠',
     title: '慣用色名',
     subtitle: '構造理解で逃げず、少量ずつタグ付け',
+    categoryIds: ['conventional-color-names'],
     keys: ['色名', '大まかな色の方向', '由来'],
     traps: [
       '海松色＝海藻ミルの暗い灰みの黄緑。',
@@ -83,9 +125,40 @@ const sourceBase = {
   type: 'choice',
 }
 
-const weaknessQuestions = [
-  {
+function q({
+  categoryId,
+  categoryLabel,
+  id,
+  number,
+  prompt,
+  choices,
+  correctIndex,
+  explanation,
+  caution,
+  wrongHint = '設問が指定した条件とは一致しない。',
+}) {
+  return {
     ...sourceBase,
+    categoryId,
+    categoryLabel,
+    id,
+    number,
+    prompt,
+    choices,
+    correctIndex,
+    explanation,
+    caution,
+    answerCheck: ANSWER_CHECK,
+    choiceExplanations: choices.map((choice, index) =>
+      index === correctIndex
+        ? `「${choice}」が正解。${explanation}`
+        : `「${choice}」は${wrongHint}`,
+    ),
+  }
+}
+
+const weaknessQuestions = [
+  q({
     categoryId: 'light-properties-color',
     categoryLabel: '光の性質と色',
     id: 'color2-weak-001',
@@ -93,213 +166,328 @@ const weaknessQuestions = [
     prompt: '波長ごとに、照明光がどの程度の強さをもっているかを表すものはどれか。',
     choices: ['分光反射率', '分光分布', '照度', 'マンセル明度'],
     correctIndex: 1,
-    explanation: '分光分布は光源が各波長の光をどれだけ出しているかを表す。分光反射率は物体が各波長をどれだけ返すかを表す。',
+    explanation: '分光分布は光源が各波長の光をどれだけ出しているかを表す。',
     caution: '出す＝分布、返す＝反射率。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'light-properties-color',
     categoryLabel: '光の性質と色',
     id: 'color2-weak-002',
     number: '弱点 02',
-    prompt: '赤い物体を、赤の成分をほとんど含まない青系の光で照らしたときの見え方として最も適切なものはどれか。',
-    choices: ['鮮やかな赤', '黄色', '黒っぽく暗い色', '白'],
-    correctIndex: 2,
-    explanation: '物体が返せる赤の波長が照明光側にほとんどないため、反射する光が少なくなり黒っぽく暗く見える。',
-    caution: '見える色＝光源と物体の共通部分。',
-  },
-  {
-    ...sourceBase,
+    prompt: '物体が各波長の光をどの程度反射できるかを割合で表すものはどれか。',
+    choices: ['分光反射率', '分光分布', '色温度', '照度'],
+    correctIndex: 0,
+    explanation: '分光反射率は物体が各波長をどれだけ返せるかを表す。',
+    caution: '物体が返す＝分光反射率。',
+  }),
+  q({
     categoryId: 'light-properties-color',
     categoryLabel: '光の性質と色',
     id: 'color2-weak-003',
     number: '弱点 03',
+    prompt: '赤い物体を、赤の成分をほとんど含まない青系の光で照らしたときの見え方として最も適切なものはどれか。',
+    choices: ['鮮やかな赤', '黄色', '黒っぽく暗い色', '白'],
+    correctIndex: 2,
+    explanation: '照明側に赤の波長がほとんどないため、赤い物体が返せる光が少なくなり暗く見える。',
+    caution: '見える色＝光源と物体の共通部分。',
+  }),
+  q({
+    categoryId: 'lighting',
+    categoryLabel: '照明',
+    id: 'color2-weak-004',
+    number: '弱点 04',
     prompt: '照度の説明として正しいものはどれか。',
     choices: ['光源そのものの色を表す', '面に届く光の量を表し、単位はlxである', '物体が返す波長の割合を表す', '色の鮮やかさを表す'],
     correctIndex: 1,
-    explanation: '照度は照らされた面にどれだけ光が届いているかを表し、単位はlx（ルクス）を用いる。',
+    explanation: '照度は照らされた面にどれだけ光が届いているかを表し、単位はlxを用いる。',
     caution: '照度＝面に届く光。',
-  },
-  {
-    ...sourceBase,
-    categoryId: 'light-properties-color',
-    categoryLabel: '光の性質と色',
-    id: 'color2-weak-004',
-    number: '弱点 04',
+  }),
+  q({
+    categoryId: 'lighting',
+    categoryLabel: '照明',
+    id: 'color2-weak-005',
+    number: '弱点 05',
     prompt: '一般的な白色LEDの分光分布の特徴として最も適切なものはどれか。',
     choices: ['全波長が完全に同じ強さ', '青付近の鋭いピークと、より長波長側の広い山', '長波長側へなだらかに上がる連続分布だけ', '黄色の一本の線だけ'],
     correctIndex: 1,
-    explanation: '白色LEDでは青色LEDの鋭いピークと、蛍光体がつくる広い波長域の山が組み合わさる形が代表的である。',
+    explanation: '白色LEDでは青色LEDの鋭いピークと、蛍光体がつくる広い波長域の山が組み合わさる。',
     caution: 'LED＝青い針＋広い山。',
-  },
-  {
-    ...sourceBase,
-    categoryId: 'munsell-color-system',
-    categoryLabel: '色の表示（マンセル表色系）',
-    id: 'color2-weak-005',
-    number: '弱点 05',
-    prompt: 'マンセル表色系が主に扱う対象として最も適切なものはどれか。',
-    choices: ['物体の色', '音の高さ', '画面のRGB値だけ', '照度だけ'],
-    correctIndex: 0,
-    explanation: 'マンセル表色系は物体色を色相・明度・彩度の三属性で体系的に表す表色系である。',
-    caution: 'マンセル＝物体色。',
-  },
-  {
-    ...sourceBase,
-    categoryId: 'munsell-color-system',
-    categoryLabel: '色の表示（マンセル表色系）',
+  }),
+  q({
+    categoryId: 'lighting',
+    categoryLabel: '照明',
     id: 'color2-weak-006',
     number: '弱点 06',
-    prompt: 'マンセル表色系の明度について正しいものはどれか。',
-    choices: ['理想的な黒が10、白が0', '理想的な黒が0、白が10', 'すべての色で最高彩度は10', '無彩色には明度がない'],
-    correctIndex: 1,
-    explanation: 'マンセル明度は理想的な黒を0、理想的な白を10とする。無彩色にも明度がある。',
-    caution: '黒0、白10。',
-  },
-  {
-    ...sourceBase,
+    prompt: '白熱電球の分光分布の特徴として最も適切なものはどれか。',
+    choices: ['連続した分光分布を示す', '青の一本の線だけを示す', '可視域に光をほとんど含まない', 'RGBの3本だけを示す'],
+    correctIndex: 0,
+    explanation: '白熱電球は可視域にわたる連続した分光分布を示す。',
+    caution: '白熱＝連続。',
+  }),
+  q({
     categoryId: 'munsell-color-system',
     categoryLabel: '色の表示（マンセル表色系）',
     id: 'color2-weak-007',
     number: '弱点 07',
-    prompt: 'マンセル表記「N5」が表すものはどれか。',
-    choices: ['彩度5の赤', '明度5の無彩色', '色相Nの有彩色', '明度10の白'],
-    correctIndex: 1,
-    explanation: '無彩色はNeutralのNと明度の数値で表す。N5は明度5の無彩色である。',
-    caution: 'Nの後ろの数字＝明度。',
-  },
-  {
-    ...sourceBase,
+    prompt: 'マンセル表色系が主に扱う対象として最も適切なものはどれか。',
+    choices: ['物体の色', '音の高さ', '画面のRGB値だけ', '照度だけ'],
+    correctIndex: 0,
+    explanation: 'マンセル表色系は物体色を色相・明度・彩度の三属性で体系的に表す。',
+    caution: 'マンセル＝物体色。',
+  }),
+  q({
     categoryId: 'munsell-color-system',
     categoryLabel: '色の表示（マンセル表色系）',
     id: 'color2-weak-008',
     number: '弱点 08',
+    prompt: 'マンセル表色系の明度について正しいものはどれか。',
+    choices: ['理想的な黒が10、白が0', '理想的な黒が0、白が10', 'すべての色で最高彩度は10', '無彩色には明度がない'],
+    correctIndex: 1,
+    explanation: 'マンセル明度は理想的な黒を0、理想的な白を10とする。',
+    caution: '黒0、白10。',
+  }),
+  q({
+    categoryId: 'munsell-color-system',
+    categoryLabel: '色の表示（マンセル表色系）',
+    id: 'color2-weak-009',
+    number: '弱点 09',
+    prompt: 'マンセル表記「N5」が表すものはどれか。',
+    choices: ['彩度5の赤', '明度5の無彩色', '色相Nの有彩色', '明度10の白'],
+    correctIndex: 1,
+    explanation: '無彩色はNeutralのNと明度の数値で表すため、N5は明度5の無彩色である。',
+    caution: 'Nの後ろの数字＝明度。',
+  }),
+  q({
+    categoryId: 'munsell-color-system',
+    categoryLabel: '色の表示（マンセル表色系）',
+    id: 'color2-weak-010',
+    number: '弱点 10',
+    prompt: '10色相の並びで5YRの反対側に位置する色相はどれか。',
+    choices: ['5Y', '5G', '5B', '5P'],
+    correctIndex: 2,
+    explanation: 'R→YR→Y→GY→G→BG→B→PB→P→RPの10色相では、反対側は5つ進むためYRの反対はBになる。',
+    caution: '対向色相＝5個進む。',
+  }),
+  q({
+    categoryId: 'munsell-color-system',
+    categoryLabel: '色の表示（マンセル表色系）',
+    id: 'color2-weak-011',
+    number: '弱点 11',
     prompt: '「等明度」の意味として最も適切なものはどれか。',
     choices: ['色相が同じ', '彩度が同じ', '白黒にしたときの明るさが同じ', '補色関係にある'],
     correctIndex: 2,
-    explanation: '等明度は明度が等しいことをいう。色相や彩度が違っていても、無彩色化したときの明るさが同程度になる。',
+    explanation: '等明度は明度が等しいことで、色相や彩度が違っていても明るさが同程度になる。',
     caution: '等明度＝同じ明るさ。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'color-harmony',
     categoryLabel: '色彩調和',
-    id: 'color2-weak-009',
-    number: '弱点 09',
+    id: 'color2-weak-012',
+    number: '弱点 12',
     prompt: 'トライアドの判断で最初に見るべきものはどれか。',
     choices: ['3色の色相環上の位置', 'すべての色の明度', '素材の質感', '無彩色が含まれるかだけ'],
     correctIndex: 0,
-    explanation: 'トライアドは色相環を3等分した位置関係を使う3色配色であり、まず色相の位置関係を見る。',
-    caution: 'トライアド＝色相環3等分。トーンの見た目で除外しない。',
-  },
-  {
-    ...sourceBase,
+    explanation: 'トライアドは色相環を3等分した位置関係を使う3色配色なので、まず色相の位置を見る。',
+    caution: 'トライアド＝色相環3等分。',
+  }),
+  q({
     categoryId: 'color-harmony',
     categoryLabel: '色彩調和',
-    id: 'color2-weak-010',
-    number: '弱点 10',
+    id: 'color2-weak-013',
+    number: '弱点 13',
     prompt: 'トーン・オン・トーン配色の核となる条件はどれか。',
     choices: ['同一・類似色相で明度差を明確にする', '同一トーンだけを使い色相を自由にする', '補色だけを2色使う', '無彩色だけを使う'],
     correctIndex: 0,
     explanation: 'トーン・オン・トーンは同系色相を保ちながら明度差を大きくした濃淡配色である。',
     caution: 'オン＝同系色相＋濃淡。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'color-harmony',
     categoryLabel: '色彩調和',
-    id: 'color2-weak-011',
-    number: '弱点 11',
+    id: 'color2-weak-014',
+    number: '弱点 14',
     prompt: 'トーン・イン・トーン配色の説明として正しいものはどれか。',
     choices: ['同一・類似トーンでまとめ、色相は自由に選べる', '同一色相で明度差を最大にする', '必ず補色を使う', '高彩度色だけでまとめる'],
     correctIndex: 0,
     explanation: 'トーン・イン・トーンは同じ色調または近似トーンで全体をまとめ、色相はイメージに応じて選ぶ。',
     caution: 'イン＝トーンをそろえる。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'color-harmony',
     categoryLabel: '色彩調和',
-    id: 'color2-weak-012',
-    number: '弱点 12',
+    id: 'color2-weak-015',
+    number: '弱点 15',
+    prompt: 'トーナル配色の代表的なトーン領域として最も適切なものはどれか。',
+    choices: ['v・bだけ', 'd・sf・ltg・g', 'dk・dkgだけ', 'p・ltだけ'],
+    correctIndex: 1,
+    explanation: 'トーナル配色は中明度・中低彩度の中間色が中心で、d・sf・ltg・gが代表的な範囲である。',
+    caution: 'トーナル＝中明度・中低彩度。dが代表。',
+  }),
+  q({
+    categoryId: 'color-harmony',
+    categoryLabel: '色彩調和',
+    id: 'color2-weak-016',
+    number: '弱点 16',
     prompt: 'ナチュラルハーモニーとコンプレックスハーモニーの違いとして正しいものはどれか。',
     choices: ['色数だけが違う', '黄側と青紫側の明度関係が逆になる', '片方だけが有彩色を使う', '片方だけが3色配色である'],
     correctIndex: 1,
-    explanation: 'ナチュラルは黄側を明るく青紫側を暗くする。コンプレックスは黄側を暗く青紫側を明るくする。',
+    explanation: 'ナチュラルは黄側を明るく青紫側を暗くし、コンプレックスはその明度関係を逆にする。',
     caution: '違いは明度の向き。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
+    categoryId: 'color-universal-design',
+    categoryLabel: '色のユニバーサルデザイン',
+    id: 'color2-weak-017',
+    number: '弱点 17',
+    prompt: '注意を向けていない対象が自然に目を引く度合いを表す用語はどれか。',
+    choices: ['視認性', '誘目性', '可読性', '識別性'],
+    correctIndex: 1,
+    explanation: '誘目性は、注意を向けていない対象の発見されやすさ・目を引きやすさを表す。',
+    caution: '誘目＝向こうから目に入る。視認＝探して見つける。',
+  }),
+  q({
+    categoryId: 'color-psychology',
+    categoryLabel: '色彩心理',
+    id: 'color2-weak-018',
+    number: '弱点 18',
+    prompt: '「彩度」を最もシンプルに言い換えるとどれか。',
+    choices: ['明るさ', '鮮やかさ', '色相環上の位置', '光の量'],
+    correctIndex: 1,
+    explanation: '彩度は色の鮮やかさの度合いを表す。',
+    caution: '明度＝明るさ、彩度＝鮮やかさ。',
+  }),
+  q({
     categoryId: 'visual-design',
     categoryLabel: 'ビジュアル',
-    id: 'color2-weak-013',
-    number: '弱点 13',
+    id: 'color2-weak-019',
+    number: '弱点 19',
     prompt: 'RGBとCMYKの対応として正しいものはどれか。',
     choices: ['RGB＝印刷、CMYK＝光', 'RGB＝光、CMYK＝印刷・色料', 'どちらも物体色だけ', 'どちらも照度を表す'],
     correctIndex: 1,
     explanation: 'RGBはディスプレイなどの光の加法混色、CMYKは印刷で用いる色料の減法混色として整理する。',
     caution: '数字が合っていても、主語が光か色料かを最後まで確認する。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'visual-design',
     categoryLabel: 'ビジュアル',
-    id: 'color2-weak-014',
-    number: '弱点 14',
+    id: 'color2-weak-020',
+    number: '弱点 20',
     prompt: 'HSBの3要素として正しいものはどれか。',
     choices: ['色相・彩度・明るさ', '赤・緑・青', 'シアン・マゼンタ・イエロー', '色相・照度・反射率'],
     correctIndex: 0,
     explanation: 'HSBはHue（色相）、Saturation（彩度）、Brightness（明るさ）で色を扱う。',
     caution: 'HSB＝色相・彩度・明るさ。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
+    categoryId: 'visual-design',
+    categoryLabel: 'ビジュアル',
+    id: 'color2-weak-021',
+    number: '弱点 21',
+    prompt: '加法混色と減法混色の説明として正しいものはどれか。',
+    choices: ['RGBは混ぜるほど白に近づき、CMYは混ぜるほど黒に近づく', 'RGBもCMYも混ぜるほど白に近づく', 'RGBは印刷専用である', 'CMYは光の三原色である'],
+    correctIndex: 0,
+    explanation: 'RGBの加法混色は光を足すほど白へ、CMYの減法混色は色料を重ねるほど暗く黒へ近づく。',
+    caution: 'RGB＝光＝加法＝白へ。CMY＝色料＝減法＝黒へ。',
+  }),
+  q({
+    categoryId: 'color-image',
+    categoryLabel: '配色イメージ',
+    id: 'color2-weak-022',
+    number: '弱点 22',
+    prompt: 'ロマンチックな配色イメージの代表的なトーンとして最も適切なものはどれか。',
+    choices: ['p・ltトーン', 'dkgトーンだけ', 'vトーンだけ', '黒と高彩度色だけ'],
+    correctIndex: 0,
+    explanation: 'ロマンチックは淡い暖色や白を中心に、p・ltトーンで柔らかな可愛らしさをつくる。',
+    caution: 'ロマンチック＝淡い暖色＋p・lt。',
+  }),
+  q({
+    categoryId: 'fashion',
+    categoryLabel: 'ファッション',
+    id: 'color2-weak-023',
+    number: '弱点 23',
+    prompt: 'ファッションのカジュアルスタイルで中心となる色として、公式テキストの整理に合うものはどれか。',
+    choices: ['ベーシックカラー', '金属色だけ', '蛍光色だけ', '補色2色だけ'],
+    correctIndex: 0,
+    explanation: 'カジュアルは日常的なスタイルとして、白・グレイ・黒・紺・ベージュなどのベーシックカラーが中心になる。',
+    caution: 'カジュアル＝ベーシックカラー中心。',
+  }),
+  q({
     categoryId: 'interior',
     categoryLabel: 'インテリア',
-    id: 'color2-weak-015',
-    number: '弱点 15',
+    id: 'color2-weak-024',
+    number: '弱点 24',
     prompt: '住空間のゾーニングで、キッチンが分類される空間はどれか。',
     choices: ['パブリック空間', 'プライベート空間', 'サービス空間', 'アクセント空間'],
     correctIndex: 2,
     explanation: 'キッチンは家事や生活機能を支えるサービス空間に分類する。',
     caution: 'キッチン＝サービス。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'interior',
     categoryLabel: 'インテリア',
-    id: 'color2-weak-016',
-    number: '弱点 16',
+    id: 'color2-weak-025',
+    number: '弱点 25',
+    prompt: 'リビングルームの壁・天井の基本的な色の方向として最も適切なものはどれか。',
+    choices: ['高明度・低彩度', '低明度・高彩度', '高明度・高彩度だけ', '低明度・低彩度だけ'],
+    correctIndex: 0,
+    explanation: 'リビングの壁・天井は暖色系のオフホワイトなど、高明度・低彩度を基本に明るく落ち着かせる。',
+    caution: '壁・天井＝明るく・派手すぎない。',
+  }),
+  q({
+    categoryId: 'interior',
+    categoryLabel: 'インテリア',
+    id: 'color2-weak-026',
+    number: '弱点 26',
     prompt: 'ベースカラー、アソートカラー、アクセントカラーの役割として正しいものはどれか。',
     choices: ['ベースは小面積で最も目立たせる', 'アソートはベースを補い中程度の面積で使う', 'アクセントは床・壁・天井など最大面積に使う', '3つは面積や役割に違いがない'],
     correctIndex: 1,
-    explanation: 'ベースは背景となる大面積、アソートはベースを補う中程度の面積、アクセントは小面積で目立たせる役割をもつ。',
+    explanation: 'ベースは背景となる大面積、アソートはベースを補う中程度、アクセントは小面積で目立たせる役割をもつ。',
     caution: 'ベース＝広い、アソート＝中、アクセント＝少量。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'conventional-color-names',
     categoryLabel: '慣用色名',
-    id: 'color2-weak-017',
-    number: '弱点 17',
+    id: 'color2-weak-027',
+    number: '弱点 27',
     prompt: '海松色（みるいろ）の由来と色の方向の組み合わせとして正しいものはどれか。',
     choices: ['海藻ミル ― 暗い灰みの黄緑', '新橋芸者 ― 明るい緑みの青', '藤の花 ― 明るい青紫', '紅花 ― 鮮やかな赤'],
     correctIndex: 0,
-    explanation: '海松色は海藻ミルに由来する、暗い灰みの黄緑である。',
+    explanation: '海松色は海藻ミルに由来する暗い灰みの黄緑である。',
     caution: '海松＝海藻ミル＝暗いオリーブ系。',
-  },
-  {
-    ...sourceBase,
+  }),
+  q({
     categoryId: 'conventional-color-names',
     categoryLabel: '慣用色名',
-    id: 'color2-weak-018',
-    number: '弱点 18',
+    id: 'color2-weak-028',
+    number: '弱点 28',
     prompt: '新橋色（しんばしいろ）の説明として正しいものはどれか。',
     choices: ['新橋芸者が好んだ明るい緑みの青', '海藻ミルの暗い黄緑', 'ブルゴーニュの赤ワインの暗い紫みの赤', '藤の花房の明るい青紫'],
     correctIndex: 0,
-    explanation: '新橋色は明治末から大正期に新橋芸者が好んだ、化学染料による明るい緑みの青である。',
+    explanation: '新橋色は明治末から大正期に新橋芸者が好んだ、明るい緑みの青である。',
     caution: '新橋＝芸者＝明るい青緑。',
-  },
+  }),
+  q({
+    categoryId: 'conventional-color-names',
+    categoryLabel: '慣用色名',
+    id: 'color2-weak-029',
+    number: '弱点 29',
+    prompt: 'バーガンディーの由来として正しいものはどれか。',
+    choices: ['フランス・ブルゴーニュ産の赤ワイン', '新橋芸者', '海藻ミル', 'ヒノキの樹皮'],
+    correctIndex: 0,
+    explanation: 'バーガンディーはフランス・ブルゴーニュ産の赤ワインの色に由来する。',
+    caution: 'バーガンディー＝ブルゴーニュワイン。',
+  }),
+  q({
+    categoryId: 'color-harmony',
+    categoryLabel: '色彩調和',
+    id: 'color2-weak-030',
+    number: '弱点 30',
+    prompt: '3色が色相環を3等分する位置にあり、さらにトーンにもまとまりがある場合の考え方として最も適切なものはどれか。',
+    choices: ['トーンにまとまりがあるためトライアドではない', '色相位置が条件を満たすならトライアドとして判断できる', '配色名は必ず1つしか成立しない', '無彩色でない限り配色技法名は付かない'],
+    correctIndex: 1,
+    explanation: 'トライアドは色相位置の条件で判断する。別のトーン条件を同時に満たしていても、色相位置の条件は消えない。',
+    caution: '問われた軸を見る。トライアドなら色相位置。',
+  }),
 ]
 
 const colorQualification = qualifications.find(
@@ -312,7 +500,7 @@ if (colorQualification) {
       id: SOURCE_ID,
       type: 'personal-weakness',
       label: SOURCE_LABEL,
-      description: '2026夏の誤答と2025夏の注意点から作った個人専用ドリル。',
+      description: '2026夏の実失点と2025夏冬の注意点から作った個人専用ドリル。',
       important: true,
     })
   }
@@ -387,7 +575,28 @@ function startWeaknessQuiz(count = '10問') {
   window.requestAnimationFrame(prepare)
 }
 
+function profileStats(item) {
+  if (!item.categoryIds.length) return { wrong: 0, flagged: 0 }
+  const data = loadStudyData()
+  const related = questions.filter(
+    (question) =>
+      question.qualificationId === COLOR2_ID &&
+      item.categoryIds.includes(question.categoryId),
+  )
+
+  return related.reduce(
+    (result, question) => {
+      const record = getRecord(data, question.id)
+      result.wrong += record.wrong
+      result.flagged += record.flagged ? 1 : 0
+      return result
+    },
+    { wrong: 0, flagged: 0 },
+  )
+}
+
 function profileCard(item) {
+  const stats = profileStats(item)
   return `
     <article class="color2-personal-card">
       <div class="color2-personal-card-head">
@@ -403,6 +612,11 @@ function profileCard(item) {
       <div class="color2-personal-traps">
         ${item.traps.map((trap) => `<p>${escapeHtml(trap)}</p>`).join('')}
       </div>
+      ${
+        item.categoryIds.length
+          ? `<div class="color2-personal-live"><span>累計誤答 ${stats.wrong}</span><span>要注意 ${stats.flagged}</span></div>`
+          : ''
+      }
     </article>
   `
 }
@@ -422,12 +636,12 @@ function enhanceQualificationScreen() {
         <span>PERSONAL WEAKNESS</span>
         <h2>俺の弱点</h2>
       </div>
-      <p>2026夏は137 / 200、合格線146。大枠ではなく「1語のズレ・条件の見落とし」で削られた場所を優先固定する。</p>
+      <p>2026夏は137 / 200、合格線146。大枠の理解は残しつつ、最後の1語・条件・用語境界まで取る。</p>
     </div>
 
     <div class="color2-personal-rule">
       <strong>本番ルール</strong>
-      <p>正しい要素を1つ見つけても判定を止めない。最後に「他の文も全部正しい？」を1回だけ確認する。</p>
+      <p>${escapeHtml(ANSWER_CHECK)}</p>
     </div>
 
     <div class="color2-personal-grid">
@@ -436,11 +650,11 @@ function enhanceQualificationScreen() {
 
     <div class="color2-personal-actions">
       <button type="button" data-weakness-count="10問">
-        <span><small>18問からランダム</small>弱点だけ10問</span>
+        <span><small>${weaknessQuestions.length}問からランダム</small>弱点だけ10問</span>
         <span aria-hidden="true">→</span>
       </button>
       <button type="button" data-weakness-count="全部">
-        <span><small>一気に確認</small>弱点18問を全部解く</span>
+        <span><small>一気に確認</small>弱点${weaknessQuestions.length}問を全部解く</span>
         <span aria-hidden="true">→</span>
       </button>
     </div>
@@ -471,6 +685,7 @@ document.addEventListener('click', interceptWeaknessResource, true)
 
 const root = document.getElementById('root')
 if (root) {
+  enhanceQualificationScreen()
   const observer = new MutationObserver(enhanceQualificationScreen)
   observer.observe(root, { childList: true, subtree: true })
 }
