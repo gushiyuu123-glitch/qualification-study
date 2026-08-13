@@ -5,6 +5,15 @@ import Color2ReferenceView from './Color2ReferenceView.jsx'
 import './color2ReferenceOnly.css'
 
 const COLOR2_ID = 'color-2'
+const color2 = qualifications.find((item) => item.id === COLOR2_ID)
+
+if (color2) {
+  color2.note = `問題形式は使用しない
+2025夏・冬の公式解説と2026夏の実試験で確認できた内容だけを、単語→解説で整理
+弱点は専用解説セクションへ集約`
+  color2.resources = []
+  color2.categories = []
+}
 
 function normalize(value) {
   return String(value ?? '').toLowerCase().replace(/\s+/g, '')
@@ -80,12 +89,10 @@ function renderReferenceOnly() {
 
   const heading = currentScreen.querySelector('.qualification-hero h1')?.textContent?.trim()
   if (heading !== '色彩検定2級') return
-
-  const qualification = qualifications.find((item) => item.id === COLOR2_ID)
-  if (!qualification) return
+  if (!color2) return
 
   const html = renderToStaticMarkup(
-    createElement(Color2ReferenceView, { qualification }),
+    createElement(Color2ReferenceView, { qualification: color2 }),
   )
 
   currentScreen.outerHTML = html
@@ -107,9 +114,30 @@ function keepColor2QuestionNavDisabled() {
   })
 }
 
+function enhanceHomeCard() {
+  document.querySelectorAll('.qualification-card').forEach((card) => {
+    const name = card.querySelector('.qualification-body > strong')?.textContent?.trim()
+    if (name !== '色彩検定2級') return
+    const progress = card.querySelector('.card-progress')
+    if (progress) progress.textContent = '確認済み用語集 · 問題形式なし'
+  })
+}
+
+function enhanceCompletionOverview() {
+  document.querySelectorAll('.qualify-completion-row').forEach((row) => {
+    const name = row.querySelector('.qualify-completion-copy strong')?.textContent?.trim()
+    if (name !== '色彩検定2級') return
+    const status = row.querySelector('.qualify-completion-copy small')
+    if (status) status.textContent = '確認済み用語集 / 解説専用'
+    row.querySelector('.qualify-completion-bar')?.remove()
+  })
+}
+
 function enhance() {
   renderReferenceOnly()
   keepColor2QuestionNavDisabled()
+  enhanceHomeCard()
+  enhanceCompletionOverview()
 }
 
 const root = document.getElementById('root')
