@@ -5,10 +5,12 @@ const root = process.cwd()
 const indexPath = path.join(root, 'index.html')
 const referencePath = path.join(root, 'src', 'Color2ReferenceView.jsx')
 const enhancerPath = path.join(root, 'src', 'color2ReferenceOnly.js')
+const sharedQuestionsPath = path.join(root, 'src', 'data', 'questions.js')
 
 const index = fs.readFileSync(indexPath, 'utf8')
 const reference = fs.readFileSync(referencePath, 'utf8')
 const enhancer = fs.readFileSync(enhancerPath, 'utf8')
+const sharedQuestions = fs.readFileSync(sharedQuestionsPath, 'utf8')
 
 const forbiddenRuntimeModules = [
   'registerColor2TextbookQuestions.js',
@@ -37,6 +39,10 @@ const forbiddenRuntimeModules = [
 const loadedForbidden = forbiddenRuntimeModules.filter((name) => index.includes(name))
 if (loadedForbidden.length > 0) {
   throw new Error(`色彩2級の旧問題・旧教材モジュールが読み込まれています: ${loadedForbidden.join(', ')}`)
+}
+
+if (/qualificationId\s*:\s*['"]color-2['"]/.test(sharedQuestions)) {
+  throw new Error('共通問題配列に色彩検定2級の問題が残っています。')
 }
 
 const referenceModule = '/src/color2ReferenceOnly.js'
