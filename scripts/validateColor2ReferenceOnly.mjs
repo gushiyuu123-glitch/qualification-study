@@ -39,8 +39,16 @@ if (loadedForbidden.length > 0) {
   throw new Error(`色彩2級の旧問題・旧教材モジュールが読み込まれています: ${loadedForbidden.join(', ')}`)
 }
 
-if (!index.includes('/src/color2ReferenceOnly.js')) {
+const referenceModule = '/src/color2ReferenceOnly.js'
+const mainModule = '/src/main.jsx'
+const referencePosition = index.indexOf(referenceModule)
+const mainPosition = index.indexOf(mainModule)
+
+if (referencePosition < 0) {
   throw new Error('色彩2級の解説専用モジュールがindex.htmlに登録されていません。')
+}
+if (mainPosition < 0 || referencePosition > mainPosition) {
+  throw new Error('色彩2級の解説専用設定はmain.jsxより前に読み込む必要があります。')
 }
 
 const questionShapeTokens = ['correctIndex:', 'choices:', 'prompt:']
