@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { qualifications } from './data/qualifications'
 import Color2ReferenceView from './Color2ReferenceView.jsx'
+import './color2ReferenceOnly.css'
 
 const COLOR2_ID = 'color-2'
 
