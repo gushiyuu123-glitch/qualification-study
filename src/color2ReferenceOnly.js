@@ -26,7 +26,8 @@ function updateVisibleCount(screen) {
   if (!copy) return
   const match = copy.textContent?.match(/\/\s*(\d+)/)
   const total = match?.[1] ?? terms.length
-  copy.textContent = `${visible} / ${total} 語を表示`
+  const next = `${visible} / ${total} 語を表示`
+  if (copy.textContent !== next) copy.textContent = next
 }
 
 function wireReferenceFilters(screen) {
@@ -116,20 +117,24 @@ function keepColor2QuestionNavDisabled() {
 
 function enhanceHomeCard() {
   document.querySelectorAll('.qualification-card').forEach((card) => {
+    if (card.dataset.color2ReferenceCard === 'true') return
     const name = card.querySelector('.qualification-body > strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const progress = card.querySelector('.card-progress')
     if (progress) progress.textContent = '確認済み用語集 · 問題形式なし'
+    card.dataset.color2ReferenceCard = 'true'
   })
 }
 
 function enhanceCompletionOverview() {
   document.querySelectorAll('.qualify-completion-row').forEach((row) => {
+    if (row.dataset.color2ReferenceRow === 'true') return
     const name = row.querySelector('.qualify-completion-copy strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const status = row.querySelector('.qualify-completion-copy small')
     if (status) status.textContent = '確認済み用語集 / 解説専用'
     row.querySelector('.qualify-completion-bar')?.remove()
+    row.dataset.color2ReferenceRow = 'true'
   })
 }
 
