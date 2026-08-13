@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs && node scripts/enrichColor2ChoiceExplanations.mjs && node scripts/structureColor2TextbookMockExams.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs && node scripts/enrichColor2ChoiceExplanations.mjs && node scripts/structureColor2TextbookMockExams.mjs",
-    "build": "node scripts/validateColor2Questions.mjs && node scripts/validateColor2ChoiceQuality.mjs && node scripts/validateColor2ChoiceExplanations.mjs && node scripts/validateColor2TextbookMockExams.mjs && node scripts/validateColor2VisualCoverage.mjs && node scripts/validateColor2PastExams.mjs && node scripts/validateColor2ExamPapers.mjs && node scripts/validateColor2WinterOfficialReview.mjs && eslint . && vite build",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/validateColor2ReferenceOnly.mjs",
+    "build": "eslint . && vite build",
     "lint": "eslint .",
-    "validate:color2": "node scripts/generateColor2TextbookQuestions.mjs && node scripts/prepareColor2ChoiceBanks.mjs && node scripts/curateColor2TextbookQuestions.mjs && node scripts/refineColor2QuestionDirections.mjs && node scripts/refineColor2ChoiceQuality.mjs && node scripts/refineColor2StatementChoices.mjs && node scripts/refineColor2BankChoices.mjs && node scripts/refineColor2FinalChoiceFamilies.mjs && node scripts/enrichColor2ChoiceExplanations.mjs && node scripts/structureColor2TextbookMockExams.mjs && node scripts/validateColor2Questions.mjs && node scripts/validateColor2ChoiceQuality.mjs && node scripts/validateColor2ChoiceExplanations.mjs && node scripts/validateColor2TextbookMockExams.mjs && node scripts/validateColor2VisualCoverage.mjs && node scripts/validateColor2PastExams.mjs && node scripts/validateColor2ExamPapers.mjs && node scripts/validateColor2WinterOfficialReview.mjs",
+    "validate:color2": "node scripts/validateColor2ReferenceOnly.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,8 +21,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^10.6.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-react-hooks": "^6.1.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
     "globals": "^17.7.0",
     "vite": "^8.1.1"
   }
