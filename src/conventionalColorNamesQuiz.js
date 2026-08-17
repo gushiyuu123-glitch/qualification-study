@@ -176,12 +176,12 @@ function ensureQuiz() {
         <span class="conventional-color-quiz__progress" data-quiz-progress>SETUP</span>
       </header>
 
-      <main class="conventional-color-quiz__body">
+      <main class="conventional-color-quiz__body" data-quiz-body>
         <section class="conventional-color-quiz__setup" data-quiz-setup>
           <div class="conventional-color-quiz__lead">
             <span>VERIFIED DATA ONLY</span>
-            <h2>63色から、4択で確認する。</h2>
-            <p>問題と正解は色面リーダーに表示されている確認済みデータから、その場で生成します。別の答え表は持ちません。</p>
+            <h2>63色を、色面と一緒に覚える。</h2>
+            <p>問題と正解は色面リーダーに表示されている確認済みデータから、その場で生成します。4種類すべての問題で対象色の色面を表示します。</p>
           </div>
 
           <div class="conventional-color-quiz__scope" aria-label="出題範囲">
@@ -208,12 +208,23 @@ function ensureQuiz() {
             <strong data-quiz-number></strong>
           </div>
           <h2 data-quiz-prompt></h2>
-          <div class="conventional-color-quiz__swatch" data-quiz-swatch hidden></div>
+          <div class="conventional-color-quiz__swatch-wrap">
+            <div class="conventional-color-quiz__swatch-label">
+              <span>COLOR CHIP</span>
+              <b>画面用近似</b>
+            </div>
+            <div class="conventional-color-quiz__swatch" data-quiz-swatch aria-label="問題の色面"></div>
+          </div>
           <div class="conventional-color-quiz__choices" data-quiz-choices></div>
           <div class="conventional-color-quiz__answer" data-quiz-answer hidden>
-            <span data-answer-state></span>
-            <strong data-answer-name></strong>
-            <p data-answer-facts></p>
+            <div class="conventional-color-quiz__answer-head">
+              <div class="conventional-color-quiz__answer-swatch" data-answer-swatch aria-hidden="true"></div>
+              <div class="conventional-color-quiz__answer-copy">
+                <span data-answer-state></span>
+                <strong data-answer-name></strong>
+              </div>
+            </div>
+            <div class="conventional-color-quiz__answer-facts" data-answer-facts></div>
           </div>
           <button type="button" class="conventional-color-quiz__next" data-quiz-next hidden>次へ</button>
         </section>
@@ -257,6 +268,11 @@ function ensureQuiz() {
   return quizRoot
 }
 
+function scrollQuizTop() {
+  const body = quizRoot?.querySelector('[data-quiz-body]')
+  if (body) body.scrollTop = 0
+}
+
 function showSetup() {
   if (!quizRoot) return
   quizRoot.querySelector('[data-quiz-setup]').hidden = false
@@ -264,6 +280,7 @@ function showSetup() {
   quizRoot.querySelector('[data-quiz-complete]').hidden = true
   const progress = quizRoot.querySelector('[data-quiz-progress]')
   if (progress) progress.textContent = 'SETUP'
+  scrollQuizTop()
 }
 
 function startQuiz(requestedCount) {
@@ -299,9 +316,9 @@ function renderQuestion() {
   if (prompt) prompt.textContent = question.prompt
 
   if (swatch) {
-    swatch.hidden = question.kind !== 'swatch'
-    swatch.style.background = question.kind === 'swatch' ? question.item.swatch : ''
-    swatch.setAttribute('aria-label', question.kind === 'swatch' ? '問題の色面' : '')
+    swatch.hidden = false
+    swatch.style.background = question.item.swatch
+    swatch.setAttribute('aria-label', '問題の色面')
   }
 
   if (answer) answer.hidden = true
@@ -322,6 +339,30 @@ function renderQuestion() {
       choices.append(button)
     })
   }
+
+  scrollQuizTop()
+}
+
+function renderAnswerFacts(item) {
+  const facts = quizRoot?.querySelector('[data-answer-facts]')
+  if (!facts) return
+  facts.replaceChildren()
+
+  const rows = [
+    ['系統色名', item.system],
+    ['Munsell', item.munsell],
+    ['教科書', `P.${item.page}`],
+  ]
+
+  rows.forEach(([label, value]) => {
+    const row = document.createElement('div')
+    const key = document.createElement('span')
+    const data = document.createElement('b')
+    key.textContent = label
+    data.textContent = value
+    row.append(key, data)
+    facts.append(row)
+  })
 }
 
 function answerQuestion(selected, selectedButton) {
@@ -343,12 +384,13 @@ function answerQuestion(selected, selectedButton) {
   const answer = quizRoot.querySelector('[data-quiz-answer]')
   const state = quizRoot.querySelector('[data-answer-state]')
   const name = quizRoot.querySelector('[data-answer-name]')
-  const facts = quizRoot.querySelector('[data-answer-facts]')
+  const answerSwatch = quizRoot.querySelector('[data-answer-swatch]')
   const next = quizRoot.querySelector('[data-quiz-next]')
 
   if (state) state.textContent = isCorrect ? '正解' : '不正解'
   if (name) name.textContent = `${question.item.name} / ${question.item.sub}`
-  if (facts) facts.textContent = `${question.item.system} · Munsell ${question.item.munsell} · P.${question.item.page}`
+  if (answerSwatch) answerSwatch.style.background = question.item.swatch
+  renderAnswerFacts(question.item)
   if (answer) answer.hidden = false
   if (next) next.hidden = false
 }
@@ -382,6 +424,7 @@ function showComplete() {
   const uniqueMisses = unique(mistakes)
   if (misses) misses.hidden = uniqueMisses.length === 0
   if (missList) missList.textContent = uniqueMisses.join('、')
+  scrollQuizTop()
 }
 
 function injectReaderQuizButton() {
@@ -420,6 +463,13 @@ function openQuiz() {
   showSetup()
   document.body.style.overflow = 'hidden'
   root.hidden = false
+
+  requestAnimationFrame(() => {
+    readerBeforeQuiz?.querySelector('input')?.blur()
+    if (document.activeElement instanceof HTMLElement && !root.contains(document.activeElement)) {
+      document.activeElement.blur()
+    }
+  })
 }
 
 function closeQuiz() {
