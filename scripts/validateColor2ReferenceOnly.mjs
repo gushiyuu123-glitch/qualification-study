@@ -95,8 +95,23 @@ if (hardcodedMunsell.length) {
   throw new Error(`慣用色名4択に正解データの二重持ちがあります: ${hardcodedMunsell.join(', ')}`)
 }
 
-if (!conventionalQuiz.includes('EXPECTED_ITEM_COUNT = 63') || !conventionalQuiz.includes('fourChoices')) {
-  throw new Error('慣用色名4択の63色検証または4択生成処理が不足しています。')
+if (!conventionalQuiz.includes('EXPECTED_ITEM_COUNT = 63') || !conventionalQuiz.includes('examChoices')) {
+  throw new Error('慣用色名4択の63色検証または本試験型4択生成処理が不足しています。')
 }
 
-console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / 専用4択あり / 共通問題データ0`)
+const leakedAnswerPatterns = [
+  "prompt: `「${item.name}",
+  "answer: item.system",
+  "answer: item.munsell",
+  "answer: item.sub",
+]
+const leakedPatterns = leakedAnswerPatterns.filter((pattern) => conventionalQuiz.includes(pattern))
+if (leakedPatterns.length) {
+  throw new Error(`本試験型4択の問題文に答えの手掛かりが混入しています: ${leakedPatterns.join(', ')}`)
+}
+
+if (!conventionalQuiz.includes("answer: item.name") || !conventionalQuiz.includes("prompt: '次の色面に最も適切な慣用色名は？'")) {
+  throw new Error('慣用色名4択が「色面→色名」の本試験型に固定されていません。')
+}
+
+console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / 本試験型4択あり / 共通問題データ0`)
