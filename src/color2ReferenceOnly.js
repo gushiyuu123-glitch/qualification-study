@@ -6,11 +6,12 @@ import './color2ReferenceOnly.css'
 
 const COLOR2_ID = 'color-2'
 const CONVENTIONAL_READER_KEY = 'conventional-color-names'
+const CONVENTIONAL_QUIZ_EVENT = 'qualify:conventional-color-quiz-ready'
 const color2 = qualifications.find((item) => item.id === COLOR2_ID)
 
 if (color2) {
-  color2.note = `問題形式は使用しない
-2025夏・冬の公式解説と2026夏の実試験で確認できた内容だけを、単語→解説で整理
+  color2.note = `本編は確認済み内容だけの解説専用
+慣用色名63色のみ、色面・系統色名・マンセル値・読み／英語名から4択で確認
 弱点は専用解説セクションへ集約`
   color2.resources = []
   color2.categories = []
@@ -33,18 +34,24 @@ function injectConventionalColorNamesEntry(screen) {
         <div class="color2-conventional-entry__copy">
           <span>JIS CONVENTIONAL COLOR NAMES</span>
           <h2 id="color2-conventional-title">慣用色名 63色</h2>
-          <p>和色名31色＋外来色名32色。色面、系統色名、マンセル値を同じ画面で確認する。</p>
+          <p>和色名31色＋外来色名32色。色面、系統色名、マンセル値を確認し、その同じ確認済みデータだけで4択問題を解く。</p>
         </div>
-        <button type="button" data-conventional-reader-open>
-          <span>色面を開く</span>
-          <b aria-hidden="true">63</b>
-        </button>
+        <div class="color2-conventional-entry__actions">
+          <button type="button" data-conventional-reader-open>
+            <span>色面を開く</span>
+            <b aria-hidden="true">63</b>
+          </button>
+          <button type="button" data-conventional-quiz-open>
+            <span>4択問題を解く</span>
+            <b aria-hidden="true">QUIZ</b>
+          </button>
+        </div>
       </section>
     `,
   )
 }
 
-function wireConventionalColorNames(screen) {
+function wireConventionalReader(screen) {
   const button = screen.querySelector('[data-conventional-reader-open]')
   if (!button || button.dataset.readerWired === 'true') return
   button.dataset.readerWired = 'true'
@@ -67,9 +74,45 @@ function wireConventionalColorNames(screen) {
   })
 }
 
+function wireConventionalQuiz(screen) {
+  const button = screen.querySelector('[data-conventional-quiz-open]')
+  if (!button || button.dataset.quizWired === 'true') return
+  button.dataset.quizWired = 'true'
+
+  button.addEventListener('click', () => {
+    const quiz = window.__QUALIFY_CONVENTIONAL_COLOR_QUIZ__
+    if (quiz?.open) {
+      quiz.open()
+      return
+    }
+
+    button.classList.add('is-loading')
+    const handleReady = () => {
+      window.removeEventListener(CONVENTIONAL_QUIZ_EVENT, handleReady)
+      button.classList.remove('is-loading')
+      window.__QUALIFY_CONVENTIONAL_COLOR_QUIZ__?.open?.()
+    }
+    window.addEventListener(CONVENTIONAL_QUIZ_EVENT, handleReady)
+  })
+}
+
+function syncConventionalQuizCopy(screen) {
+  const heroCopy = screen.querySelector('.color2-reference-hero > p')
+  if (heroCopy) {
+    heroCopy.textContent = '本編は確認済み内容だけの解説専用。慣用色名63色だけは、同じ確認済みデータから4択でも確認できる。'
+  }
+
+  const statusStrong = screen.querySelectorAll('.color2-reference-status strong')
+  const statusLabel = screen.querySelectorAll('.color2-reference-status span')
+  if (statusStrong[1]) statusStrong[1].textContent = '63'
+  if (statusLabel[1]) statusLabel[1].textContent = '慣用色名4択対象'
+}
+
 function enhanceConventionalColorNames(screen) {
   injectConventionalColorNamesEntry(screen)
-  wireConventionalColorNames(screen)
+  wireConventionalReader(screen)
+  wireConventionalQuiz(screen)
+  syncConventionalQuizCopy(screen)
 }
 
 function updateVisibleCount(screen) {
@@ -178,7 +221,7 @@ function enhanceHomeCard() {
     const name = card.querySelector('.qualification-body > strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const progress = card.querySelector('.card-progress')
-    if (progress) progress.textContent = '確認済み用語集 · 問題形式なし'
+    if (progress) progress.textContent = '確認済み用語集 · 慣用色名4択あり'
     card.dataset.color2ReferenceCard = 'true'
   })
 }
@@ -189,7 +232,7 @@ function enhanceCompletionOverview() {
     const name = row.querySelector('.qualify-completion-copy strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const status = row.querySelector('.qualify-completion-copy small')
-    if (status) status.textContent = '確認済み用語集 / 解説専用'
+    if (status) status.textContent = '確認済み用語集 / 慣用色名4択あり'
     row.querySelector('.qualify-completion-bar')?.remove()
     row.dataset.color2ReferenceRow = 'true'
   })

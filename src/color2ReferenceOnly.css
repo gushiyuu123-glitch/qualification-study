@@ -46,8 +46,15 @@
   line-height: 1.75;
 }
 
+.color2-conventional-entry__actions {
+  min-width: 184px;
+  display: grid;
+  gap: 4px;
+}
+
 .color2-conventional-entry button {
   appearance: none;
+  width: 100%;
   min-width: 174px;
   display: flex;
   align-items: center;
@@ -62,6 +69,10 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+.color2-conventional-entry button[data-conventional-quiz-open] {
+  border-bottom-color: #8d3b3b;
 }
 
 .color2-conventional-entry button span {
@@ -88,6 +99,7 @@
     padding: 24px 0;
   }
 
+  .color2-conventional-entry__actions,
   .color2-conventional-entry button {
     width: 100%;
     min-width: 0;

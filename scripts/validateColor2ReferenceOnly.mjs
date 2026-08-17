@@ -6,6 +6,8 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
 const index = read('index.html')
 const reference = read('src/Color2ReferenceView.jsx')
 const enhancer = read('src/color2ReferenceOnly.js')
+const conventional = read('src/conventionalColorNamesStudy.js')
+const conventionalQuiz = read('src/conventionalColorNamesQuiz.js')
 const sharedQuestions = read('src/data/questions.js')
 
 const forbiddenRuntimeModules = [
@@ -60,7 +62,41 @@ const missingTerms = requiredTerms.filter((term) => !reference.includes(term))
 if (missingTerms.length) throw new Error(`必須の確認済み用語が不足しています: ${missingTerms.join(', ')}`)
 
 if (!enhancer.includes('renderToStaticMarkup') || !enhancer.includes('問題') || !enhancer.includes('弱点')) {
-  throw new Error('色彩2級の問題ナビ停止処理を確認できません。')
+  throw new Error('色彩2級の共通問題ナビ停止処理を確認できません。')
 }
 
-console.log(`色彩検定2級 解説専用モード検証OK: ${termCount}語 / 問題データ0 / 旧問題資産0`)
+const conventionalModule = '/src/conventionalColorNamesStudy.js'
+const quizModule = '/src/conventionalColorNamesQuiz.js'
+const conventionalPosition = index.indexOf(conventionalModule)
+const quizPosition = index.indexOf(quizModule)
+if (conventionalPosition < 0) throw new Error('慣用色名63色リーダーが登録されていません。')
+if (quizPosition < 0 || quizPosition < conventionalPosition) {
+  throw new Error('慣用色名4択は確認済み色データの後に読み込む必要があります。')
+}
+
+const conventionalDataCount = (conventional.match(/\{ group: '(?:和色名|外来色名)'/g) ?? []).length
+if (conventionalDataCount !== 63) {
+  throw new Error(`慣用色名の確認済み色数が想定外です: ${conventionalDataCount}色`)
+}
+
+const quizRequiredSelectors = [
+  '.conventional-color-card',
+  '.conventional-color-card__swatch-label strong',
+  '.conventional-color-card__system',
+  '.conventional-color-card__facts b',
+]
+const missingQuizSelectors = quizRequiredSelectors.filter((selector) => !conventionalQuiz.includes(selector))
+if (missingQuizSelectors.length) {
+  throw new Error(`慣用色名4択が確認済み色面データを参照していません: ${missingQuizSelectors.join(', ')}`)
+}
+
+const hardcodedMunsell = conventionalQuiz.match(/['\"](?:N\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?(?:RP|YR|GY|BG|PB|R|Y|G|B|P)\s+\d+(?:\.\d+)?\/\d+(?:\.\d+)?)["']/g) ?? []
+if (hardcodedMunsell.length) {
+  throw new Error(`慣用色名4択に正解データの二重持ちがあります: ${hardcodedMunsell.join(', ')}`)
+}
+
+if (!conventionalQuiz.includes('EXPECTED_ITEM_COUNT = 63') || !conventionalQuiz.includes('fourChoices')) {
+  throw new Error('慣用色名4択の63色検証または4択生成処理が不足しています。')
+}
+
+console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / 専用4択あり / 共通問題データ0`)
