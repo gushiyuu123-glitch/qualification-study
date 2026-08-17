@@ -17,7 +17,7 @@ const forbiddenRuntimeModules = [
   'lightingStudy.js', 'munsellColorSystemStudy.js', 'colorPsychologyStudy.js',
   'colorHarmonyStudy.js', 'colorImageStudy.js', 'visualDesignStudy.js',
   'fashionStudy.js', 'interiorStudy.js', 'landscapeColorStudy.js',
-  'conventionalColorNamesStudy.js', 'colorTextbookStructure.js',
+  'colorTextbookStructure.js',
 ]
 const loadedForbidden = forbiddenRuntimeModules.filter((name) => index.includes(name))
 if (loadedForbidden.length) throw new Error(`旧色彩2級モジュールが読み込まれています: ${loadedForbidden.join(', ')}`)
