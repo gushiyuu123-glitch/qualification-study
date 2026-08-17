@@ -3,7 +3,7 @@ import './conventionalColorNamesQuiz.css'
 const READER_KEY = 'conventional-color-names'
 const READY_EVENT = 'qualify:conventional-color-quiz-ready'
 const EXPECTED_ITEM_COUNT = 63
-const questionKinds = ['swatch', 'system', 'munsell', 'sub']
+const hueOrder = ['R', 'YR', 'Y', 'GY', 'G', 'BG', 'B', 'PB', 'P', 'RP']
 
 let quizRoot = null
 let verifiedItems = []
@@ -84,65 +84,77 @@ function candidatePool(item) {
   return sameGroup.length >= 4 ? sameGroup : verifiedItems
 }
 
-function fourChoices(correct, candidates) {
-  const distractors = shuffle(unique(candidates.filter((value) => value && value !== correct))).slice(0, 3)
+function parseMunsellForDistance(notation) {
+  const neutral = notation.match(/^N\s*(\d+(?:\.\d+)?)$/i)
+  if (neutral) {
+    return {
+      neutral: true,
+      hue: 0,
+      value: Number(neutral[1]),
+      chroma: 0,
+    }
+  }
+
+  const match = notation.match(
+    /^(\d+(?:\.\d+)?)(RP|YR|GY|BG|PB|R|Y|G|B|P)\s+(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/i,
+  )
+  if (!match) return null
+
+  const [, step, hueName, value, chroma] = match
+  const hueIndex = hueOrder.indexOf(hueName.toUpperCase())
+  if (hueIndex < 0) return null
+
+  return {
+    neutral: false,
+    hue: hueIndex * 10 + Number(step),
+    value: Number(value),
+    chroma: Number(chroma),
+  }
+}
+
+function colorDistance(source, target) {
+  const a = parseMunsellForDistance(source.munsell)
+  const b = parseMunsellForDistance(target.munsell)
+  if (!a || !b) return 9999
+
+  if (a.neutral && b.neutral) {
+    return Math.abs(a.value - b.value) * 8
+  }
+
+  if (a.neutral !== b.neutral) {
+    return 150 + Math.abs(a.value - b.value) * 6 + Math.abs(a.chroma - b.chroma)
+  }
+
+  const rawHueDistance = Math.abs(a.hue - b.hue)
+  const hueDistance = Math.min(rawHueDistance, 100 - rawHueDistance)
+  const valueDistance = Math.abs(a.value - b.value)
+  const chromaDistance = Math.abs(a.chroma - b.chroma)
+
+  return hueDistance * 2.2 + valueDistance * 7 + chromaDistance * 1.4
+}
+
+function examChoices(item) {
+  const nearest = candidatePool(item)
+    .filter((candidate) => candidate.name !== item.name && candidate.munsell !== item.munsell)
+    .sort((a, b) => colorDistance(item, a) - colorDistance(item, b))
+    .slice(0, 7)
+
+  const distractors = shuffle(nearest).slice(0, 3).map((candidate) => candidate.name)
   if (distractors.length < 3) {
     throw new Error('4択の選択肢を安全に作れませんでした。')
   }
-  return shuffle([correct, ...distractors])
+
+  return shuffle([item.name, ...distractors])
 }
 
-function createQuestion(item, kind) {
-  const pool = candidatePool(item)
-
-  if (kind === 'swatch') {
-    const distractors = pool
-      .filter((candidate) => candidate.name !== item.name && candidate.munsell !== item.munsell)
-      .map((candidate) => candidate.name)
-    return {
-      kind,
-      item,
-      label: '色面 → 色名',
-      prompt: 'この色面の慣用色名は？',
-      answer: item.name,
-      choices: fourChoices(item.name, distractors),
-    }
-  }
-
-  if (kind === 'system') {
-    return {
-      kind,
-      item,
-      label: '色名 → 系統色名',
-      prompt: `「${item.name}」の系統色名は？`,
-      answer: item.system,
-      choices: fourChoices(item.system, pool.map((candidate) => candidate.system)),
-    }
-  }
-
-  if (kind === 'munsell') {
-    return {
-      kind,
-      item,
-      label: '色名 → マンセル値',
-      prompt: `「${item.name}」のマンセル値は？`,
-      answer: item.munsell,
-      choices: fourChoices(item.munsell, pool.map((candidate) => candidate.munsell)),
-    }
-  }
-
-  const label = item.group === '和色名' ? '色名 → 読み' : '色名 → 英語名'
-  const prompt = item.group === '和色名'
-    ? `「${item.name}」の読みは？`
-    : `「${item.name}」の英語表記は？`
-
+function createQuestion(item) {
   return {
-    kind: 'sub',
+    kind: 'swatch',
     item,
-    label,
-    prompt,
-    answer: item.sub,
-    choices: fourChoices(item.sub, pool.map((candidate) => candidate.sub)),
+    label: 'JIS慣用色名 / 色面 → 色名',
+    prompt: '次の色面に最も適切な慣用色名は？',
+    answer: item.name,
+    choices: examChoices(item),
   }
 }
 
@@ -154,11 +166,8 @@ function buildSession(requestedCount) {
     ? pool.length
     : Math.min(Number(requestedCount) || 10, pool.length)
   const selected = shuffle(pool).slice(0, count)
-  const kinds = shuffle(
-    selected.map((_, index) => questionKinds[index % questionKinds.length]),
-  )
 
-  return selected.map((item, index) => createQuestion(item, kinds[index]))
+  return selected.map((item) => createQuestion(item))
 }
 
 function ensureQuiz() {
@@ -179,9 +188,9 @@ function ensureQuiz() {
       <main class="conventional-color-quiz__body" data-quiz-body>
         <section class="conventional-color-quiz__setup" data-quiz-setup>
           <div class="conventional-color-quiz__lead">
-            <span>VERIFIED DATA ONLY</span>
-            <h2>63色を、色面と一緒に覚える。</h2>
-            <p>問題と正解は色面リーダーに表示されている確認済みデータから、その場で生成します。4種類すべての問題で対象色の色面を表示します。</p>
+            <span>EXAM STYLE</span>
+            <h2>色面を見て、色名を選ぶ。</h2>
+            <p>本試験と同じ考え方で、問題中は答えにつながる系統色名・マンセル値・読みを表示しません。確認済み63色の中から、近い色を含む4択を出します。</p>
           </div>
 
           <div class="conventional-color-quiz__scope" aria-label="出題範囲">
@@ -199,7 +208,7 @@ function ensureQuiz() {
             <button type="button" data-quiz-start="all"><strong>全色</strong><span>選択範囲を一周</span></button>
           </div>
 
-          <p class="conventional-color-quiz__types">色面→色名 / 色名→系統色名 / 色名→マンセル値 / 色名→読み・英語名</p>
+          <p class="conventional-color-quiz__types">出題：色面 → 慣用色名 / 解答後：読み・系統色名・マンセル値を確認</p>
         </section>
 
         <section class="conventional-color-quiz__question" data-quiz-question hidden>
@@ -349,6 +358,7 @@ function renderAnswerFacts(item) {
   facts.replaceChildren()
 
   const rows = [
+    [item.group === '和色名' ? '読み' : '英語名', item.sub],
     ['系統色名', item.system],
     ['Munsell', item.munsell],
     ['教科書', `P.${item.page}`],
@@ -388,7 +398,7 @@ function answerQuestion(selected, selectedButton) {
   const next = quizRoot.querySelector('[data-quiz-next]')
 
   if (state) state.textContent = isCorrect ? '正解' : '不正解'
-  if (name) name.textContent = `${question.item.name} / ${question.item.sub}`
+  if (name) name.textContent = question.item.name
   if (answerSwatch) answerSwatch.style.background = question.item.swatch
   renderAnswerFacts(question.item)
   if (answer) answer.hidden = false
