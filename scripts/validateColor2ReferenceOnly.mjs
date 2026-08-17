@@ -3,6 +3,7 @@ import path from 'node:path'
 
 const root = process.cwd()
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
+const packageJson = JSON.parse(read('package.json'))
 const index = read('index.html')
 const reference = read('src/Color2ReferenceView.jsx')
 const enhancer = read('src/color2ReferenceOnly.js')
@@ -79,6 +80,31 @@ if (conventionalDataCount !== 63) {
   throw new Error(`慣用色名の確認済み色数が想定外です: ${conventionalDataCount}色`)
 }
 
+if (packageJson.dependencies?.munsell !== '1.1.6') {
+  throw new Error('慣用色名の高精度色変換に munsell 1.1.6 が固定されていません。')
+}
+
+const accurateColorTokens = [
+  "import * as munsell from 'munsell'",
+  'munsell.munsellToRgb255',
+  'normalizeMunsellNotation',
+  'Renotation Data',
+]
+const missingAccurateColorTokens = accurateColorTokens.filter((token) => !conventional.includes(token))
+if (missingAccurateColorTokens.length) {
+  throw new Error(`慣用色名のRenotation基準sRGB変換が不足しています: ${missingAccurateColorTokens.join(', ')}`)
+}
+
+const forbiddenApproximationTokens = ['hueCenters', 'hslToRgb', 'solveLightness', 'Math.exp(-parsed.chroma']
+const leftoverApproximationTokens = forbiddenApproximationTokens.filter((token) => conventional.includes(token))
+if (leftoverApproximationTokens.length) {
+  throw new Error(`旧HSL近似変換が残っています: ${leftoverApproximationTokens.join(', ')}`)
+}
+
+if (!conventional.includes("sub: 'jaune brillant'")) {
+  throw new Error('ジョンブリアンの英語表記が jaune brillant に固定されていません。')
+}
+
 const quizRequiredSelectors = [
   '.conventional-color-card',
   '.conventional-color-card__swatch-label strong',
@@ -101,17 +127,21 @@ if (!conventionalQuiz.includes('EXPECTED_ITEM_COUNT = 63') || !conventionalQuiz.
 
 const leakedAnswerPatterns = [
   "prompt: `「${item.name}",
-  "answer: item.system",
-  "answer: item.munsell",
-  "answer: item.sub",
+  'answer: item.system',
+  'answer: item.munsell',
+  'answer: item.sub',
 ]
 const leakedPatterns = leakedAnswerPatterns.filter((pattern) => conventionalQuiz.includes(pattern))
 if (leakedPatterns.length) {
   throw new Error(`本試験型4択の問題文に答えの手掛かりが混入しています: ${leakedPatterns.join(', ')}`)
 }
 
-if (!conventionalQuiz.includes("answer: item.name") || !conventionalQuiz.includes("prompt: '次の色面に最も適切な慣用色名は？'")) {
+if (!conventionalQuiz.includes('answer: item.name') || !conventionalQuiz.includes("prompt: '次の色面に最も適切な慣用色名は？'")) {
   throw new Error('慣用色名4択が「色面→色名」の本試験型に固定されていません。')
 }
 
-console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / 本試験型4択あり / 共通問題データ0`)
+if (!conventionalQuiz.includes('buildMistakeSession') || !conventionalQuiz.includes('data-quiz-retry-misses')) {
+  throw new Error('慣用色名4択に誤答だけの再挑戦導線がありません。')
+}
+
+console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / Renotation基準sRGB / 本試験型4択 / 誤答再挑戦 / 共通問題データ0`)

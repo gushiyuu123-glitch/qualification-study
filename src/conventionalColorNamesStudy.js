@@ -1,3 +1,4 @@
+import * as munsell from 'munsell'
 import './conventionalColorNamesStudy.css'
 
 const content = {
@@ -51,7 +52,7 @@ const content = {
     { group: '外来色名', name: 'バーントアンバー', sub: 'burnt umber', system: 'ごく暗い赤みの黄', munsell: '10YR 3/3', page: 133 },
     { group: '外来色名', name: 'ローアンバー', sub: 'raw umber', system: '暗い黄', munsell: '2.5Y 4/6', page: 133 },
     { group: '外来色名', name: 'ネープルスイエロー', sub: 'Naples yellow', system: 'つよい黄', munsell: '2.5Y 8/7.5', page: 133 },
-    { group: '外来色名', name: 'ジョンブリアン', sub: 'jaune brilliant', system: 'あざやかな黄', munsell: '5Y 8.5/14', page: 133 },
+    { group: '外来色名', name: 'ジョンブリアン', sub: 'jaune brillant', system: 'あざやかな黄', munsell: '5Y 8.5/14', page: 133 },
     { group: '外来色名', name: 'シャトルーズグリーン', sub: 'chartreuse green', system: '明るい黄緑', munsell: '4GY 8/10', page: 134 },
     { group: '外来色名', name: 'リーフグリーン', sub: 'leaf green', system: 'つよい黄緑', munsell: '5GY 6/7', page: 134 },
     { group: '外来色名', name: 'グラスグリーン', sub: 'grass green', system: 'くすんだ黄緑', munsell: '5GY 5/5', page: 134 },
@@ -70,9 +71,6 @@ const content = {
     { group: '外来色名', name: 'ランプブラック', sub: 'lamp black', system: '黒', munsell: 'N1', page: 135 },
   ],
 }
-
-const hueOrder = ['R', 'YR', 'Y', 'GY', 'G', 'BG', 'B', 'PB', 'P', 'RP']
-const hueCenters = [0, 30, 57, 88, 128, 170, 208, 246, 286, 326]
 
 let readerRoot = null
 let readerIndex = 0
@@ -100,70 +98,13 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;')
 }
 
-function wrapDegrees(value) {
-  return ((value % 360) + 360) % 360
+function normalizeMunsellNotation(notation) {
+  const neutral = String(notation).trim().match(/^N\s*(\d+(?:\.\d+)?)$/i)
+  return neutral ? `N ${neutral[1]}` : String(notation).trim()
 }
 
-function shortestHueDelta(from, to) {
-  return ((to - from + 540) % 360) - 180
-}
-
-function munsellHueDegrees(hue, step) {
-  const index = hueOrder.indexOf(hue)
-  if (index < 0) return 0
-
-  const center = hueCenters[index]
-  const previous = hueCenters[(index + hueCenters.length - 1) % hueCenters.length]
-  const next = hueCenters[(index + 1) % hueCenters.length]
-  const amount = (step - 5) / 5
-
-  if (amount < 0) {
-    const boundaryDelta = shortestHueDelta(center, previous) / 2
-    return wrapDegrees(center + boundaryDelta * Math.abs(amount))
-  }
-
-  const boundaryDelta = shortestHueDelta(center, next) / 2
-  return wrapDegrees(center + boundaryDelta * amount)
-}
-
-function munsellValueToLuminance(value) {
-  const v = clamp(value, 0, 10)
-  const y =
-    1.2219 * v -
-    0.23111 * v ** 2 +
-    0.23951 * v ** 3 -
-    0.021009 * v ** 4 +
-    0.0008404 * v ** 5
-  return clamp(y / 100, 0, 1)
-}
-
-function hueToRgb(p, q, t) {
-  let next = t
-  if (next < 0) next += 1
-  if (next > 1) next -= 1
-  if (next < 1 / 6) return p + (q - p) * 6 * next
-  if (next < 1 / 2) return q
-  if (next < 2 / 3) return p + (q - p) * (2 / 3 - next) * 6
-  return p
-}
-
-function hslToRgb(hue, saturation, lightness) {
-  const h = wrapDegrees(hue) / 360
-  const s = clamp(saturation, 0, 1)
-  const l = clamp(lightness, 0, 1)
-
-  if (s === 0) return [l, l, l]
-
-  const q = l < 0.5 ? l * (1 + s) : l + s - l * s
-  const p = 2 * l - q
-  return [
-    hueToRgb(p, q, h + 1 / 3),
-    hueToRgb(p, q, h),
-    hueToRgb(p, q, h - 1 / 3),
-  ]
-}
-
-function srgbToLinear(channel) {
+function srgbToLinear(channel255) {
+  const channel = clamp(channel255 / 255, 0, 1)
   return channel <= 0.04045
     ? channel / 12.92
     : ((channel + 0.055) / 1.055) ** 2.4
@@ -174,67 +115,28 @@ function relativeLuminance(rgb) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
-function solveLightness(hue, saturation, targetLuminance) {
-  let low = 0
-  let high = 1
-
-  for (let index = 0; index < 22; index += 1) {
-    const middle = (low + high) / 2
-    const luminance = relativeLuminance(hslToRgb(hue, saturation, middle))
-    if (luminance < targetLuminance) low = middle
-    else high = middle
-  }
-
-  return (low + high) / 2
-}
-
-function parseMunsell(notation) {
-  const neutral = notation.match(/^N\s*(\d+(?:\.\d+)?)$/i)
-  if (neutral) {
-    return {
-      neutral: true,
-      value: Number(neutral[1]),
-      chroma: 0,
-      hue: 0,
-    }
-  }
-
-  const match = notation.match(
-    /^(\d+(?:\.\d+)?)(RP|YR|GY|BG|PB|R|Y|G|B|P)\s+(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/i,
-  )
-  if (!match) return null
-
-  const [, step, hueName, value, chroma] = match
-  return {
-    neutral: false,
-    hue: munsellHueDegrees(hueName.toUpperCase(), Number(step)),
-    value: Number(value),
-    chroma: Number(chroma),
-  }
+function rgbToHex(rgb) {
+  return `#${rgb.map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0')).join('')}`
 }
 
 function munsellToScreenColor(notation) {
-  const parsed = parseMunsell(notation)
-  if (!parsed) return { css: '#777777', text: '#ffffff' }
+  const normalized = normalizeMunsellNotation(notation)
+  let rgb
 
-  const targetLuminance = munsellValueToLuminance(parsed.value)
-
-  if (parsed.neutral) {
-    const channel = targetLuminance <= 0.0031308
-      ? 12.92 * targetLuminance
-      : 1.055 * targetLuminance ** (1 / 2.4) - 0.055
-    const value = Math.round(clamp(channel, 0, 1) * 255)
-    const css = `rgb(${value} ${value} ${value})`
-    return { css, text: targetLuminance > 0.38 ? '#171717' : '#ffffff' }
+  try {
+    rgb = munsell.munsellToRgb255(normalized)
+  } catch (error) {
+    console.error(`Munsell conversion failed: ${notation}`, error)
+    rgb = [119, 119, 119]
   }
 
-  const saturation = clamp(1 - Math.exp(-parsed.chroma / 5.5), 0, 0.96)
-  const lightness = solveLightness(parsed.hue, saturation, targetLuminance)
-  const css = `hsl(${parsed.hue.toFixed(1)}deg ${(saturation * 100).toFixed(1)}% ${(lightness * 100).toFixed(1)}%)`
+  const safeRgb = rgb.map((value) => clamp(Math.round(Number(value) || 0), 0, 255))
+  const luminance = relativeLuminance(safeRgb)
 
   return {
-    css,
-    text: targetLuminance > 0.42 ? '#171717' : '#ffffff',
+    css: `rgb(${safeRgb[0]} ${safeRgb[1]} ${safeRgb[2]})`,
+    hex: rgbToHex(safeRgb).toUpperCase(),
+    text: luminance > 0.43 ? '#171717' : '#ffffff',
   }
 }
 
@@ -250,11 +152,12 @@ function cardMarkup(item, index) {
       data-index="${index}"
       data-group="${escapeHtml(item.group)}"
       data-search="${escapeHtml(itemSearchText(item))}"
+      data-srgb="${escapeHtml(color.hex)}"
     >
       <div
         class="conventional-color-card__swatch"
         style="--swatch:${escapeHtml(color.css)};--swatch-text:${escapeHtml(color.text)}"
-        aria-label="${escapeHtml(item.name)}の画面用近似色"
+        aria-label="${escapeHtml(item.name)}のRenotation基準sRGB色面"
       >
         <div class="conventional-color-card__swatch-label">
           <strong>${escapeHtml(item.name)}</strong>
@@ -266,6 +169,10 @@ function cardMarkup(item, index) {
         <div class="conventional-color-card__facts">
           <span>MUNSELL / P.${item.page}</span>
           <b>${escapeHtml(item.munsell)}</b>
+        </div>
+        <div class="conventional-color-card__screen-value">
+          <span>sRGB</span>
+          <b>${escapeHtml(color.hex)}</b>
         </div>
       </div>
     </article>
@@ -300,7 +207,7 @@ function ensureReader() {
         <button class="conventional-color-reader__close" type="button" data-conventional-close>← 戻る</button>
         <div class="conventional-color-reader__title">
           <strong>${escapeHtml(content.section)}</strong>
-          <span>COLOR / MUNSELL REFERENCE</span>
+          <span>REN0TATION DATA → sRGB / D65</span>
         </div>
         <div class="conventional-color-reader__count" aria-live="polite">63 / 63</div>
       </header>
@@ -309,7 +216,7 @@ function ensureReader() {
         <div class="conventional-color-reader__controls-inner">
           <label class="conventional-color-reader__search">
             <span>SEARCH</span>
-            <input type="search" autocomplete="off" placeholder="色名・読み・系統色名・マンセル値" data-conventional-search />
+            <input type="search" autocomplete="off" inputmode="search" placeholder="色名・読み・系統色名・マンセル値" data-conventional-search />
           </label>
           <div class="conventional-color-reader__tabs" role="group" aria-label="慣用色名の種類">
             <button type="button" class="is-active" data-group-filter="all">すべて 63</button>
@@ -318,7 +225,7 @@ function ensureReader() {
           </div>
         </div>
         <p class="conventional-color-reader__note">
-          色面は教科書記載のマンセル値 H V/C から画面用に近似生成しています。実物のJIS標準色票とは、ディスプレイの色域・設定により差が出ます。
+          色面は教科書のマンセル値をMunsell Renotation Data基準でD65のsRGBへ変換。画面の色域・輝度・True Tone等で実物色票との見え方は変わります。
         </p>
       </div>
 
@@ -410,7 +317,6 @@ function openReader() {
     const target = reader.querySelector(`.conventional-color-card[data-index="${readerIndex}"]`)
     if (readerIndex > 0 && target) target.scrollIntoView({ block: 'start' })
     else scroll.scrollTop = 0
-    search?.focus({ preventScroll: true })
   })
 }
 
