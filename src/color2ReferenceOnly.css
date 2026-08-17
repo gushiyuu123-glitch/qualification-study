@@ -9,3 +9,87 @@
 .app-shell[data-qualification='color-2'] .bottom-nav button:not([hidden]) {
   width: 100%;
 }
+
+.color2-conventional-entry {
+  margin: 22px 0 8px;
+  padding: 28px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  border-top: 1px solid rgba(22, 22, 22, 0.18);
+  border-bottom: 1px solid rgba(22, 22, 22, 0.18);
+}
+
+.color2-conventional-entry__copy > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #8d3b3b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.color2-conventional-entry__copy h2 {
+  margin: 0;
+  font-size: clamp(27px, 5vw, 44px);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.color2-conventional-entry__copy p {
+  max-width: 620px;
+  margin: 10px 0 0;
+  color: #6f6a64;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.color2-conventional-entry button {
+  appearance: none;
+  min-width: 174px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  border: 0;
+  border-bottom: 1px solid #191919;
+  border-radius: 0;
+  background: transparent;
+  color: #191919;
+  padding: 12px 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.color2-conventional-entry button span {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.color2-conventional-entry button b {
+  color: #8d3b3b;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.color2-conventional-entry button.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 620px) {
+  .color2-conventional-entry {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 24px 0;
+  }
+
+  .color2-conventional-entry button {
+    width: 100%;
+    min-width: 0;
+  }
+}
