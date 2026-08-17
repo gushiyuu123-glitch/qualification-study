@@ -5,6 +5,7 @@ import Color2ReferenceView from './Color2ReferenceView.jsx'
 import './color2ReferenceOnly.css'
 
 const COLOR2_ID = 'color-2'
+const CONVENTIONAL_READER_KEY = 'conventional-color-names'
 const color2 = qualifications.find((item) => item.id === COLOR2_ID)
 
 if (color2) {
@@ -17,6 +18,58 @@ if (color2) {
 
 function normalize(value) {
   return String(value ?? '').toLowerCase().replace(/\s+/g, '')
+}
+
+function injectConventionalColorNamesEntry(screen) {
+  if (screen.querySelector('.color2-conventional-entry')) return
+
+  const library = screen.querySelector('#color2-reference-library')
+  if (!library) return
+
+  library.insertAdjacentHTML(
+    'beforebegin',
+    `
+      <section class="color2-conventional-entry" aria-labelledby="color2-conventional-title">
+        <div class="color2-conventional-entry__copy">
+          <span>JIS CONVENTIONAL COLOR NAMES</span>
+          <h2 id="color2-conventional-title">慣用色名 63色</h2>
+          <p>和色名31色＋外来色名32色。色面、系統色名、マンセル値を同じ画面で確認する。</p>
+        </div>
+        <button type="button" data-conventional-reader-open>
+          <span>色面を開く</span>
+          <b aria-hidden="true">63</b>
+        </button>
+      </section>
+    `,
+  )
+}
+
+function wireConventionalColorNames(screen) {
+  const button = screen.querySelector('[data-conventional-reader-open]')
+  if (!button || button.dataset.readerWired === 'true') return
+  button.dataset.readerWired = 'true'
+
+  button.addEventListener('click', () => {
+    const reader = window.__QUALIFY_TEXTBOOK_READERS__?.[CONVENTIONAL_READER_KEY]
+    if (!reader?.open) {
+      button.classList.add('is-loading')
+      const handleReady = (event) => {
+        if (event.detail?.readerKey !== CONVENTIONAL_READER_KEY) return
+        window.removeEventListener('qualify:textbook-readers-ready', handleReady)
+        button.classList.remove('is-loading')
+        window.__QUALIFY_TEXTBOOK_READERS__?.[CONVENTIONAL_READER_KEY]?.open?.(0)
+      }
+      window.addEventListener('qualify:textbook-readers-ready', handleReady)
+      return
+    }
+
+    reader.open(0)
+  })
+}
+
+function enhanceConventionalColorNames(screen) {
+  injectConventionalColorNamesEntry(screen)
+  wireConventionalColorNames(screen)
 }
 
 function updateVisibleCount(screen) {
@@ -84,6 +137,7 @@ function renderReferenceOnly() {
   if (!main || !currentScreen) return
 
   if (currentScreen.classList.contains('color2-reference-screen')) {
+    enhanceConventionalColorNames(currentScreen)
     wireReferenceFilters(currentScreen)
     return
   }
@@ -98,7 +152,10 @@ function renderReferenceOnly() {
 
   currentScreen.outerHTML = html
   const referenceScreen = main.querySelector(':scope > .color2-reference-screen')
-  if (referenceScreen) wireReferenceFilters(referenceScreen)
+  if (referenceScreen) {
+    enhanceConventionalColorNames(referenceScreen)
+    wireReferenceFilters(referenceScreen)
+  }
 }
 
 function keepColor2QuestionNavDisabled() {
