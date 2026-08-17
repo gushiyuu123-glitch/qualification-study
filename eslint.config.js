@@ -24,4 +24,10 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    files: ['src/conventionalColorNamesStudy.js'],
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^openReader$' }],
+    },
+  },
 ])
