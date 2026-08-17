@@ -96,16 +96,21 @@ function wireConventionalQuiz(screen) {
   })
 }
 
+function setTextIfChanged(node, nextText) {
+  if (node && node.textContent !== nextText) node.textContent = nextText
+}
+
 function syncConventionalQuizCopy(screen) {
   const heroCopy = screen.querySelector('.color2-reference-hero > p')
-  if (heroCopy) {
-    heroCopy.textContent = '本編は確認済み内容だけの解説専用。慣用色名63色だけは、同じ確認済みデータから4択でも確認できる。'
-  }
+  setTextIfChanged(
+    heroCopy,
+    '本編は確認済み内容だけの解説専用。慣用色名63色だけは、同じ確認済みデータから4択でも確認できる。',
+  )
 
   const statusStrong = screen.querySelectorAll('.color2-reference-status strong')
   const statusLabel = screen.querySelectorAll('.color2-reference-status span')
-  if (statusStrong[1]) statusStrong[1].textContent = '63'
-  if (statusLabel[1]) statusLabel[1].textContent = '慣用色名4択対象'
+  setTextIfChanged(statusStrong[1], '63')
+  setTextIfChanged(statusLabel[1], '慣用色名4択対象')
 }
 
 function enhanceConventionalColorNames(screen) {
