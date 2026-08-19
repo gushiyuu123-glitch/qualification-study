@@ -144,4 +144,17 @@ if (!conventionalQuiz.includes('buildMistakeSession') || !conventionalQuiz.inclu
   throw new Error('慣用色名4択に誤答だけの再挑戦導線がありません。')
 }
 
-console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / Renotation基準sRGB / 本試験型4択 / 誤答再挑戦 / 共通問題データ0`)
+const weaknessTokens = [
+  'STORAGE_KEY',
+  'window.localStorage',
+  'MASTERED_STREAK = 2',
+  'recordWeaknessAnswer',
+  'buildSavedMistakeSession',
+  'data-quiz-start-weak',
+]
+const missingWeaknessTokens = weaknessTokens.filter((token) => !conventionalQuiz.includes(token))
+if (missingWeaknessTokens.length) {
+  throw new Error(`慣用色名の蓄積ミス機能が不足しています: ${missingWeaknessTokens.join(', ')}`)
+}
+
+console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / Renotation基準sRGB / 本試験型4択 / 誤答再挑戦 / 蓄積ミス保存 / 共通問題データ0`)
