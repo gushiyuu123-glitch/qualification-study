@@ -1,8 +1,11 @@
 import './conventionalColorNamesQuiz.css'
+import './conventionalColorNamesWeakness.css'
 
 const READER_KEY = 'conventional-color-names'
 const READY_EVENT = 'qualify:conventional-color-quiz-ready'
 const EXPECTED_ITEM_COUNT = 63
+const STORAGE_KEY = 'qualify:color2:conventional-color-names:weakness:v1'
+const MASTERED_STREAK = 2
 const hueOrder = ['R', 'YR', 'Y', 'GY', 'G', 'BG', 'B', 'PB', 'P', 'RP']
 
 let quizRoot = null
@@ -13,6 +16,7 @@ let quizIndex = 0
 let correctCount = 0
 let answered = false
 let mistakes = []
+let weaknessBank = {}
 let returnToReader = false
 let readerBeforeQuiz = null
 let bodyOverflowBeforeQuiz = ''
@@ -32,6 +36,130 @@ function unique(values) {
 
 function readText(root, selector) {
   return root.querySelector(selector)?.textContent?.trim() ?? ''
+}
+
+function normalizeWeaknessEntry(entry) {
+  return {
+    misses: Math.max(1, Math.trunc(Number(entry?.misses) || 1)),
+    streak: Math.max(0, Math.trunc(Number(entry?.streak) || 0)),
+    mastered: Boolean(entry?.mastered),
+    lastMissAt: Math.max(0, Math.trunc(Number(entry?.lastMissAt) || 0)),
+  }
+}
+
+function loadWeaknessBank() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
+    const storedItems = parsed?.items
+    if (!storedItems || typeof storedItems !== 'object' || Array.isArray(storedItems)) return {}
+
+    return Object.fromEntries(
+      Object.entries(storedItems)
+        .filter(([name, entry]) => typeof name === 'string' && entry && typeof entry === 'object')
+        .map(([name, entry]) => [name, normalizeWeaknessEntry(entry)]),
+    )
+  } catch {
+    return {}
+  }
+}
+
+function saveWeaknessBank() {
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ version: 1, items: weaknessBank }),
+    )
+  } catch {
+    // Storage can be unavailable in private/restricted browser contexts.
+  }
+}
+
+function syncWeaknessBankWithMaster() {
+  const validNames = new Set(verifiedItems.map((item) => item.name))
+  let changed = false
+
+  Object.keys(weaknessBank).forEach((name) => {
+    if (!validNames.has(name)) {
+      delete weaknessBank[name]
+      changed = true
+    }
+  })
+
+  if (changed) saveWeaknessBank()
+}
+
+function weaknessNames() {
+  return Object.entries(weaknessBank)
+    .filter(([, entry]) => !entry.mastered)
+    .sort(([, a], [, b]) => b.misses - a.misses || b.lastMissAt - a.lastMissAt)
+    .map(([name]) => name)
+}
+
+function weaknessItems() {
+  return weaknessNames()
+    .map((name) => verifiedItems.find((item) => item.name === name))
+    .filter(Boolean)
+}
+
+function formatWeaknessList(limit = 8) {
+  const names = weaknessNames()
+  if (!names.length) return 'まだなし。間違えた色はここに自動で蓄積されます。'
+
+  const visible = names.slice(0, limit).map((name) => {
+    const misses = weaknessBank[name]?.misses ?? 1
+    return misses > 1 ? `${name} ×${misses}` : name
+  })
+  const rest = names.length - visible.length
+  return `${visible.join('、')}${rest > 0 ? `、ほか${rest}色` : ''}`
+}
+
+function refreshWeaknessUI() {
+  if (!quizRoot) return
+  const names = weaknessNames()
+  const count = quizRoot.querySelector('[data-quiz-weak-count]')
+  const list = quizRoot.querySelector('[data-quiz-weak-list]')
+  const start = quizRoot.querySelector('[data-quiz-start-weak]')
+  const reset = quizRoot.querySelector('[data-quiz-clear-weak]')
+
+  if (count) count.textContent = `${names.length}色`
+  if (list) list.textContent = formatWeaknessList()
+  if (start) start.disabled = names.length === 0
+  if (reset) reset.hidden = names.length === 0
+}
+
+function recordWeaknessAnswer(name, isCorrect) {
+  const current = weaknessBank[name]
+
+  if (!isCorrect) {
+    weaknessBank[name] = {
+      misses: (current?.misses ?? 0) + 1,
+      streak: 0,
+      mastered: false,
+      lastMissAt: Date.now(),
+    }
+    saveWeaknessBank()
+    refreshWeaknessUI()
+    return
+  }
+
+  if (!current || current.mastered) return
+
+  const streak = current.streak + 1
+  weaknessBank[name] = {
+    ...current,
+    streak,
+    mastered: streak >= MASTERED_STREAK,
+  }
+  saveWeaknessBank()
+  refreshWeaknessUI()
+}
+
+function clearWeaknessBank() {
+  if (!weaknessNames().length) return
+  if (!window.confirm('蓄積した慣用色名のミス履歴をリセットしますか？')) return
+  weaknessBank = {}
+  saveWeaknessBank()
+  refreshWeaknessUI()
 }
 
 function readVerifiedItems(reader) {
@@ -170,6 +298,10 @@ function buildMistakeSession() {
   ).map(createQuestion)
 }
 
+function buildSavedMistakeSession() {
+  return shuffle(weaknessItems()).map(createQuestion)
+}
+
 function ensureQuiz() {
   if (quizRoot?.isConnected) return quizRoot
 
@@ -208,6 +340,19 @@ function ensureQuiz() {
             <button type="button" data-quiz-start="all"><strong>全色</strong><span>選択範囲を一周</span></button>
           </div>
 
+          <section class="conventional-color-quiz__weak-bank" aria-label="蓄積した苦手色">
+            <div class="conventional-color-quiz__weak-head">
+              <span>蓄積ミス</span>
+              <strong data-quiz-weak-count>0色</strong>
+            </div>
+            <p data-quiz-weak-list>まだなし。間違えた色はここに自動で蓄積されます。</p>
+            <div class="conventional-color-quiz__weak-actions">
+              <button type="button" data-quiz-start-weak disabled>蓄積ミスだけ解く</button>
+              <button type="button" data-quiz-clear-weak hidden>履歴をリセット</button>
+            </div>
+            <small>間違いは端末に保存。あとから2回連続で正解すると克服扱いになります。</small>
+          </section>
+
           <p class="conventional-color-quiz__types">色面 → 慣用色名を選択 / 解答後に読み・系統色名・マンセル値を確認</p>
         </section>
 
@@ -220,7 +365,7 @@ function ensureQuiz() {
 
           <figure class="conventional-color-quiz__swatch-wrap">
             <div class="conventional-color-quiz__swatch" data-quiz-swatch aria-label="問題の色面"></div>
-            <figcaption>REN0TATION DATA → sRGB / D65</figcaption>
+            <figcaption>RENOTATION DATA → sRGB / D65</figcaption>
           </figure>
 
           <div class="conventional-color-quiz__choices" data-quiz-choices></div>
@@ -272,11 +417,14 @@ function ensureQuiz() {
   quizRoot.querySelectorAll('[data-quiz-start]').forEach((button) => {
     button.addEventListener('click', () => startQuiz(button.dataset.quizStart || '10'))
   })
+  quizRoot.querySelector('[data-quiz-start-weak]')?.addEventListener('click', startSavedMistakes)
+  quizRoot.querySelector('[data-quiz-clear-weak]')?.addEventListener('click', clearWeaknessBank)
   quizRoot.querySelector('[data-quiz-next]')?.addEventListener('click', nextQuestion)
   quizRoot.querySelector('[data-quiz-retry-misses]')?.addEventListener('click', retryMistakes)
   quizRoot.querySelector('[data-quiz-again]')?.addEventListener('click', showSetup)
   quizRoot.querySelector('[data-quiz-finish]')?.addEventListener('click', closeQuiz)
 
+  refreshWeaknessUI()
   return quizRoot
 }
 
@@ -292,10 +440,16 @@ function showSetup() {
   quizRoot.querySelector('[data-quiz-complete]').hidden = true
   const progress = quizRoot.querySelector('[data-quiz-progress]')
   if (progress) progress.textContent = 'SETUP'
+  refreshWeaknessUI()
   scrollQuizTop()
 }
 
 function beginSession(nextSession) {
+  if (!nextSession.length) {
+    showSetup()
+    return
+  }
+
   session = nextSession
   quizIndex = 0
   correctCount = 0
@@ -310,6 +464,10 @@ function beginSession(nextSession) {
 
 function startQuiz(requestedCount) {
   beginSession(buildSession(requestedCount))
+}
+
+function startSavedMistakes() {
+  beginSession(buildSavedMistakeSession())
 }
 
 function renderQuestion() {
@@ -385,6 +543,7 @@ function answerQuestion(selected, selectedButton) {
   const isCorrect = selected === question.answer
   if (isCorrect) correctCount += 1
   else mistakes.push(question.item.name)
+  recordWeaknessAnswer(question.item.name, isCorrect)
 
   quizRoot.querySelectorAll('[data-quiz-choices] button').forEach((button) => {
     button.disabled = true
@@ -427,15 +586,21 @@ function showComplete() {
   const retry = quizRoot.querySelector('[data-quiz-retry-misses]')
   const accuracy = session.length ? Math.round((correctCount / session.length) * 100) : 0
   const uniqueMisses = unique(mistakes)
+  const savedWeaknessCount = weaknessNames().length
 
   if (questionScreen) questionScreen.hidden = true
   if (complete) complete.hidden = false
   if (progress) progress.textContent = 'DONE'
   if (score) score.textContent = `${correctCount} / ${session.length}`
-  if (summary) summary.textContent = `正答率 ${accuracy}% · ${uniqueMisses.length ? `要復習 ${uniqueMisses.length}色` : '全問正解'}`
+  if (summary) {
+    const current = uniqueMisses.length ? `要復習 ${uniqueMisses.length}色` : '全問正解'
+    const stored = savedWeaknessCount ? ` · 蓄積ミス ${savedWeaknessCount}色` : ''
+    summary.textContent = `正答率 ${accuracy}% · ${current}${stored}`
+  }
   if (misses) misses.hidden = uniqueMisses.length === 0
   if (missList) missList.textContent = uniqueMisses.join('、')
   if (retry) retry.hidden = uniqueMisses.length === 0
+  refreshWeaknessUI()
   scrollQuizTop()
 }
 
@@ -475,6 +640,9 @@ function openQuiz() {
     window.alert(error.message)
     return
   }
+
+  weaknessBank = loadWeaknessBank()
+  syncWeaknessBankWithMaster()
 
   const root = ensureQuiz()
   activeScope = 'all'
