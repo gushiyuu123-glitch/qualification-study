@@ -21,6 +21,43 @@ if (color2Summer2026PointTotal !== EXPECTED_POINT_TOTAL) {
   throw new Error(`2026夏期の配点が想定外です: ${color2Summer2026PointTotal}`)
 }
 
+const officialAnswerKey = {
+  1: [1, 0, 3, 2, 2, 3],
+  2: [1, 2, 3, 3, 1, 0, 2, 0],
+  3: [2, 3, 3, 1, 0, 1],
+  4: [0, 1, 0, 3, 1, 2, 0, 2, 1, 2],
+  5: [0, 2, 1, 1, 0, 0],
+  6: [1, 3, 0, 1, 0, 2, 0, 1],
+  7: [0, 3, 1, 1, 2, 0, 3, 2, 0, 2],
+  8: [1, 2, 2, 3, 0, 1],
+  9: [0, 3, 2, 1, 2],
+  10: [2, 1, 0, 2, 3, 3],
+  11: [2, 0],
+  12: [3, 2],
+  13: [2, 0, 3, 1, 3, 0],
+  14: [1, 3, 0, 0, 2, 3],
+  15: [0, 1, 1, 3, 3, 3],
+  16: [0, 2, 2, 3, 2, 1],
+  17: [0, 1, 2, 2, 2],
+}
+
+for (const [groupNumberText, expectedIndexes] of Object.entries(officialAnswerKey)) {
+  const groupNumber = Number(groupNumberText)
+  const actual = color2Summer2026Questions.filter((question) => question.groupNumber === groupNumber)
+
+  if (actual.length !== expectedIndexes.length) {
+    throw new Error(`公式解答照合: 問題(${groupNumber})の設問数が不一致です。`)
+  }
+
+  actual.forEach((question, index) => {
+    if (question.correctIndex !== expectedIndexes[index]) {
+      throw new Error(
+        `公式解答照合: 問題(${groupNumber})${question.part} の正解が不一致です。期待=${expectedIndexes[index] + 1} 実際=${question.correctIndex + 1}`,
+      )
+    }
+  })
+}
+
 const invalidChoices = color2Summer2026Questions.filter(
   (question) =>
     !Array.isArray(question.choices) ||
@@ -87,5 +124,5 @@ if (missingRuntimeTokens.length) {
 }
 
 console.log(
-  `色彩検定2級 2026夏期 検証OK: ${EXPECTED_QUESTION_COUNT}問 / ${EXPECTED_POINT_TOTAL}点 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`,
+  `色彩検定2級 2026夏期 検証OK: ${EXPECTED_QUESTION_COUNT}問 / ${EXPECTED_POINT_TOTAL}点 / 公式解答照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`,
 )
