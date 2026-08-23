@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/validateColor2ReferenceOnly.mjs",
+    "prebuild": "node scripts/prepareBrandAssets.mjs && node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs",
     "build": "eslint . && vite build",
     "lint": "eslint .",
-    "validate:color2": "node scripts/validateColor2ReferenceOnly.mjs",
+    "validate:color2": "node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
