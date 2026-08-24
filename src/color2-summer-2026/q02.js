@@ -1,136 +1,78 @@
-// 2026年度夏期の出題内容を基に、転載を避けて学習用に再構成した問題です。
+// 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに4択練習として収録します。
 export const q02 = {
-  "number": 2,
-  "questionPage": null,
-  "answerPage": 1,
-  "defaultPoints": 2,
-  "caution": "光の分光特性、物体の反射特性、視細胞の感度を別々に整理する。",
-  "items": [
+  number: 2,
+  questionPage: 2,
+  answerPage: 18,
+  defaultPoints: 2,
+  caution: '教科書の問題(2)に沿って、分光分布・分光反射率・中心窩・分光視感効率を図と対応づける。',
+  items: [
     {
-      "part": "A",
-      "prompt": "光源に含まれる波長ごとのエネルギー量を表す特性はどれか。",
-      "choices": [
-        "分光感度",
-        "分光分布",
-        "分光反射率",
-        "分光透過率"
-      ],
-      "correctIndex": 1,
-      "explanation": "光源の波長別エネルギー量は分光分布で表す。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'A',
+      prompt: '光の特性を表し、光の成分を知ることができるものはどれか。',
+      choices: ['分光感度', '分光分布', '分光反射率', '分光透過率'],
+      correctIndex: 1,
+      explanation: '教科書の正答は②。光源に含まれる波長ごとのエネルギーの分布を分光分布という。',
+      questionType: 'visual-diagram',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
     },
     {
-      "part": "B",
-      "prompt": "長波長側の成分が比較的多い光は、どのような光色に見えやすいか。",
-      "choices": [
-        "色みのない無色",
-        "青みがかった色",
-        "黄みから赤みがかった色",
-        "青みから緑みがかった色"
-      ],
-      "correctIndex": 2,
-      "explanation": "長波長側の比率が高い光は、黄から赤方向の暖かい光色に見えやすい。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'B',
+      prompt: '図1から判断できる、示された光の色として最も適切なものはどれか。',
+      choices: ['色みを感じさせない無色である', '青みがかっている', '黄みから赤みがかっている', '青みから緑みがかっている'],
+      correctIndex: 2,
+      explanation: '教科書の正答は③。図1は長波長側の比エネルギーが大きく、黄みから赤みを帯びた光と判断できる。',
+      questionType: 'visual-diagram',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
     },
     {
-      "part": "C",
-      "prompt": "図2と図3の反射特性を白色光の下で比較した説明として適切なものはどれか。",
-      "choices": [
-        "図2は無彩色、図3は有彩色になる",
-        "図2は図3より彩度が低い",
-        "図2と図3は同じ色相になる",
-        "図3は図2より明度が低い"
-      ],
-      "correctIndex": 3,
-      "explanation": "全波長域で反射率が低い図3は、図2より暗く、明度の低い色として見える。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'C',
+      prompt: '図2と図3のような反射特性をもつ物体を白色光の下で比べたとき、最も適切な記述はどれか。',
+      choices: ['図2のほうは無彩色', '図3のほうは有彩色', '図2は図3よりも彩度の低い色', '図3は図2よりも明度の低い色'],
+      correctIndex: 3,
+      explanation: '教科書の正答は④。図3は可視域全体の反射率が低いため、図2より明度の低い色に見える。',
+      questionType: 'visual-diagram',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
     },
     {
-      "part": "D",
-      "prompt": "図2のように中〜長波長域をよく反射する色票に最も近い色はどれか。",
-      "choices": [
-        "暗い無彩色",
-        "中明度の灰色",
-        "赤",
-        "黄"
-      ],
-      "correctIndex": 3,
-      "explanation": "緑から赤にかけて広く反射し、短波長側をあまり反射しないため黄に見えやすい。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'D',
+      prompt: '図2の分光反射率をもつ色として最も適切なものはどれか。',
+      choices: ['色票①', '色票②', '色票③', '色票④'],
+      correctIndex: 3,
+      explanation: '教科書の正答は④。短波長側の反射が低く、中〜長波長側の反射が高いため黄色に対応する。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
     },
     {
-      "part": "E",
-      "prompt": "網膜で錐体細胞が高密度に集まり、細部を最も明瞭に見る部分はどれか。",
-      "choices": [
-        "周辺部",
-        "中心窩",
-        "視神経乳頭",
-        "色素上皮層"
-      ],
-      "correctIndex": 1,
-      "explanation": "中心窩には錐体細胞が密集し、色と細部の識別に優れる。"
+      part: 'E',
+      prompt: '明るいところではたらく視細胞が高密度に分布している部分はどれか。',
+      choices: ['周辺部分', '中心窩', '視神経乳頭', '色素上皮層'],
+      correctIndex: 1,
+      explanation: '教科書の正答は②。中心窩には錐体細胞が高密度に分布している。',
     },
     {
-      "part": "F",
-      "prompt": "中心窩から外れた周辺視野で見る場合の特徴として適切なものはどれか。",
-      "choices": [
-        "色の感度と解像度がともに低い",
-        "色の感度と解像度がともに高い",
-        "色の感度は低いが解像度は高い",
-        "色の感度は高いが解像度は低い"
-      ],
-      "correctIndex": 0,
-      "explanation": "周辺視野では中心窩に比べ、色の感度と空間的な解像度が低くなる。"
+      part: 'F',
+      prompt: '中心窩以外で見たときの特徴として最も適切なものはどれか。',
+      choices: ['色の感度および解像度が低く', '色の感度および解像度が高く', '色の感度は低く解像度は高く', '色の感度は高く解像度は低く'],
+      correctIndex: 0,
+      explanation: '教科書の正答は①。周辺視では中心窩より色の感度と解像度が低くなる。',
     },
     {
-      "part": "G",
-      "prompt": "波長ごとの明るさに対する相対的な感度を表す曲線はどれか。",
-      "choices": [
-        "比視覚度",
-        "視感度率",
-        "分光視感効率",
-        "分光視覚効率"
-      ],
-      "correctIndex": 2,
-      "explanation": "人の波長別の明るさ感度は分光視感効率で表す。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'G',
+      prompt: '明るさに対する視細胞の波長別の感度を表すものはどれか。',
+      choices: ['比視覚度', '視感度率', '分光視感効率', '分光視覚効率'],
+      correctIndex: 2,
+      explanation: '教科書の正答は③。波長ごとの明るさ感度は分光視感効率で表す。',
+      questionType: 'visual-diagram',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
     },
     {
-      "part": "H",
-      "prompt": "暗い環境へ順応すると、相対的に感度が高くなる光の領域はどれか。",
-      "choices": [
-        "短波長",
-        "中波長",
-        "長波長",
-        "短波長と長波長の両方"
-      ],
-      "correctIndex": 0,
-      "explanation": "暗所視では感度のピークが短波長側へ移る。これがプルキンエシフトである。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q02-light.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    }
-  ]
+      part: 'H',
+      prompt: '暗くなってくると相対的に感度が高くなる光の領域はどれか。',
+      choices: ['短波長', '中波長', '長波長', '短波長と長波長'],
+      correctIndex: 0,
+      explanation: '教科書の正答は①。暗所では感度のピークが短波長側へ移る。',
+      questionType: 'visual-diagram',
+      image: { src: '/color2-2026-summer-practice/q02-light.svg', alt: '2026年度夏期 問題2の図1〜図4と色票選択肢' },
+    },
+  ],
 }
