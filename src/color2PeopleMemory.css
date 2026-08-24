@@ -1,0 +1,102 @@
+.color2-people-memory {
+  margin-top: 46px;
+}
+
+.color2-people-memory__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #202020;
+}
+
+.color2-people-memory__heading span {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: #8d8d8d;
+}
+
+.color2-people-memory__heading h2 {
+  margin: 5px 0 0;
+  font-size: clamp(24px, 4.6vw, 34px);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.color2-people-memory__heading p {
+  max-width: 430px;
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.65;
+  text-align: right;
+}
+
+.color2-people-memory__list {
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.color2-people-memory__list article {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.75fr) minmax(0, 1.6fr);
+  gap: 28px;
+  padding: 20px 0;
+  border-top: 1px solid #ededed;
+}
+
+.color2-people-memory__list article:first-child {
+  border-top: 0;
+}
+
+.color2-people-memory__name strong {
+  display: block;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.color2-people-memory__name span {
+  display: inline-block;
+  margin-top: 7px;
+  color: #8d3b3b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.color2-people-memory__list p {
+  margin: 0;
+  color: #444;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.color2-people-memory__list b {
+  color: #171717;
+  font-weight: 700;
+}
+
+.color2-people-memory__mnemonic {
+  margin: 14px 0 0;
+  color: #8d3b3b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .color2-people-memory__heading {
+    display: block;
+  }
+
+  .color2-people-memory__heading p {
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  .color2-people-memory__list article {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 18px 0;
+  }
+}
