@@ -1,102 +1,70 @@
-// 2026年度夏期の出題内容を基に、転載を避けて学習用に再構成した問題です。
+// 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに4択練習として収録します。
 export const q08 = {
-  "number": 8,
-  "questionPage": null,
-  "answerPage": 1,
-  "defaultPoints": 2,
-  "caution": "図の色数、色相差、トーン関係を数えて配色技法を判定する。",
-  "items": [
+  number: 8,
+  questionPage: 8,
+  answerPage: 18,
+  defaultPoints: 2,
+  caution: '教科書の問題(8)に沿って、図の色相関係・トーン関係と配色イメージを判断する。',
+  items: [
     {
-      "part": "A",
-      "prompt": "引き出しの4色がトライアドの関係になっているものはどれか。",
-      "choices": [
-        "黄・紫・淡紫",
-        "茶・青緑・赤紫",
-        "赤・黒・黄",
-        "青・橙・紫"
-      ],
-      "correctIndex": 1,
-      "explanation": "色相環を3等分する色相関係に近い3色を含む②がトライアドの構成になる。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q08-techniques.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'A',
+      prompt: '引き出しの色がトライアドになっているものはどれか。',
+      choices: ['図①', '図②', '図③', '図④'],
+      correctIndex: 1,
+      explanation: '教科書の正答は②。色相環を3等分する関係の3色で構成されている。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
-      "part": "B",
-      "prompt": "トリコロール配色として最も適切なソファはどれか。",
-      "choices": [
-        "黄と黒の2色",
-        "青系だけの配色",
-        "青・黄緑・赤の明快な3色",
-        "低彩度の緑・紫・黄緑"
-      ],
-      "correctIndex": 2,
-      "explanation": "明快で対照性のある3色を使う③がトリコロール配色である。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q08-techniques.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'B',
+      prompt: 'トリコロール配色になっているものはどれか。',
+      choices: ['図①', '図②', '図③', '図④'],
+      correctIndex: 2,
+      explanation: '教科書の正答は③。明快な3色を対照的に用いたトリコロール配色である。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
-      "part": "C",
-      "prompt": "カマイユ配色として最も適切なカップはどれか。",
-      "choices": [
-        "紫系の明度差が大きい配色",
-        "黄系の明度差が大きい配色",
-        "近い紫系で差の小さい配色",
-        "黄緑と紫の対照配色"
-      ],
-      "correctIndex": 2,
-      "explanation": "色相・トーンとも差が小さく、一見単色に見える③がカマイユである。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q08-techniques.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'C',
+      prompt: 'カマイユ配色になっているものはどれか。',
+      choices: ['図①', '図②', '図③', '図④'],
+      correctIndex: 2,
+      explanation: '教科書の正答は③。色相差とトーン差がともに小さく、一見単色に近く見える配色である。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
-      "part": "D",
-      "prompt": "バッグの空欄に入れてテトラード配色を完成させる色はどれか。",
-      "choices": [
-        "黄土色",
-        "淡い紫",
-        "淡い緑",
-        "青緑"
-      ],
-      "correctIndex": 3,
-      "explanation": "既存の紫・黄緑・赤橙と色相環上で4等分に近い関係をつくる青緑が適切である。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q08-techniques.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
+      part: 'D',
+      prompt: '下の図のアに入ってテトラードになる色はどれか。',
+      choices: ['色票①', '色票②', '色票③', '色票④'],
+      correctIndex: 3,
+      explanation: '教科書の正答は④。既存の3色と合わせて色相環上を4等分する関係になる。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
-      "part": "E",
-      "prompt": "クラシックなイメージの配色として適切な説明はどれか。",
-      "choices": [
-        "低〜中彩度・低〜中明度のブラウン系をベースにする",
-        "ベースと類似色相の高明度色だけを使う",
-        "暗い色調に白だけを加える",
-        "紫系の明清色だけをアクセントにする"
+      part: 'E',
+      prompt: 'クラシックなイメージの配色では、',
+      choices: [
+        'ベースカラーに低明度で、中彩度のトーンのブラウン系を用いる。',
+        'ベースカラーと類似色相のトーンをアソートカラーに用いると効果的である。',
+        '暗く落ち着いた色調の中に、ホワイト系やpトーンの色をポイントとして組みあわせる。',
+        'アクセントカラーにパープル系の明清色を用いると味わい深さが表現できる。',
       ],
-      "correctIndex": 0,
-      "explanation": "クラシックは低〜中明度・低〜中彩度のブラウン系など、重厚で落ち着いた色が合う。"
+      correctIndex: 0,
+      explanation: '教科書の正答は①。クラシックでは低明度・中彩度程度のブラウン系をベースに用いる。',
     },
     {
-      "part": "F",
-      "prompt": "モダンなイメージの配色として適切な説明はどれか。",
-      "choices": [
-        "赤紫〜赤みの黄のp・ltトーンを中心にする",
-        "ベースカラーにライトグレイを用いる",
-        "中高彩度の暖色だけをアソートにする",
-        "ブラウン系だけでまとめる"
+      part: 'F',
+      prompt: 'モダンなイメージの配色にしたいときには、',
+      choices: [
+        '無彩色にpトーンやltトーンの赤紫〜赤みの黄を中心にあわせる。',
+        'ベースカラーにライトグレイを用いるのが適している。',
+        'アソートカラーに中・高彩度の暖色系の色を用いるのが有効である。',
+        '無彩色にブラウン系の色を中心にあわせるとイメージの表現につながる。',
       ],
-      "correctIndex": 1,
-      "explanation": "モダンは無彩色やライトグレイを軸に、整理されたコントラストをつくると表現しやすい。"
-    }
-  ]
+      correctIndex: 1,
+      explanation: '教科書の正答は②。モダンなイメージではライトグレイなどの無彩色をベースに用いる。',
+    },
+  ],
 }
