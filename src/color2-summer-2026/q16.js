@@ -4,7 +4,7 @@ export const q16 = {
   questionPage: 16,
   answerPage: 18,
   defaultPoints: 2,
-  caution: '教科書の問題(16)と同じく、問題文で色の特徴を説明せず、色票そのものから慣用色名を判断する。画面色は近似色。',
+  caution: '教科書の問題(16)と同じく、問題文で色の特徴を説明せず、色票そのものから慣用色名を判断する。画面色は原本PDFの色票中央を基準にした近似色。',
   items: [
     {
       part: 'A',
@@ -13,16 +13,16 @@ export const q16 = {
       correctIndex: 0,
       explanation: '教科書の正答は①。色票Aは橙金色である。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
     {
       part: 'B',
       prompt: '色票Bに最も適切なJISの物体色の慣用色名はどれか。',
-      choices: ['刈安色', '鴇色', '常磐色', '海松色'],
+      choices: ['刈安色', '鶸色', '常磐色', '海松色'],
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Bは常磐色である。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
     {
       part: 'C',
@@ -31,7 +31,7 @@ export const q16 = {
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Cは茶鼠である。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
     {
       part: 'D',
@@ -40,16 +40,16 @@ export const q16 = {
       correctIndex: 3,
       explanation: '教科書の正答は④。色票Dはローズピンクである。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
     {
       part: 'E',
       prompt: '色票Eに最も適切なJISの物体色の慣用色名はどれか。',
-      choices: ['アンバー', 'テラコッタ', 'ジョンブリアン', 'ローシェンナ'],
+      choices: ['アンバー', 'チョコッタ', 'ジョンブリアン', 'ローシェンナ'],
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Eはジョンブリアンである。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
     {
       part: 'F',
@@ -58,7 +58,7 @@ export const q16 = {
       correctIndex: 1,
       explanation: '教科書の正答は②。色票Fはセルリアンブルーである。',
       questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16の学習用近似色票A〜F' },
+      image: { src: '/color2-2026-summer-practice/q16-colors.svg', alt: '2026年度夏期 問題16 色票A〜F' },
     },
   ],
 }
