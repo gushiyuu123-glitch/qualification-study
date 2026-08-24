@@ -7,7 +7,7 @@ import {
 
 const STORAGE_KEY = 'qualify:color2:summer-2025:weakness:v1'
 const MASTERED_STREAK = 2
-const ENTRY_MARKER = 'data-summer-2025-entry'
+const ENTRY_CLASS = 'color2-summer-entry--2025'
 
 let root = null
 let session = []
@@ -56,7 +56,7 @@ function saveWeaknessBank() {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, items: weaknessBank }))
   } catch {
-    // localStorageが使えない環境では、そのセッション内だけで動作する。
+    // localStorage が利用できない環境ではセッション中のみ動作する。
   }
 }
 
@@ -74,7 +74,6 @@ function weaknessQuestions() {
 
 function recordWeaknessAnswer(question, isCorrect) {
   const current = weaknessBank[question.id]
-
   if (!isCorrect) {
     weaknessBank[question.id] = {
       misses: (current?.misses ?? 0) + 1,
@@ -89,155 +88,9 @@ function recordWeaknessAnswer(question, isCorrect) {
 
   if (!current || current.mastered) return
   const streak = current.streak + 1
-  weaknessBank[question.id] = {
-    ...current,
-    streak,
-    mastered: streak >= MASTERED_STREAK,
-  }
+  weaknessBank[question.id] = { ...current, streak, mastered: streak >= MASTERED_STREAK }
   saveWeaknessBank()
   refreshWeaknessUI()
-}
-
-function choiceMark(choiceIndex) {
-  return ['①', '②', '③', '④'][choiceIndex] ?? ''
-}
-
-function ensureRoot() {
-  if (root?.isConnected) return root
-
-  const wrapper = document.createElement('div')
-  wrapper.innerHTML = `
-    <div class="color2-summer-quiz color2-summer-quiz--2025" role="dialog" aria-modal="true" aria-label="2025年度夏期 色彩検定2級 4択練習" hidden>
-      <header class="color2-summer-quiz__topbar">
-        <button type="button" class="color2-summer-quiz__back" data-s25-close>← 戻る</button>
-        <div class="color2-summer-quiz__title">
-          <strong>2025 SUMMER</strong>
-          <span>色彩検定2級 / 4択練習</span>
-        </div>
-        <span class="color2-summer-quiz__progress" data-s25-progress>SETUP</span>
-      </header>
-
-      <main class="color2-summer-quiz__body">
-        <section class="color2-summer-quiz__setup" data-s25-setup>
-          <div class="color2-summer-quiz__lead">
-            <span>PAST EXAM PRACTICE</span>
-            <h2>2025夏期も、何度でも回す。</h2>
-            <p>2025年度夏期2級の全17大問・200点分を、公開用の学習問題として4択へ再構成。問題(17)のA・Bは順不同のため1問にまとめ、4択では全105問です。</p>
-          </div>
-
-          <div class="color2-summer-quiz__summary">
-            <div><strong>${EXPECTED_QUESTION_COUNT_2025}</strong><span>QUESTIONS</span></div>
-            <div><strong>${EXPECTED_POINT_TOTAL_2025}</strong><span>POINTS</span></div>
-            <div><strong>17</strong><span>GROUPS</span></div>
-          </div>
-
-          <div class="color2-summer-quiz__starts">
-            <button type="button" data-s25-start="all"><strong>全105問</strong><span>本番順で一周する</span></button>
-            <button type="button" data-s25-start="20"><strong>20問</strong><span>ランダムで標準練習</span></button>
-            <button type="button" data-s25-start="10"><strong>10問</strong><span>短く回す</span></button>
-          </div>
-
-          <div class="color2-summer-quiz__group">
-            <label for="summer-2025-group-select">大問を指定して解く</label>
-            <div>
-              <select id="summer-2025-group-select" data-s25-group-select>
-                ${Array.from({ length: 17 }, (_, i) => `<option value="${i + 1}">問題(${i + 1})</option>`).join('')}
-              </select>
-              <button type="button" data-s25-start-group>この大問を解く</button>
-            </div>
-          </div>
-
-          <section class="color2-summer-quiz__weak" aria-label="蓄積したミス">
-            <div><span>蓄積ミス</span><strong data-s25-weak-count>0問</strong></div>
-            <p data-s25-weak-list>まだなし。間違えた問題はここに自動で残ります。</p>
-            <div class="color2-summer-quiz__weak-actions">
-              <button type="button" data-s25-start-weak disabled>ミスだけ解く</button>
-              <button type="button" data-s25-clear-weak hidden>履歴をリセット</button>
-            </div>
-            <small>ミスはこの端末に保存。あとから2回連続で正解すると克服扱いになります。</small>
-          </section>
-        </section>
-
-        <section class="color2-summer-quiz__question" data-s25-question hidden>
-          <div class="color2-summer-quiz__question-head">
-            <span data-s25-question-label></span>
-            <strong data-s25-question-number></strong>
-          </div>
-          <h2 data-s25-prompt></h2>
-          <figure class="color2-summer-quiz__figure" data-s25-figure hidden>
-            <img data-s25-image alt="" />
-          </figure>
-          <div class="color2-summer-quiz__choices" data-s25-choices></div>
-          <section class="color2-summer-quiz__feedback" data-s25-feedback hidden>
-            <strong data-s25-feedback-title></strong>
-            <p class="color2-summer-quiz__answer" data-s25-answer></p>
-            <p data-s25-explanation></p>
-            <small data-s25-caution hidden></small>
-            <button type="button" data-s25-next>次へ</button>
-          </section>
-        </section>
-
-        <section class="color2-summer-quiz__result" data-s25-result hidden>
-          <span>RESULT</span>
-          <h2 data-s25-result-score></h2>
-          <p data-s25-result-detail></p>
-          <div class="color2-summer-quiz__result-actions">
-            <button type="button" data-s25-retry-misses>今回のミスだけ解く</button>
-            <button type="button" data-s25-back-setup>メニューへ戻る</button>
-          </div>
-        </section>
-      </main>
-    </div>
-  `
-
-  root = wrapper.firstElementChild
-  document.body.appendChild(root)
-
-  root.querySelector('[data-s25-close]')?.addEventListener('click', close)
-  root.querySelectorAll('[data-s25-start]').forEach((button) => {
-    button.addEventListener('click', () => start(button.dataset.s25Start))
-  })
-  root.querySelector('[data-s25-start-group]')?.addEventListener('click', startSelectedGroup)
-  root.querySelector('[data-s25-start-weak]')?.addEventListener('click', () => startQuestions(shuffle(weaknessQuestions())))
-  root.querySelector('[data-s25-clear-weak]')?.addEventListener('click', clearWeaknessBank)
-  root.querySelector('[data-s25-next]')?.addEventListener('click', next)
-  root.querySelector('[data-s25-retry-misses]')?.addEventListener('click', retryMisses)
-  root.querySelector('[data-s25-back-setup]')?.addEventListener('click', showSetup)
-
-  refreshWeaknessUI()
-  return root
-}
-
-function setVisible(selector, visible) {
-  const element = ensureRoot().querySelector(selector)
-  if (element) element.hidden = !visible
-}
-
-function showSetup() {
-  setVisible('[data-s25-setup]', true)
-  setVisible('[data-s25-question]', false)
-  setVisible('[data-s25-result]', false)
-  const progress = ensureRoot().querySelector('[data-s25-progress]')
-  if (progress) progress.textContent = 'SETUP'
-  refreshWeaknessUI()
-}
-
-function refreshWeaknessUI() {
-  if (!root) return
-  const questions = weaknessQuestions()
-  const count = root.querySelector('[data-s25-weak-count]')
-  const list = root.querySelector('[data-s25-weak-list]')
-  const startButton = root.querySelector('[data-s25-start-weak]')
-  const clearButton = root.querySelector('[data-s25-clear-weak]')
-
-  if (count) count.textContent = `${questions.length}問`
-  if (startButton) startButton.disabled = questions.length === 0
-  if (clearButton) clearButton.hidden = questions.length === 0
-  if (list) {
-    list.textContent = questions.length
-      ? questions.slice(0, 8).map((q) => `(${q.groupNumber})${q.part}`).join('・') + (questions.length > 8 ? ` ほか${questions.length - 8}問` : '')
-      : 'まだなし。間違えた問題はここに自動で残ります。'
-  }
 }
 
 function clearWeaknessBank() {
@@ -248,20 +101,154 @@ function clearWeaknessBank() {
   refreshWeaknessUI()
 }
 
-function start(requestedCount) {
-  if (requestedCount === 'all') {
-    startQuestions([...color2Summer2025Questions])
-    return
+const choiceMark = (choiceIndex) => ['①', '②', '③', '④'][choiceIndex] ?? ''
+const sessionPoints = () => session.reduce((sum, question) => sum + question.points, 0)
+
+function ensureRoot() {
+  if (root?.isConnected) return root
+
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = `
+    <div class="color2-summer-quiz" role="dialog" aria-modal="true" aria-label="2025年度夏期 色彩検定2級 4択練習" hidden>
+      <header class="color2-summer-quiz__topbar">
+        <button type="button" class="color2-summer-quiz__back" data-summer2025-close>← 戻る</button>
+        <div class="color2-summer-quiz__title">
+          <strong>2025 SUMMER</strong>
+          <span>色彩検定2級 / 4択練習</span>
+        </div>
+        <span class="color2-summer-quiz__progress" data-summer2025-progress>SETUP</span>
+      </header>
+
+      <main class="color2-summer-quiz__body">
+        <section class="color2-summer-quiz__setup" data-summer2025-setup>
+          <div class="color2-summer-quiz__lead">
+            <span>PAST EXAM PRACTICE</span>
+            <h2>2025夏期を、何度でも解く。</h2>
+            <p>2025年度夏期2級の全17大問を、出題内容と公式解答・解説を基に4択練習へ再構成。解答直後に正答と要点を確認できます。</p>
+          </div>
+
+          <div class="color2-summer-quiz__summary">
+            <div><strong>${EXPECTED_QUESTION_COUNT_2025}</strong><span>QUESTIONS</span></div>
+            <div><strong>${EXPECTED_POINT_TOTAL_2025}</strong><span>POINTS</span></div>
+            <div><strong>17</strong><span>GROUPS</span></div>
+          </div>
+
+          <div class="color2-summer-quiz__starts">
+            <button type="button" data-summer2025-start="all"><strong>全${EXPECTED_QUESTION_COUNT_2025}問</strong><span>本番順で一周する</span></button>
+            <button type="button" data-summer2025-start="20"><strong>20問</strong><span>ランダムで標準練習</span></button>
+            <button type="button" data-summer2025-start="10"><strong>10問</strong><span>短く回す</span></button>
+          </div>
+
+          <div class="color2-summer-quiz__group">
+            <label for="summer-2025-group-select">大問を指定して解く</label>
+            <div>
+              <select id="summer-2025-group-select" data-summer2025-group-select>
+                ${Array.from({ length: 17 }, (_, i) => `<option value="${i + 1}">問題(${i + 1})</option>`).join('')}
+              </select>
+              <button type="button" data-summer2025-start-group>この大問を解く</button>
+            </div>
+          </div>
+
+          <section class="color2-summer-quiz__weak" aria-label="2025夏期の蓄積ミス">
+            <div><span>蓄積ミス</span><strong data-summer2025-weak-count>0問</strong></div>
+            <p data-summer2025-weak-list>まだなし。間違えた問題はここに自動で残ります。</p>
+            <div class="color2-summer-quiz__weak-actions">
+              <button type="button" data-summer2025-start-weak disabled>ミスだけ解く</button>
+              <button type="button" data-summer2025-clear-weak hidden>履歴をリセット</button>
+            </div>
+            <small>ミスはこの端末に保存。あとから2回連続で正解すると克服扱いになります。</small>
+          </section>
+        </section>
+
+        <section class="color2-summer-quiz__question" data-summer2025-question hidden>
+          <div class="color2-summer-quiz__question-head">
+            <span data-summer2025-question-label></span>
+            <strong data-summer2025-question-number></strong>
+          </div>
+          <h2 data-summer2025-prompt></h2>
+          <figure class="color2-summer-quiz__figure" data-summer2025-figure hidden><img data-summer2025-image alt="" /></figure>
+          <div class="color2-summer-quiz__choices" data-summer2025-choices></div>
+          <section class="color2-summer-quiz__feedback" data-summer2025-feedback hidden>
+            <strong data-summer2025-feedback-title></strong>
+            <p class="color2-summer-quiz__answer" data-summer2025-answer></p>
+            <p data-summer2025-explanation></p>
+            <small data-summer2025-caution hidden></small>
+            <button type="button" data-summer2025-next>次へ</button>
+          </section>
+        </section>
+
+        <section class="color2-summer-quiz__result" data-summer2025-result hidden>
+          <span>RESULT</span>
+          <h2 data-summer2025-result-score></h2>
+          <p data-summer2025-result-detail></p>
+          <div class="color2-summer-quiz__result-actions">
+            <button type="button" data-summer2025-retry-misses>今回のミスだけ解く</button>
+            <button type="button" data-summer2025-back-setup>メニューへ戻る</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  `
+
+  root = wrapper.firstElementChild
+  document.body.appendChild(root)
+
+  root.querySelector('[data-summer2025-close]')?.addEventListener('click', close)
+  root.querySelectorAll('[data-summer2025-start]').forEach((button) => button.addEventListener('click', () => start(button.dataset.summer2025Start)))
+  root.querySelector('[data-summer2025-start-group]')?.addEventListener('click', startSelectedGroup)
+  root.querySelector('[data-summer2025-start-weak]')?.addEventListener('click', startWeakness)
+  root.querySelector('[data-summer2025-clear-weak]')?.addEventListener('click', clearWeaknessBank)
+  root.querySelector('[data-summer2025-next]')?.addEventListener('click', next)
+  root.querySelector('[data-summer2025-retry-misses]')?.addEventListener('click', retryMisses)
+  root.querySelector('[data-summer2025-back-setup]')?.addEventListener('click', showSetup)
+  refreshWeaknessUI()
+  return root
+}
+
+function setVisible(selector, visible) {
+  const element = ensureRoot().querySelector(selector)
+  if (element) element.hidden = !visible
+}
+
+function showSetup() {
+  setVisible('[data-summer2025-setup]', true)
+  setVisible('[data-summer2025-question]', false)
+  setVisible('[data-summer2025-result]', false)
+  const progress = ensureRoot().querySelector('[data-summer2025-progress]')
+  if (progress) progress.textContent = 'SETUP'
+  refreshWeaknessUI()
+}
+
+function refreshWeaknessUI() {
+  if (!root) return
+  const questions = weaknessQuestions()
+  const count = root.querySelector('[data-summer2025-weak-count]')
+  const list = root.querySelector('[data-summer2025-weak-list]')
+  const startButton = root.querySelector('[data-summer2025-start-weak]')
+  const clearButton = root.querySelector('[data-summer2025-clear-weak]')
+  if (count) count.textContent = `${questions.length}問`
+  if (startButton) startButton.disabled = questions.length === 0
+  if (clearButton) clearButton.hidden = questions.length === 0
+  if (list) {
+    list.textContent = questions.length
+      ? questions.slice(0, 8).map((question) => `(${question.groupNumber})${question.part}`).join('・') + (questions.length > 8 ? ` ほか${questions.length - 8}問` : '')
+      : 'まだなし。間違えた問題はここに自動で残ります。'
   }
+}
+
+function buildSession(requestedCount) {
+  if (requestedCount === 'all') return [...color2Summer2025Questions]
   const count = Math.min(Number(requestedCount) || 10, color2Summer2025Questions.length)
-  startQuestions(shuffle(color2Summer2025Questions).slice(0, count))
+  return shuffle(color2Summer2025Questions).slice(0, count)
 }
 
 function startSelectedGroup() {
-  const select = ensureRoot().querySelector('[data-s25-group-select]')
-  const groupNumber = Number(select?.value)
-  startQuestions(color2Summer2025Questions.filter((q) => q.groupNumber === groupNumber))
+  const groupNumber = Number(ensureRoot().querySelector('[data-summer2025-group-select]')?.value)
+  startQuestions(color2Summer2025Questions.filter((question) => question.groupNumber === groupNumber))
 }
+
+function startWeakness() { startQuestions(shuffle(weaknessQuestions())) }
+function start(requestedCount) { startQuestions(buildSession(requestedCount)) }
 
 function startQuestions(questions) {
   if (!questions.length) return
@@ -271,27 +258,24 @@ function startQuestions(questions) {
   earnedPoints = 0
   answered = false
   misses = []
-  setVisible('[data-s25-setup]', false)
-  setVisible('[data-s25-result]', false)
-  setVisible('[data-s25-question]', true)
+  setVisible('[data-summer2025-setup]', false)
+  setVisible('[data-summer2025-result]', false)
+  setVisible('[data-summer2025-question]', true)
   renderQuestion()
 }
 
 function renderQuestion() {
   const question = session[index]
-  if (!question) {
-    showResult()
-    return
-  }
+  if (!question) return showResult()
   answered = false
 
-  const label = root.querySelector('[data-s25-question-label]')
-  const number = root.querySelector('[data-s25-question-number]')
-  const prompt = root.querySelector('[data-s25-prompt]')
-  const choices = root.querySelector('[data-s25-choices]')
-  const progress = root.querySelector('[data-s25-progress]')
-  const figure = root.querySelector('[data-s25-figure]')
-  const image = root.querySelector('[data-s25-image]')
+  const label = root.querySelector('[data-summer2025-question-label]')
+  const number = root.querySelector('[data-summer2025-question-number]')
+  const prompt = root.querySelector('[data-summer2025-prompt]')
+  const choices = root.querySelector('[data-summer2025-choices]')
+  const progress = root.querySelector('[data-summer2025-progress]')
+  const figure = root.querySelector('[data-summer2025-figure]')
+  const image = root.querySelector('[data-summer2025-image]')
 
   if (label) label.textContent = `問題(${question.groupNumber}) ${question.part} · ${question.points}点`
   if (number) number.textContent = `${index + 1} / ${session.length}`
@@ -312,7 +296,7 @@ function renderQuestion() {
   question.choices.forEach((choice, choiceIndex) => {
     const button = document.createElement('button')
     button.type = 'button'
-    button.dataset.s25ChoiceIndex = String(choiceIndex)
+    button.dataset.summer2025Choice = String(choiceIndex)
     const mark = document.createElement('b')
     mark.textContent = choiceMark(choiceIndex)
     const text = document.createElement('span')
@@ -322,7 +306,7 @@ function renderQuestion() {
     choices?.appendChild(button)
   })
 
-  setVisible('[data-s25-feedback]', false)
+  setVisible('[data-summer2025-feedback]', false)
 }
 
 function answer(choiceIndex) {
@@ -330,7 +314,6 @@ function answer(choiceIndex) {
   const question = session[index]
   const isCorrect = choiceIndex === question.correctIndex
   answered = true
-
   if (isCorrect) {
     correctCount += 1
     earnedPoints += question.points
@@ -339,18 +322,18 @@ function answer(choiceIndex) {
   }
   recordWeaknessAnswer(question, isCorrect)
 
-  root.querySelectorAll('[data-s25-choice-index]').forEach((button) => {
-    const buttonIndex = Number(button.dataset.s25ChoiceIndex)
+  root.querySelectorAll('[data-summer2025-choice]').forEach((button) => {
+    const buttonIndex = Number(button.dataset.summer2025Choice)
     button.disabled = true
     button.classList.toggle('is-correct', buttonIndex === question.correctIndex)
     button.classList.toggle('is-wrong', buttonIndex === choiceIndex && !isCorrect)
   })
 
-  const title = root.querySelector('[data-s25-feedback-title]')
-  const answerText = root.querySelector('[data-s25-answer]')
-  const explanation = root.querySelector('[data-s25-explanation]')
-  const caution = root.querySelector('[data-s25-caution]')
-  const nextButton = root.querySelector('[data-s25-next]')
+  const title = root.querySelector('[data-summer2025-feedback-title]')
+  const answerText = root.querySelector('[data-summer2025-answer]')
+  const explanation = root.querySelector('[data-summer2025-explanation]')
+  const caution = root.querySelector('[data-summer2025-caution]')
+  const nextButton = root.querySelector('[data-summer2025-next]')
 
   if (title) {
     title.textContent = isCorrect ? '正解' : '不正解'
@@ -363,7 +346,7 @@ function answer(choiceIndex) {
     caution.hidden = !question.caution
   }
   if (nextButton) nextButton.textContent = index >= session.length - 1 ? '結果を見る' : '次へ'
-  setVisible('[data-s25-feedback]', true)
+  setVisible('[data-summer2025-feedback]', true)
 }
 
 function next() {
@@ -373,23 +356,19 @@ function next() {
 }
 
 function retryMisses() {
-  if (!misses.length) {
-    showSetup()
-    return
-  }
+  if (!misses.length) return showSetup()
   startQuestions(shuffle([...misses]))
 }
 
 function showResult() {
-  setVisible('[data-s25-question]', false)
-  setVisible('[data-s25-result]', true)
-  const score = root.querySelector('[data-s25-result-score]')
-  const detail = root.querySelector('[data-s25-result-detail]')
-  const retryButton = root.querySelector('[data-s25-retry-misses]')
-  const progress = root.querySelector('[data-s25-progress]')
-  const maxPoints = session.reduce((sum, q) => sum + q.points, 0)
+  setVisible('[data-summer2025-question]', false)
+  setVisible('[data-summer2025-result]', true)
+  const maxPoints = sessionPoints()
   const percent = maxPoints ? Math.round((earnedPoints / maxPoints) * 1000) / 10 : 0
-
+  const score = root.querySelector('[data-summer2025-result-score]')
+  const detail = root.querySelector('[data-summer2025-result-detail]')
+  const retryButton = root.querySelector('[data-summer2025-retry-misses]')
+  const progress = root.querySelector('[data-summer2025-progress]')
   if (score) score.textContent = `${earnedPoints} / ${maxPoints}点`
   if (detail) detail.textContent = `${correctCount} / ${session.length}問正解 · 得点率 ${percent}% · ミス ${misses.length}問`
   if (retryButton) retryButton.disabled = misses.length === 0
@@ -412,24 +391,21 @@ function close() {
 }
 
 function injectEntry(screen) {
-  if (!screen || screen.querySelector(`[${ENTRY_MARKER}]`)) return
-
+  if (!screen || screen.querySelector(`.${ENTRY_CLASS}`)) return
   const entry = document.createElement('section')
-  entry.className = 'color2-summer-entry color2-summer-entry--2025'
-  entry.setAttribute(ENTRY_MARKER, '')
+  entry.className = `color2-summer-entry ${ENTRY_CLASS}`
   entry.innerHTML = `
     <div class="color2-summer-entry__copy">
       <span>2025 SUMMER / PAST EXAM</span>
       <h2>2025夏期を4択で回す。</h2>
-      <p>全17大問・200点分を収録。全105問、本番順、ランダム10/20問、大問指定、蓄積ミスだけの復習に対応。解答直後に解説を確認できます。</p>
+      <p>全17大問・${EXPECTED_QUESTION_COUNT_2025}問・200点分を収録。全問、本番順、ランダム10/20問、大問指定、蓄積ミスだけの復習に対応。</p>
     </div>
     <div class="color2-summer-entry__actions">
-      <button type="button" data-s25-open><span>4択問題を解く</span><b>${EXPECTED_QUESTION_COUNT_2025}問</b></button>
-      <small>問題(17)A・Bは順不同のため、4択では組み合わせ1問として収録。</small>
+      <button type="button" data-summer2025-practice-open><span>4択問題を解く</span><b>${EXPECTED_QUESTION_COUNT_2025}問</b></button>
+      <small>出題内容と公式解答・解説を基に、公開用の学習問題として再構成。</small>
     </div>
   `
-  entry.querySelector('[data-s25-open]')?.addEventListener('click', open)
-
+  entry.querySelector('[data-summer2025-practice-open]')?.addEventListener('click', open)
   const conventional = screen.querySelector('.color2-conventional-entry')
   const library = screen.querySelector('#color2-reference-library, .color2-reference-library')
   if (conventional) conventional.before(entry)
