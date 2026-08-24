@@ -1,6 +1,6 @@
 import { summer2025Entries } from './color2-summer-2025/summer-2025.js'
 
-export const EXPECTED_QUESTION_COUNT_2025 = 105
+export const EXPECTED_QUESTION_COUNT_2025 = 106
 export const EXPECTED_POINT_TOTAL_2025 = 200
 
 const sourceAssetPrefix = '/past-exams/color2/2025-summer/'
