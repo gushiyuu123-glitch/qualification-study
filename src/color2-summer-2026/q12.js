@@ -1,28 +1,28 @@
-// 2026年度夏期の出題内容を基に、転載を避けて学習用に再構成した問題です。
+// 2026年度夏期の教科書過去問を、写真問題の手掛かりを増やさず4択練習として収録します。
 export const q12 = {
   number: 12,
-  questionPage: null,
-  answerPage: 1,
+  questionPage: 12,
+  answerPage: 18,
   defaultPoints: 2,
-  caution: '写真問題では、境界線よりも全体の色数と配色の支配関係を見る。',
+  caution: '教科書の写真A・Bを、コーディネート全体の配色から判定する。問題文で答えの特徴を先に示さない。',
   items: [
     {
       part: 'A',
-      prompt: '多数の色相を一つの衣装に用い、色彩の豊かさを前面に出したコーディネートはどれか。',
+      prompt: '写真Aのファッションコーディネートの配色として最も適切なものはどれか。',
       choices: ['トーンオントーン配色', 'グラデーション配色', 'セパレーション配色', '多色配色'],
       correctIndex: 3,
-      explanation: '複数の色相を広く用い、色数の多さが印象の中心となるため多色配色と判断する。',
+      explanation: '教科書の正答は④。写真Aは複数の色相を広く用いた多色配色である。',
       questionType: 'visual-color',
-      image: { src: '/exam-papers/color2/2026-summer/q12-fashion.svg', alt: 'ファッション配色を抽象化した学習用図版' },
+      image: { src: '/color2-2026-summer-practice/q12-fashion.svg', alt: '2026年度夏期 問題12のファッションA・Bを学習用に再構成した図' },
     },
     {
       part: 'B',
-      prompt: '高彩度の黄色と黒を大きな面積で対比させたコーディネートはどれか。',
+      prompt: '写真Bのファッションコーディネートの配色として最も適切なものはどれか。',
       choices: ['フォカマイユ配色', 'コンプレックス配色', 'バイカラー配色', 'ドミナントトーン配色'],
       correctIndex: 2,
-      explanation: '二つの色を明快に対比させた構成なのでバイカラー配色である。',
+      explanation: '教科書の正答は③。写真Bは二つの色を大きな面積で明快に対比させたバイカラー配色である。',
       questionType: 'visual-color',
-      image: { src: '/exam-papers/color2/2026-summer/q12-fashion.svg', alt: 'ファッション配色を抽象化した学習用図版' },
+      image: { src: '/color2-2026-summer-practice/q12-fashion.svg', alt: '2026年度夏期 問題12のファッションA・Bを学習用に再構成した図' },
     },
   ],
 }
