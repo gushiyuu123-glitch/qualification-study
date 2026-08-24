@@ -30,7 +30,7 @@ const officialAnswerKey = {
   8: [3, 0, 1, 3, 2, 2],
   9: [2, 3, 3, 0, 1],
   10: [2, 1, 0, 0, 3, 1],
-  11: [0, 2],
+  11: [2, 2],
   12: [1, 3],
   13: [0, 3, 0, 2, 1, 1],
   14: [1, 2, 0, 3, 2, 0],
@@ -69,8 +69,8 @@ const q11aExpectedChoices = ['ナチュラル配色', 'トーンイントーン�
 if (!q11a || JSON.stringify(q11a.choices) !== JSON.stringify(q11aExpectedChoices)) {
   throw new Error('原本照合: 問題(11)A の選択肢が原本と不一致です。')
 }
-if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色') {
-  throw new Error('原本照合: 問題(11)A の正答語が不一致です。')
+if (q11a.choices[q11a.correctIndex] !== 'ダイアード配色') {
+  throw new Error('原本照合: 問題(11)A の正答は③ダイアード配色である必要があります。')
 }
 
 const q17 = color2Summer2025Questions.filter((question) => question.groupNumber === 17)
