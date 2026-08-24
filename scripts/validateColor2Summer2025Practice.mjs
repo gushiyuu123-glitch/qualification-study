@@ -73,6 +73,31 @@ if (q11a.choices[q11a.correctIndex] !== 'ダイアード配色') {
   throw new Error('原本照合: 問題(11)A の正答は③ダイアード配色である必要があります。')
 }
 
+const q16Expected = {
+  A: { answer: '鴇色', color: '#e39db2' },
+  B: { answer: '琥珀色', color: '#9d6b46' },
+  C: { answer: '新橋色', color: '#6eb2b1' },
+  D: { answer: 'ポピーレッド', color: '#c3516a' },
+  E: { answer: 'バーントアンバー', color: '#534542' },
+  F: { answer: 'サックスブルー', color: '#5c7c93' },
+}
+
+for (const [part, expected] of Object.entries(q16Expected)) {
+  const question = getQuestion(16, part)
+  if (!question) throw new Error(`原本照合: 問題(16)${part} が見つかりません。`)
+  if (question.choices[question.correctIndex] !== expected.answer) {
+    throw new Error(`原本照合: 問題(16)${part} の正答語が不一致です。`)
+  }
+  if (!question.image?.src) throw new Error(`原本照合: 問題(16)${part} の色票がありません。`)
+  const asset = read(path.join('public', question.image.src.replace(/^\//, ''))).toLowerCase()
+  if (!asset.includes(expected.color)) {
+    throw new Error(`原本照合: 問題(16)${part} の色票色が原本基準と不一致です。`)
+  }
+  if (/rx=|stroke="#262626"|stroke="#111"/.test(asset)) {
+    throw new Error(`原本照合: 問題(16)${part} の色票に原本にない角丸・濃色枠があります。`)
+  }
+}
+
 const q17 = color2Summer2025Questions.filter((question) => question.groupNumber === 17)
 const q17Expected = ['トーンイントーン', 'ドミナントトーン', 'トライアド', 'lt12', '10R 7.5/8.0']
 q17.forEach((question, itemIndex) => {
@@ -114,4 +139,4 @@ const requiredRuntimeTokens = [
 const missingRuntimeTokens = requiredRuntimeTokens.filter((token) => !practice.includes(token))
 if (missingRuntimeTokens.length) throw new Error(`2025夏期4択の練習機能が不足しています: ${missingRuntimeTokens.join(', ')}`)
 
-console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 公式解答照合 / 原本語句照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
+console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 公式解答照合 / 原本語句・色票照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
