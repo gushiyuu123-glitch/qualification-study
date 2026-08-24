@@ -3,6 +3,17 @@ import { summer2025Entries } from './color2-summer-2025/summer-2025.js'
 export const EXPECTED_QUESTION_COUNT_2025 = 105
 export const EXPECTED_POINT_TOTAL_2025 = 200
 
+const sourceAssetPrefix = '/past-exams/color2/2025-summer/'
+const practiceAssetPrefix = '/color2-2025-summer-practice/'
+
+function normalizeImage(image) {
+  if (!image?.src) return null
+  return {
+    ...image,
+    src: image.src.replace(sourceAssetPrefix, practiceAssetPrefix),
+  }
+}
+
 export const color2Summer2025Questions = summer2025Entries.map((question, index) => ({
   id: `2025-summer-${String(question.originalQuestionNumber).padStart(2, '0')}-${String(question.originalQuestionPart).toLowerCase()}-${index + 1}`,
   groupNumber: question.originalQuestionNumber,
@@ -15,7 +26,7 @@ export const color2Summer2025Questions = summer2025Entries.map((question, index)
   explanation: String(question.explanation ?? '').trim(),
   caution: String(question.caution ?? '').trim(),
   questionType: question.questionType ?? 'choice',
-  image: question.image ?? null,
+  image: normalizeImage(question.image),
 }))
 
 export const color2Summer2025PointTotal = color2Summer2025Questions.reduce(
