@@ -1,28 +1,28 @@
-// 2026年度夏期の出題内容を基に、転載を避けて学習用に再構成した問題です。
+// 2026年度夏期の教科書過去問を、写真問題の手掛かりを増やさず4択練習として収録します。
 export const q11 = {
   number: 11,
-  questionPage: null,
-  answerPage: 1,
+  questionPage: 11,
+  answerPage: 18,
   defaultPoints: 2,
-  caution: 'ファッション写真は細部の一色ではなく、コーディネート全体の色数・明度差・統一感で判断する。',
+  caution: '教科書の写真A・Bを、コーディネート全体の配色から判定する。問題文で答えの特徴を先に示さない。',
   items: [
     {
       part: 'A',
-      prompt: '黒を中心に明度の近い無彩色でまとめたコーディネートに最も近い配色はどれか。',
+      prompt: '写真Aのファッションコーディネートの配色として最も適切なものはどれか。',
       choices: ['バイカラー配色', 'ダイアード配色', 'モノトーン配色', 'ナチュラル配色'],
       correctIndex: 2,
-      explanation: '無彩色を中心に、黒から灰色までの明度差でまとめた配色はモノトーン配色である。',
+      explanation: '教科書の正答は③。写真Aは無彩色を中心にまとめたモノトーン配色である。',
       questionType: 'visual-color',
-      image: { src: '/exam-papers/color2/2026-summer/q11-fashion.svg', alt: 'ファッション配色を抽象化した学習用図版' },
+      image: { src: '/color2-2026-summer-practice/q11-fashion.svg', alt: '2026年度夏期 問題11のファッションA・Bを学習用に再構成した図' },
     },
     {
       part: 'B',
-      prompt: '近いトーンの複数色を使い、全体に共通した穏やかな印象を与える配色はどれか。',
+      prompt: '写真Bのファッションコーディネートの配色として最も適切なものはどれか。',
       choices: ['トーンイントーン配色', 'ドミナントカラー配色', 'トリコロール配色', 'カマイユ配色'],
       correctIndex: 0,
-      explanation: '色相を変えながら同一・類似トーンで統一する配色はトーンイントーン配色である。',
+      explanation: '教科書の正答は①。写真Bは異なる色相を近いトーンでまとめたトーンイントーン配色である。',
       questionType: 'visual-color',
-      image: { src: '/exam-papers/color2/2026-summer/q11-fashion.svg', alt: 'ファッション配色を抽象化した学習用図版' },
+      image: { src: '/color2-2026-summer-practice/q11-fashion.svg', alt: '2026年度夏期 問題11のファッションA・Bを学習用に再構成した図' },
     },
   ],
 }
