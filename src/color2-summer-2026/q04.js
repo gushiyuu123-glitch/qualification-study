@@ -1,165 +1,28 @@
-// 2026年度夏期の出題内容を基に、転載を避けて学習用に再構成した問題です。
+// 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに4択練習として収録します。
 export const q04 = {
-  "number": 4,
-  "questionPage": null,
-  "answerPage": 1,
-  "defaultPoints": 2,
-  "caution": "マンセルの成立、色立体、等色相面・等明度面・等彩度面を区別する。",
-  "items": [
+  number: 4,
+  questionPage: 4,
+  answerPage: 18,
+  defaultPoints: 2,
+  caution: '教科書の問題(4)に沿って、マンセル表色系の成立と色立体を整理する。図版の色は画面用の近似色。',
+  items: [
+    { part: 'A', prompt: 'マンセル表色系は、何の表示に使われるか。', choices: ['物体の色', '光の色', '有彩色', '可視光'], correctIndex: 0, explanation: '教科書の正答は①。マンセル表色系は物体の色の表示に用いられる。', points: 1 },
+    { part: 'B', prompt: 'マンセル表色系は、どの表色系の一つか。', choices: ['混色系', '顕色系', 'カラーカード', 'グレイスケール'], correctIndex: 1, explanation: '教科書の正答は②。マンセル表色系は顕色系の表色系である。', points: 1 },
+    { part: 'C', prompt: 'マンセルはどの国の人物か。', choices: ['アメリカ', 'イギリス', 'ドイツ', 'スウェーデン'], correctIndex: 0, explanation: '教科書の正答は①。マンセルはアメリカの人物である。', points: 1 },
+    { part: 'D', prompt: 'マンセルは色をどのように整理するためにその原型を考えたか。', choices: ['主観的', '客観的', '知覚的', '系統的'], correctIndex: 3, explanation: '教科書の正答は④。色を系統的に整理することを目指した。', points: 1 },
+    { part: 'E', prompt: '原色が円周上に等間隔に置かれた色相環の順序に従って、各色相の等色相面を無彩色の中心軸のまわりに集めたものは何か。', choices: ['色断面', '色立体', '標準色票', '三属性'], correctIndex: 1, explanation: '教科書の正答は②。等色相面を中心軸のまわりに集めた三次元構造が色立体である。', points: 1 },
     {
-      "part": "A",
-      "prompt": "マンセル表色系が主に表示対象とする色はどれか。",
-      "choices": [
-        "物体の色",
-        "光源の色",
-        "有彩色だけ",
-        "可視光そのもの"
-      ],
-      "correctIndex": 0,
-      "explanation": "マンセル表色系は主に物体色を色相・明度・彩度で表す。",
-      "points": 1
+      part: 'F',
+      prompt: 'マンセルが原色として選んだ5色の組みあわせはどれか。',
+      choices: ['図①の3色', '図②の4色', '図③の5色', '図④の5色'],
+      correctIndex: 2,
+      explanation: '教科書の正答は③。R・Y・G・B・Pの5色である。',
+      questionType: 'visual-color',
+      image: { src: '/color2-2026-summer-practice/q04-munsell.svg', alt: '2026年度夏期 問題4Fの色の組みあわせ' },
     },
-    {
-      "part": "B",
-      "prompt": "マンセル表色系は、どの種類の表色系に分類されるか。",
-      "choices": [
-        "混色系",
-        "顕色系",
-        "カラーカード",
-        "グレイスケール"
-      ],
-      "correctIndex": 1,
-      "explanation": "知覚される色を三属性で整理する顕色系の表色系である。",
-      "points": 1
-    },
-    {
-      "part": "C",
-      "prompt": "マンセル表色系を考案した人物の国籍はどれか。",
-      "choices": [
-        "アメリカ",
-        "イギリス",
-        "ドイツ",
-        "スウェーデン"
-      ],
-      "correctIndex": 0,
-      "explanation": "アルバート・H・マンセルはアメリカの画家・教育者である。",
-      "points": 1
-    },
-    {
-      "part": "D",
-      "prompt": "マンセルが色を整理しようとした方法として最も適切なものはどれか。",
-      "choices": [
-        "主観的に分類する",
-        "客観値だけで決める",
-        "知覚的な印象だけで並べる",
-        "体系的に整理する"
-      ],
-      "correctIndex": 3,
-      "explanation": "色相・明度・彩度の規則に基づき、色を体系的に整理した。",
-      "points": 1
-    },
-    {
-      "part": "E",
-      "prompt": "色相環の順に等色相面を無彩色軸の周囲へ集めた三次元構造を何というか。",
-      "choices": [
-        "色断面",
-        "色立体",
-        "標準色票",
-        "三属性"
-      ],
-      "correctIndex": 1,
-      "explanation": "等色相面を無彩色軸の周囲に配置した立体が色立体である。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      },
-      "points": 1
-    },
-    {
-      "part": "F",
-      "prompt": "マンセルが基本色として選んだ5色の組み合わせはどれか。",
-      "choices": [
-        "R・G・B",
-        "R・Y・G・B",
-        "R・Y・G・B・P",
-        "R・G・B・W・Bk"
-      ],
-      "correctIndex": 2,
-      "explanation": "基本色はR、Y、G、B、Pの5色で、その中間色相を加えて10主要色相となる。",
-      "questionType": "visual-color",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    },
-    {
-      "part": "G",
-      "prompt": "同じ色相の色を明度・彩度の違いで並べた面はどれか。",
-      "choices": [
-        "等色相面",
-        "色再現領域",
-        "分光反射率曲線",
-        "分光感度曲線"
-      ],
-      "correctIndex": 0,
-      "explanation": "同じ色相の色を明度・彩度の違いで並べた面を等色相面という。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    },
-    {
-      "part": "H",
-      "prompt": "マンセル色立体で最高彩度の位置が色相ごとに異なる主な理由はどれか。",
-      "choices": [
-        "明度だけが異なるため",
-        "彩度だけが異なるため",
-        "明度と彩度の限界が色相ごとに異なるため",
-        "色相だけが異なるため"
-      ],
-      "correctIndex": 2,
-      "explanation": "実在できる最高彩度とその明度は色相ごとに異なるため、色立体は不規則な形になる。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    },
-    {
-      "part": "I",
-      "prompt": "不規則な形をしたマンセル色立体は、形状から何と呼ばれることがあるか。",
-      "choices": [
-        "カラースペース",
-        "カラーツリー",
-        "カラープロファイル",
-        "ナチュラルハーモニー"
-      ],
-      "correctIndex": 1,
-      "explanation": "枝が伸びたような形からカラーツリーと呼ばれる。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    },
-    {
-      "part": "J",
-      "prompt": "等明度面で無彩色を中心とする同一円周上に並ぶ色はどれか。",
-      "choices": [
-        "高彩度色",
-        "純色",
-        "等彩度色",
-        "代表色"
-      ],
-      "correctIndex": 2,
-      "explanation": "等明度面では中心からの距離が彩度を表し、同じ円周上は等彩度になる。",
-      "questionType": "visual-diagram",
-      "image": {
-        "src": "/exam-papers/color2/2026-summer/q04-munsell.svg",
-        "alt": "色彩検定2級の学習用に再構成した図版"
-      }
-    }
-  ]
+    { part: 'G', prompt: '各色相で、同じ色相の色を明度・彩度の違いで並べた面は何か。', choices: ['等色相面', '色再現領域', '分光反射率曲線', '分光感度曲線'], correctIndex: 0, explanation: '教科書の正答は①。同じ色相の色を明度・彩度の違いで並べた面を等色相面という。' },
+    { part: 'H', prompt: 'マンセル表色系では、最高彩度の色は色相によって何が異なるか。', choices: ['明度だけ', '彩度だけ', '明度や彩度', '色み'], correctIndex: 2, explanation: '教科書の正答は③。色相によって最高彩度の位置や値、対応する明度が異なる。' },
+    { part: 'I', prompt: 'マンセルは、色相によって形が違う色立体を何と呼んだか。', choices: ['カラースペース', 'カラーツリー', 'カラープロファイル', 'ナチュラルハーモニー'], correctIndex: 1, explanation: '教科書の正答は②。マンセルはこの色立体をカラーツリーと呼んだ。' },
+    { part: 'J', prompt: '等明度面の無彩色を中心とする同一円周上には、どの色が並ぶか。', choices: ['高彩度色', '純色', '等彩度色', '代表色'], correctIndex: 2, explanation: '教科書の正答は③。同一円周上には彩度が等しい色が並ぶ。' },
+  ],
 }
