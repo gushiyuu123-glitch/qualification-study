@@ -52,6 +52,27 @@ for (const [groupNumberText, expectedIndexes] of Object.entries(officialAnswerKe
   })
 }
 
+const getQuestion = (groupNumber, part) => color2Summer2025Questions.find(
+  (question) => question.groupNumber === groupNumber && question.part === part,
+)
+
+const q10f = getQuestion(10, 'F')
+if (!q10f?.prompt.includes('アーバン') || q10f.prompt.includes('アクティブ')) {
+  throw new Error('原本照合: 問題(10)F は「アーバン」の設問である必要があります。')
+}
+if (q10f.choices[q10f.correctIndex] !== 'ベーシックカラー') {
+  throw new Error('原本照合: 問題(10)F の正答語が不一致です。')
+}
+
+const q11a = getQuestion(11, 'A')
+const q11aExpectedChoices = ['ナチュラル配色', 'トーンイントーン配色', 'ダイアード配色', 'トリコロール配色']
+if (!q11a || JSON.stringify(q11a.choices) !== JSON.stringify(q11aExpectedChoices)) {
+  throw new Error('原本照合: 問題(11)A の選択肢が原本と不一致です。')
+}
+if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色') {
+  throw new Error('原本照合: 問題(11)A の正答語が不一致です。')
+}
+
 const q17 = color2Summer2025Questions.filter((question) => question.groupNumber === 17)
 const q17Expected = ['トーンイントーン', 'ドミナントトーン', 'トライアド', 'lt12', '10R 7.5/8.0']
 q17.forEach((question, itemIndex) => {
@@ -93,4 +114,4 @@ const requiredRuntimeTokens = [
 const missingRuntimeTokens = requiredRuntimeTokens.filter((token) => !practice.includes(token))
 if (missingRuntimeTokens.length) throw new Error(`2025夏期4択の練習機能が不足しています: ${missingRuntimeTokens.join(', ')}`)
 
-console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 公式解答照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
+console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 公式解答照合 / 原本語句照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
