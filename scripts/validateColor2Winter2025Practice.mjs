@@ -32,6 +32,45 @@ for (const [groupText, expected] of Object.entries(officialAnswerKey)) {
   })
 }
 
+const getQuestion = (groupNumber, part) => color2Winter2025Questions.find(
+  (q) => q.groupNumber === groupNumber && q.part === part,
+)
+
+const q03c = getQuestion(3, 'C')
+if (!q03c?.prompt.includes('光色・色温度') || q03c.prompt.includes('活動的に仕事をしやすいオフィス')) {
+  throw new Error('原本照合: 問題(3)C の設問文が特定選択肢へ誘導しています。')
+}
+
+const q04i = getQuestion(4, 'I')
+const visualChoiceLabels = ['図①', '図②', '図③', '図④']
+if (!q04i || JSON.stringify(q04i.choices) !== JSON.stringify(visualChoiceLabels) || !q04i.image?.src) {
+  throw new Error('原本照合: 問題(4)I は4枚の色票から選ぶ形式である必要があります。')
+}
+
+const q08e = getQuestion(8, 'E')
+if (!q08e?.choices?.[2]?.startsWith('pトーンとltトーン')) {
+  throw new Error('原本照合: 問題(8)E の選択肢③が原本と不一致です。')
+}
+
+for (const [groupNumber, part] of [[11,'A'],[11,'B'],[12,'A'],[12,'B']]) {
+  const question = getQuestion(groupNumber, part)
+  if (!question?.prompt.includes('ファッションコーディネートに関する記述として最も適切')) {
+    throw new Error(`原本照合: 問題(${groupNumber})${part} の設問文に余計な答えヒントがあります。`)
+  }
+}
+
+const assetLeakRules = [
+  ['public/color2-2025-winter-practice/q05.svg', ['同程度の明度で彩度が変化']],
+  ['public/color2-2025-winter-practice/q06.svg', ['エーレンシュタイン', 'ネオンカラー', 'マッハバンド']],
+  ['public/color2-2025-winter-practice/q11.svg', ['ブルー系で統一', '白×黒']],
+  ['public/color2-2025-winter-practice/q12.svg', ['近似した暗いオリーブ系', '赤みの同系色・明度差']],
+]
+for (const [file, bannedTokens] of assetLeakRules) {
+  const content = read(file)
+  const leaked = bannedTokens.filter((token) => content.includes(token))
+  if (leaked.length) throw new Error(`図版答え漏れ: ${file} に ${leaked.join(', ')} が残っています。`)
+}
+
 const q17Expected = {
   A:'コンプレックス', B:'ダイアード', C:'18:B', D:'スプリットコンプリメンタリー', E:'8YR 3.5/6.0',
 }
@@ -62,4 +101,4 @@ for (const token of ['STORAGE_KEY','MASTERED_STREAK = 2','recordWeaknessAnswer',
   if (!practice.includes(token)) throw new Error(`2025冬期の練習機能が不足: ${token}`)
 }
 
-console.log(`色彩検定2級 2025冬期 検証OK: ${EXPECTED_QUESTION_COUNT_WINTER_2025}問 / ${EXPECTED_POINT_TOTAL_WINTER_2025}点 / 公式解答照合 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
+console.log(`色彩検定2級 2025冬期 検証OK: ${EXPECTED_QUESTION_COUNT_WINTER_2025}問 / ${EXPECTED_POINT_TOTAL_WINTER_2025}点 / 公式解答照合 / 原本語句照合 / 図版答え漏れ監査 / 全問4択 / 全問解説 / 図版 / 大問指定 / ランダム / 蓄積ミス保存`)
