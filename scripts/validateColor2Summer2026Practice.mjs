@@ -115,7 +115,7 @@ const missingAssets = color2Summer2026Questions
     return !fs.existsSync(path.join(root, 'public', relative))
   })
 if (missingAssets.length) {
-  throw new Error(`2026夏期の図版が不足しています: ${missingAssets.map((q) => q.id).join(', ')}`)
+  throw new Error(`2026夏期の図版が不足: ${missingAssets.map((q) => q.id).join(', ')}`)
 }
 
 // 問題図の中に答えそのものを書かない。旧図版で実際に起きていた漏洩を回帰検出する。
@@ -126,6 +126,8 @@ const answerLeakChecks = {
   'public/color2-2026-summer-practice/q09-sign.svg': ['視認性の高いサイン', 'RGB と CMYK', 'カラープロファイル'],
   'public/color2-2026-summer-practice/q11-fashion.svg': ['無彩色中心', '近いトーン', 'モノトーン', 'トーンイントーン'],
   'public/color2-2026-summer-practice/q12-fashion.svg': ['多色配色', 'バイカラー'],
+  'public/color2-2026-summer-practice/q14-room.svg': ['カジュアル', 'クラシック', 'エレガント', 'モダン'],
+  'public/color2-2026-summer-practice/q17-poster.svg': ['ドミナントカラー', 'トーンオントーン', 'ナチュラル', 'コンプレックス', 'スプリットコンプリメンタリー'],
 }
 for (const [file, forbidden] of Object.entries(answerLeakChecks)) {
   const source = read(file)
@@ -133,14 +135,29 @@ for (const [file, forbidden] of Object.entries(answerLeakChecks)) {
   if (leaks.length) throw new Error(`図版に正答の手掛かりが混入しています: ${file} / ${leaks.join(', ')}`)
 }
 
-// 過去に「正答番号だけ一致し、選択肢本文が別物」だった箇所を最低限の原文アンカーで固定する。
+// Q3図3は分光反射率。図4〜7の比エネルギーと取り違えない。
+const q03Asset = read('public/color2-2026-summer-practice/q03-lighting.svg')
+const q03Figure3Start = q03Asset.indexOf('図3')
+const q03Figure4Start = q03Asset.indexOf('図4')
+const q03Figure3 = q03Figure3Start >= 0 && q03Figure4Start > q03Figure3Start
+  ? q03Asset.slice(q03Figure3Start, q03Figure4Start)
+  : ''
+if (!q03Figure3.includes('分光反射率') || q03Figure3.includes('比エネルギー')) {
+  throw new Error('原本図版照合: 問題(3)図3の縦軸は「分光反射率」である必要があります。')
+}
+
+// 過去に「正答番号だけ一致し、選択肢本文が別物」だった箇所を原文アンカーで固定する。
 const sourceAnchors = {
   'src/color2-summer-2026/q03.js': ['演色評価数は100%', '赤外線や紫外線をほとんど放出しない'],
+  'src/color2-summer-2026/q05.js': ['マンセル表色系に関する、次のA〜Fの記述について', '5R 4/14'],
   'src/color2-summer-2026/q06.js': ['背景色と同じ明度の色', '色票④'],
+  'src/color2-summer-2026/q08.js': ['配色技法に関する、次のA〜Dの記述について', '配色イメージに関する、次のE、Fの記述に続く文として'],
   'src/color2-summer-2026/q09.js': ['Webセーフカラー', 'カラープロファイルを設定する必要がある'],
   'src/color2-summer-2026/q10.js': ['Yシャツの白', 'トーナル配色にセパレーション'],
-  'src/color2-summer-2026/q15.js': ['地域には地域の色がある', '耐久性や耐候性'],
-  'src/color2-summer-2026/q17.js': ['同一トーン以外', '選択色⑩'],
+  'src/color2-summer-2026/q13.js': ['次のA〜Fの空欄にあてはまる最も適切なもの', '壁や天井よりも明度を低く'],
+  'src/color2-summer-2026/q14.js': ['インテリアの色彩に関する、次のA〜Fの記述について', '右に示した部屋のインテリアスタイルについて'],
+  'src/color2-summer-2026/q15.js': ['「地域には地域の色がある」', '耐久性や耐候性'],
+  'src/color2-summer-2026/q17.js': ['8文字以内のカタカナ', '①〜⑩', '同じ語句や記号を2度使わない', '同一トーン以外', '選択色⑩'],
 }
 for (const [file, required] of Object.entries(sourceAnchors)) {
   const source = read(file)
@@ -181,5 +198,5 @@ if (missingRuntimeTokens.length) {
 }
 
 console.log(
-  `色彩検定2級 2026夏期 検証OK: ${EXPECTED_QUESTION_COUNT}問 / ${EXPECTED_POINT_TOTAL}点 / 教科書ページ照合 / 変換前・表示後の公式解答照合 / 原本選択肢数保持 / 全問解説 / 図版答え漏れ検査 / 原文アンカー / 大問指定 / ランダム / 蓄積ミス保存`,
+  `色彩検定2級 2026夏期 検証OK: ${EXPECTED_QUESTION_COUNT}問 / ${EXPECTED_POINT_TOTAL}点 / 教科書ページ照合 / 変換前・表示後の公式解答照合 / 原本選択肢数保持 / 全問解説 / 図版答え漏れ検査 / Q3縦軸検査 / 原文アンカー / 大問指定 / ランダム / 蓄積ミス保存`,
 )
