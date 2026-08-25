@@ -1,0 +1,52 @@
+.color2-practice-target-guide {
+  margin: 24px 0 0;
+  padding: 11px 0 12px;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px 14px;
+  border-top: 1px solid rgba(23, 23, 23, 0.2);
+  border-bottom: 1px solid rgba(23, 23, 23, 0.2);
+}
+
+.color2-practice-target-guide > span {
+  color: #77716a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.color2-practice-target-guide > strong {
+  color: #8d3b3b;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.color2-practice-target-guide > small {
+  color: #817b74;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.color2-practice-target-guide + h2 {
+  margin-top: 20px !important;
+}
+
+.color2-practice-target-token {
+  color: #8d3b3b;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+@media (max-width: 640px) {
+  .color2-practice-target-guide {
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+  }
+
+  .color2-practice-target-guide > small {
+    grid-column: 1 / -1;
+  }
+}

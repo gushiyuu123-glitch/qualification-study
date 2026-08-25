@@ -20,21 +20,13 @@ export const winter2025Groups = [q01,q02,q03,q04,q05,q06,q07,q08,q09,q10,q11,q12
 export const EXPECTED_QUESTION_COUNT_WINTER_2025 = 104
 export const EXPECTED_POINT_TOTAL_WINTER_2025 = 200
 
-function practicePrompt(item) {
-  const source = String(item.prompt ?? '').trim()
-  const part = String(item.part ?? '').trim()
-  const isSharedBlankQuestion = /次の\[A\]〜\[[A-Z]\]の空欄/.test(source) && part && source.includes(`[${part}]`)
-  if (!isSharedBlankQuestion) return source
-  return `【この画面では [${part}] を解答】\n\n${source}`
-}
-
 export const color2Winter2025Questions = winter2025Groups.flatMap((group) => group.items.map((item, index) => ({
   id: '2025-winter-' + String(group.number).padStart(2, '0') + '-' + String(item.part).toLowerCase(),
   groupNumber: group.number,
   part: item.part,
   order: index + 1,
   points: Number(item.points ?? group.defaultPoints ?? 1),
-  prompt: practicePrompt(item),
+  prompt: String(item.prompt ?? '').trim(),
   choices: item.choices.map((choice) => String(choice)),
   correctIndex: Number(item.correctIndex),
   explanation: String(item.explanation ?? '').trim(),
