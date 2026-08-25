@@ -9,6 +9,7 @@ const practiceConfigs = [
 ]
 
 const companionClasses = [
+  'color2-practice-source-mode',
   'color2-practice-web-context',
   'color2-practice-source-details',
 ]
@@ -76,7 +77,17 @@ function renderPromptTitle(prompt, view) {
   prompt.dataset.practiceWebRendered = prompt.textContent ?? ''
 }
 
-function renderContext(prompt, view) {
+function renderSourceMode(prompt, view) {
+  if (!view.sourceMode) return null
+
+  const note = document.createElement('p')
+  note.className = 'color2-practice-source-mode'
+  note.textContent = `${view.sourceMode}。この練習では選択式に変換しています。`
+  prompt.after(note)
+  return note
+}
+
+function renderContext(anchor, view) {
   if (!view.context) return null
 
   const context = document.createElement('div')
@@ -84,30 +95,30 @@ function renderContext(prompt, view) {
   context.setAttribute('role', 'note')
 
   const label = document.createElement('span')
-  label.textContent = 'この問題に必要な文脈'
+  label.textContent = 'この設問で読む原文'
 
   const paragraph = document.createElement('p')
   appendTokenizedText(paragraph, view.context, view.targetToken)
 
   context.append(label, paragraph)
-  prompt.after(context)
+  anchor.after(context)
   return context
 }
 
-function renderSourceDetails(prompt, view, context) {
+function renderSourceDetails(anchor, view) {
   if (!view.source || view.source === view.title) return
 
   const details = document.createElement('details')
   details.className = 'color2-practice-source-details'
 
   const summary = document.createElement('summary')
-  summary.textContent = '原本の問題文を見る'
+  summary.textContent = '原本の問題文をすべて見る'
 
   const source = document.createElement('p')
   source.textContent = view.source
 
   details.append(summary, source)
-  ;(context ?? prompt).after(details)
+  anchor.after(details)
 }
 
 function enhancePractice({ set, prompt: promptSelector, label: labelSelector }) {
@@ -132,8 +143,10 @@ function enhancePractice({ set, prompt: promptSelector, label: labelSelector }) 
   })
   removeCompanions(prompt)
   renderPromptTitle(prompt, view)
-  const context = renderContext(prompt, view)
-  renderSourceDetails(prompt, view, context)
+
+  let anchor = renderSourceMode(prompt, view) ?? prompt
+  anchor = renderContext(anchor, view) ?? anchor
+  renderSourceDetails(anchor, view)
   prompt.dataset.practiceWebKey = key
 }
 
