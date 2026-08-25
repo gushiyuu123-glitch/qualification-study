@@ -20,12 +20,14 @@ const sets = [
 
 const sharedPattern = /[A-Z](?:〜|～|、)[A-Z]/
 const sharedCounts = []
+const stripPartBrackets = (value) => String(value ?? '')
+  .replaceAll('[', '')
+  .replaceAll(']', '')
+  .replaceAll('［', '')
+  .replaceAll('］', '')
 
 for (const [name, questions] of sets) {
-  const sharedQuestions = questions.filter((question) => {
-    const normalized = String(question.prompt ?? '').replace(/[\[\]［］]/g, '')
-    return sharedPattern.test(normalized)
-  })
+  const sharedQuestions = questions.filter((question) => sharedPattern.test(stripPartBrackets(question.prompt)))
 
   if (!sharedQuestions.length) {
     throw new Error(`${name}: 複数パート共通本文の検出結果が0件です。解答対象ガイドの監査対象を確認してください。`)

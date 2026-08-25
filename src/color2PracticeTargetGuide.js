@@ -11,8 +11,16 @@ function currentPart(labelText) {
   return String(labelText ?? '').match(/問題\(\d+\)\s+([A-Z])/)?.[1] ?? ''
 }
 
+function stripPartBrackets(value) {
+  return String(value ?? '')
+    .replaceAll('[', '')
+    .replaceAll(']', '')
+    .replaceAll('［', '')
+    .replaceAll('］', '')
+}
+
 function sharedRange(promptText) {
-  const normalized = String(promptText ?? '').replace(/[\[\]［］]/g, '')
+  const normalized = stripPartBrackets(promptText)
   const range = normalized.match(/([A-Z])[〜～]([A-Z])/)
   if (range) return `${range[1]}〜${range[2]}`
 
