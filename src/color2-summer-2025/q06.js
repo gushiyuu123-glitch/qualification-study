@@ -1,19 +1,87 @@
 import { defineSummerGroup } from './utils.js'
 
+const q06Figure1 = { src: '/past-exams/color2/2025-summer/q6-fig1.svg', alt: '2025年度夏期 問題6 図1の縞模様' }
+const q06Figure2 = { src: '/past-exams/color2/2025-summer/q6-fig2.svg', alt: '2025年度夏期 問題6 図2の格子図' }
+const q06Figure3 = { src: '/past-exams/color2/2025-summer/q6-fig3.svg', alt: '2025年度夏期 問題6 図3の色線を用いた格子図' }
+
 export const q06 = defineSummerGroup({
   number: 6,
   questionPage: 12,
   answerPage: 54,
   defaultPoints: 2,
-  caution: "錯視名だけでなく、どの図で何がどう見えるかを対応づける。",
+  caution: '原本の問題ページは、図1〜図3と本文が色の視覚効果を扱っている一方、A〜Hの選択肢欄にはマンセル表色系の語句が掲載されており、解答・解説ページの内容とも一致していない。推測で選択肢を作り直さず、問題ページに印刷された選択肢と解答表の正答番号をそのまま保持する。',
   items: [
-  {"part":"A","prompt":"図1のアとイを交互に見続けた後、ウを見ると、ウの横縞は何色に見えるか。","choices":["赤","赤の心理補色","黄","青緑"],"correctIndex":0,"explanation":"緑の横縞へ順応した後は、その反対色である赤が横縞として知覚される。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig1.svg","alt":"緑の横縞、赤の縦縞、白黒の縞模様"}},
-  {"part":"B","prompt":"同じ操作の後、ウの縦縞は何色に見えるか。","choices":["紫","橙","緑（青緑）","赤紫"],"correctIndex":2,"explanation":"赤の縦縞へ順応した後は、反対色の緑系が縦縞として見える。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig1.svg","alt":"緑の横縞、赤の縦縞、白黒の縞模様"}},
-  {"part":"C","prompt":"縞の方向と色の組み合わせに応じて補色が残るこの現象を何というか。","choices":["リープマン効果","色相対比","色相の同化","マッカロー効果"],"correctIndex":3,"explanation":"方向と色の組み合わせに依存して生じる残効をマッカロー効果という。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig1.svg","alt":"緑の横縞、赤の縦縞、白黒の縞模様"}},
-  {"part":"D","prompt":"マッカロー効果は、視覚系が方向と色の組み合わせにどのように反応した結果生じるか。","choices":["側抑制","視野欠損","順応","拡散反射"],"correctIndex":2,"explanation":"特定の方向と色の組み合わせへ順応した結果、補色の残効が生じる。","image":{"src":"/past-exams/color2/2025-summer/q6-fig1.svg","alt":"緑の横縞、赤の縦縞、白黒の縞模様"}},
-  {"part":"E","prompt":"図2の白い十字路の抜けた部分は、黒い図ではどのように見えるか。","choices":["黄の色みが緑から広がって見える","黒がほかの部分より暗く見える","黒がほかの部分より明るく見える","主観色が見える"],"correctIndex":1,"explanation":"白い切れ目は周囲との関係により、ほかの黒い部分より暗く見える。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig2.svg","alt":"黒い格子に白い切れ目がある図"}},
-  {"part":"F","prompt":"図2のような白い線の切れ目によって生じる現象はどれか。","choices":["ハーマングリッド","マッハバンド","色陰現象","エーレンシュタイン効果"],"correctIndex":3,"explanation":"線の切れ目が周囲より明るく、または暗く見える現象をエーレンシュタイン効果という。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig2.svg","alt":"黒い格子に白い切れ目がある図"}},
-  {"part":"G","prompt":"図2の十字路を図3のような色線にすると、切れ目部分はどのように見えるか。","choices":["元の色より鮮やかに見える","色が線からにじみ出て広がるように見える","線の心理補色の円形が見える","ハレーションが見える"],"correctIndex":1,"explanation":"線の色が切れ目へにじみ出て広がるように見える。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig3.svg","alt":"黒い格子の間を青い線でつないだ図"}},
-  {"part":"H","prompt":"図3で色がにじみ出て広がるように見える現象を何というか。","choices":["ネオンカラー効果","縁辺対比","補色残像","透明視"],"correctIndex":0,"explanation":"色線の切れ目から色が広がるように見える現象はネオンカラー効果である。","questionType":"visual-diagram","image":{"src":"/past-exams/color2/2025-summer/q6-fig3.svg","alt":"黒い格子の間を青い線でつないだ図"}}
-]
+    {
+      part: 'A',
+      prompt: '図1のアとイを交互に10秒間ずつ、計10回程度見続けた後に、ウに目を移すと、ウの横縞は［A］に、縦縞は［B］に色づいて見える。',
+      choices: ['ナチュラルハーモニーシステム', 'カラーダイヤル', 'カラーピッカー', 'カラーオーダシステム'],
+      correctIndex: 0,
+      explanation: '原本解答表はA-①。原本解説では横縞は赤に見えるとしているが、問題ページの選択肢①は「ナチュラルハーモニーシステム」であり、本文・解説と選択肢が不整合である。選択肢は問題ページを改変せず収録している。',
+      questionType: 'visual-diagram',
+      image: q06Figure1,
+    },
+    {
+      part: 'B',
+      prompt: '図1のアとイを交互に10秒間ずつ、計10回程度見続けた後に、ウに目を移すと、ウの横縞は［A］に、縦縞は［B］に色づいて見える。',
+      choices: ['色の三属性の段階', 'トーンの分類', '光の色', '光の強さ'],
+      correctIndex: 2,
+      explanation: '原本解答表はB-③。原本解説では縦縞は緑系に見えるとしているが、問題ページの選択肢③は「光の色」であり、本文・解説と選択肢が不整合である。選択肢は問題ページを改変せず収録している。',
+      questionType: 'visual-diagram',
+      image: q06Figure1,
+    },
+    {
+      part: 'C',
+      prompt: 'この現象は［C］と呼ばれる。［C］は視覚系が方向と色という二つの情報の組みあわせに［D］した結果生じる現象とされる。',
+      choices: ['YR, GY, BG, PB, RP', 'R, Y, G, B, P', 'C, M, Y, K', 'R, G, B'],
+      correctIndex: 3,
+      explanation: '原本解答表はC-④。原本解説では④マッカロー効果としているが、問題ページの選択肢④は「R, G, B」であり不整合である。推測で「マッカロー効果」を選択肢へ追加していない。',
+      questionType: 'visual-diagram',
+      image: q06Figure1,
+    },
+    {
+      part: 'D',
+      prompt: 'この現象は［C］と呼ばれる。［C］は視覚系が方向と色という二つの情報の組みあわせに［D］した結果生じる現象とされる。',
+      choices: ['10BG', '5B', '5PB', '10PB'],
+      correctIndex: 2,
+      explanation: '原本解答表はD-③。原本解説では③順応としているが、問題ページの選択肢③は「5PB」であり不整合である。問題ページの印刷内容を優先して保持する。',
+      questionType: 'visual-diagram',
+      image: q06Figure1,
+    },
+    {
+      part: 'E',
+      prompt: '図2のように白い線の十字路部分を黒にすると、その部分では［E］見える。この現象は［F］と呼ばれる。',
+      choices: ['GY', 'YR', 'RP', 'R'],
+      correctIndex: 1,
+      explanation: '原本解答表はE-②。原本解説では黒がほかの部分より暗く見えるとしているが、問題ページの選択肢②は「YR」であり不整合である。',
+      questionType: 'visual-diagram',
+      image: q06Figure2,
+    },
+    {
+      part: 'F',
+      prompt: '図2のように白い線の十字路部分を黒にすると、その部分では［E］見える。この現象は［F］と呼ばれる。',
+      choices: ['B', 'PB', 'G', 'P'],
+      correctIndex: 3,
+      explanation: '原本解答表はF-④。原本解説では④エーレンシュタイン効果としているが、問題ページの選択肢④は「P」であり不整合である。',
+      questionType: 'visual-diagram',
+      image: q06Figure2,
+    },
+    {
+      part: 'G',
+      prompt: 'また、図3のように、図2の十字路部分の黒を色線にすると、その部分では［G］見える。この現象は［H］と呼ばれる。',
+      choices: ['n-5', '5s', 'Gy-5', 'N5'],
+      correctIndex: 1,
+      explanation: '原本解答表はG-②。原本解説では色が線からにじみ出て広がるように見えるとしているが、問題ページの選択肢②は「5s」であり不整合である。',
+      questionType: 'visual-diagram',
+      image: q06Figure3,
+    },
+    {
+      part: 'H',
+      prompt: 'また、図3のように、図2の十字路部分の黒を色線にすると、その部分では［G］見える。この現象は［H］と呼ばれる。',
+      choices: ['彩度', '明度', 'トーン', 'クロマ'],
+      correctIndex: 0,
+      explanation: '原本解答表はH-①。原本解説では①ネオンカラー効果としているが、問題ページの選択肢①は「彩度」であり不整合である。問題ページの選択肢を推測で置換していない。',
+      questionType: 'visual-diagram',
+      image: q06Figure3,
+    },
+  ],
 })
