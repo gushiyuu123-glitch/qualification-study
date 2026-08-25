@@ -80,11 +80,16 @@ if (q10f.choices[q10f.correctIndex] !== 'ベーシックカラー') {
 }
 
 const q11a = getQuestion(11, 'A')
-const q11aExpectedChoices = ['ナチュラル配色', 'トーンイントーン配色', 'ダイアード配色', 'トリコロール配色']
+const q11aExpectedChoices = [
+  'ナチュラル配色によるコーディネートである。',
+  'トーンイントーン配色によるコーディネートである。',
+  'ダイアード配色によるコーディネートである。',
+  'トリコロール配色によるコーディネートである。',
+]
 if (!q11a || JSON.stringify(q11a.choices) !== JSON.stringify(q11aExpectedChoices)) {
   throw new Error('原本照合: 問題(11)A の選択肢が原本と不一致です。')
 }
-if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色') {
+if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色によるコーディネートである。') {
   throw new Error('原本照合: 問題(11)A は教科書解答表どおり①ナチュラル配色で固定してください。')
 }
 
