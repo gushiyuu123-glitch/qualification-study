@@ -1,6 +1,7 @@
 const SOURCE_INSTRUCTION_HINT = /^(?:次の|以下の)/
 const SOURCE_INSTRUCTION_ACTION = /(選び|選んで|記入|マーク|答え)/
 const TARGET_TOKEN_PATTERN = /(\[[A-Z]\]|［[A-Z]］)/g
+const SOURCE_NOTE_PATTERN = /^【([^】]+)】\s*/
 
 const TITLE_OVERRIDES = new Map([
   ['2025-winter:3:A', '照度について、最も適切な記述を1つ選んでください。'],
@@ -18,8 +19,17 @@ function normalizeText(value) {
   return String(value ?? '').replace(/\r\n?/g, '\n').trim()
 }
 
+function leadingSourceNote(text) {
+  return normalizeText(text).match(SOURCE_NOTE_PATTERN)?.[1] ?? ''
+}
+
+function sourceModeLabel(source) {
+  const note = leadingSourceNote(source)
+  return /記述式/.test(note) ? '原本は記述式' : ''
+}
+
 function stripLeadingSourceNote(text) {
-  return text.replace(/^【[^】]+】\s*/, '').trim()
+  return text.replace(SOURCE_NOTE_PATTERN, '').trim()
 }
 
 function splitInstruction(source) {
@@ -140,6 +150,43 @@ function commonInstructionOnlyTitle(source, part, options) {
   return ''
 }
 
+function finishFragmentTitle(clean) {
+  const withoutPeriod = clean.replace(/。$/, '')
+
+  const reasonStem = withoutPeriod.match(/^(.+?)のは、$/)
+  if (reasonStem) {
+    return `${reasonStem[1]}理由として、最も適切なものを1つ選んでください。`
+  }
+
+  const amongStem = withoutPeriod.match(/^(.+?)のうち、$/)
+  if (amongStem) {
+    return `${amongStem[1]}について、最も適切なものを1つ選んでください。`
+  }
+
+  const topicStem = withoutPeriod.match(/^(.+?)(?:では|は)、$/)
+  if (topicStem) {
+    return `${topicStem[1]}について、最も適切な記述を1つ選んでください。`
+  }
+
+  if (/(について|に関して)[、,]?$/.test(withoutPeriod)) {
+    return `${withoutPeriod.replace(/[、,]$/, '')}、最も適切な記述を1つ選んでください。`
+  }
+
+  if (/についての記述$/.test(withoutPeriod)) {
+    return `${withoutPeriod}から、最も適切なものを1つ選んでください。`
+  }
+
+  if (/(とき|場合)$/.test(withoutPeriod)) {
+    return `${withoutPeriod}、最も適切なものを1つ選んでください。`
+  }
+
+  if (/もの$/.test(withoutPeriod)) {
+    return `${withoutPeriod}を1つ選んでください。`
+  }
+
+  return clean
+}
+
 function statementTitle(body, part, source, options) {
   const instructionOnly = commonInstructionOnlyTitle(source, part, options)
   if (instructionOnly && body === source) return instructionOnly
@@ -147,16 +194,7 @@ function statementTitle(body, part, source, options) {
   const clean = stripLeadingPart(stripLeadingSourceNote(body), part).replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
   if (!clean || isAlreadyInstruction(clean)) return instructionOnly || clean
 
-  const withoutPeriod = clean.replace(/。$/, '')
-  if (/(について|に関して)$/.test(withoutPeriod)) {
-    return `${withoutPeriod}、最も適切な記述を1つ選んでください。`
-  }
-
-  if (/についての記述$/.test(withoutPeriod)) {
-    return `${withoutPeriod}から、最も適切なものを1つ選んでください。`
-  }
-
-  return clean
+  return finishFragmentTitle(clean)
 }
 
 export function buildColor2PracticePromptView(sourcePrompt, part, options = {}) {
@@ -165,6 +203,7 @@ export function buildColor2PracticePromptView(sourcePrompt, part, options = {}) 
   const { instruction, body } = splitInstruction(source)
   const analysisBody = stripLeadingSourceNote(body)
   const targetToken = exactTargetToken(analysisBody, normalizedPart)
+  const sourceMode = sourceModeLabel(source)
 
   if (targetToken) {
     return {
@@ -174,6 +213,7 @@ export function buildColor2PracticePromptView(sourcePrompt, part, options = {}) 
       targetToken,
       source,
       sourceInstruction: instruction,
+      sourceMode,
     }
   }
 
@@ -184,6 +224,7 @@ export function buildColor2PracticePromptView(sourcePrompt, part, options = {}) 
     targetToken: '',
     source,
     sourceInstruction: instruction,
+    sourceMode,
   }
 }
 
