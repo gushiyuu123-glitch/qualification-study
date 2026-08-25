@@ -1,14 +1,16 @@
 // 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに選択練習として収録します。
+const sourceInstruction = '次のA〜Eの記述について、最も適切なものを、それぞれの①②③④からひとつ選びその番号をマークしなさい。'
+
 export const q09 = {
   number: 9,
   questionPage: 9,
   answerPage: 18,
   defaultPoints: 2,
-  caution: '教科書の問題(9)に沿って、サイン・RGB/CMYK・HSB・色域・カラープロファイルを区別する。',
+  caution: '原本の問題(9)の共通指示・図・各選択肢・解答を基準にする。選択肢本文を要約しない。',
   items: [
     {
       part: 'A',
-      prompt: '下に示した図について',
+      prompt: `${sourceInstruction}\n\nA 下に示した図について`,
       choices: [
         'ピクトグラムが使われており、視認性の高いデザインになっている。',
         '誘目性を低くすることが最も重要になる。',
@@ -16,13 +18,13 @@ export const q09 = {
         '誘目性は高める必要があるが、視認性は低いほうがよい。',
       ],
       correctIndex: 0,
-      explanation: '教科書の正答は①。ピクトグラムと明快な色の対比により、視認性の高いサインになっている。',
+      explanation: '教科書の正答は①。',
       questionType: 'visual-diagram',
       image: { src: '/color2-2026-summer-practice/q09-sign.svg', alt: '2026年度夏期 問題9AのSOSサイン' },
     },
     {
       part: 'B',
-      prompt: 'コンピュータ環境における色空間について',
+      prompt: `${sourceInstruction}\n\nB コンピュータ環境における色空間について`,
       choices: [
         'DTP作業もWebデザインも、基本は同じ色空間で色彩設計することである。',
         '一般的に印刷物をつくる際にはHSB色空間が使用される。',
@@ -30,11 +32,11 @@ export const q09 = {
         'CMYK色空間は、印刷物をつくるDTP作業の色指定に使用する。',
       ],
       correctIndex: 3,
-      explanation: '教科書の正答は④。印刷物を制作するDTPではCMYK色空間を用いる。',
+      explanation: '教科書の正答は④。',
     },
     {
       part: 'C',
-      prompt: 'コンピュータ環境における色空間の色選択について',
+      prompt: `${sourceInstruction}\n\nC コンピュータ環境における色空間の色選択について`,
       choices: [
         'CMYK色空間では、色選択に16進数が用いられ、黒は#000000、白は#FFFFFFのように設定する。',
         'RGB色空間では、色料の三原色の組みあわせによって、256×256×256＝16,777,216色の設定ができる。',
@@ -42,11 +44,11 @@ export const q09 = {
         'Webセーフカラー色空間での色表示には色の三属性が用いられ、それぞれ0〜100%の範囲で表される。',
       ],
       correctIndex: 2,
-      explanation: '教科書の正答は③。HSBでは色相を角度、彩度と明度を0〜100%で設定する。',
+      explanation: '教科書の正答は③。',
     },
     {
       part: 'D',
-      prompt: 'xy色度図内における色空間の色再現領域について',
+      prompt: `${sourceInstruction}\n\nD xy色度図内における色空間の色再現領域について`,
       choices: [
         '印刷色再現色空間と光の色を扱う色空間の色再現領域に違いはないので、RGBで制作した色はすべてCMYKで色再現できる。',
         '光の色を扱う色空間よりも印刷色再現色空間のほうが色再現領域が狭く、RGBでは色再現できるが、CMYKでは色再現が難しい領域がある。',
@@ -54,11 +56,11 @@ export const q09 = {
         '赤成分の色再現領域は、印刷色再現色空間のほうが光の色を扱う色空間よりも広くなっている。',
       ],
       correctIndex: 1,
-      explanation: '教科書の正答は②。一般に印刷のCMYK色域はRGB色域より狭く、RGBでは表現できてもCMYKでは再現しにくい色がある。',
+      explanation: '教科書の正答は②。',
     },
     {
       part: 'E',
-      prompt: 'DTP作業におけるカラーマネジメントについて',
+      prompt: `${sourceInstruction}\n\nE DTP作業におけるカラーマネジメントについて`,
       choices: [
         'AD変換はディスプレイの特性とプリンタの特性の相違による、印刷物の色ずれを防ぐために行う。',
         '照明の色温度や照度によって、ディスプレイや印刷物の見え方が異なるため、AD変換を行うことが大切になる。',
@@ -66,7 +68,7 @@ export const q09 = {
         'カラープロファイルの設定は、作業空間の照明の照度や色温度による、印刷物の色の見えの影響を最小限にするために行う。',
       ],
       correctIndex: 2,
-      explanation: '教科書の正答は③。色空間や機器間の変換ではカラープロファイルを用いて色ずれを抑える。',
+      explanation: '教科書の正答は③。',
     },
   ],
 }
