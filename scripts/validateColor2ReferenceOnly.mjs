@@ -8,6 +8,7 @@ const index = read('index.html')
 const reference = read('src/Color2ReferenceView.jsx')
 const enhancer = read('src/color2ReferenceOnly.js')
 const conventional = read('src/conventionalColorNamesStudy.js')
+const conventionalQuiz = read('src/conventionalColorNamesQuiz.js')
 const sharedQuestions = read('src/data/questions.js')
 
 const forbiddenRuntimeModules = [
@@ -19,7 +20,7 @@ const forbiddenRuntimeModules = [
   'lightingStudy.js', 'munsellColorSystemStudy.js', 'colorPsychologyStudy.js',
   'colorHarmonyStudy.js', 'colorImageStudy.js', 'visualDesignStudy.js',
   'fashionStudy.js', 'interiorStudy.js', 'landscapeColorStudy.js',
-  'colorTextbookStructure.js', 'conventionalColorNamesQuiz.js',
+  'colorTextbookStructure.js',
 ]
 const loadedForbidden = forbiddenRuntimeModules.filter((name) => index.includes(name))
 if (loadedForbidden.length) throw new Error(`色彩2級で許可していない問題モジュールが読み込まれています: ${loadedForbidden.join(', ')}`)
@@ -65,19 +66,44 @@ if (!enhancer.includes('renderToStaticMarkup') || !enhancer.includes('問題') |
   throw new Error('色彩2級の共通問題ナビ停止処理を確認できません。')
 }
 if (!enhancer.includes('教科書・過去問に実際に収録された問題だけ')) {
-  throw new Error('色彩2級の問題ソース方針が教科書・過去問限定に固定されていません。')
+  throw new Error('色彩2級の共通問題ソース方針が教科書・過去問限定に固定されていません。')
 }
 if (enhancer.includes('data-conventional-quiz-open') || enhancer.includes('__QUALIFY_CONVENTIONAL_COLOR_QUIZ__')) {
-  throw new Error('独自生成の慣用色名4択導線が色彩2級画面に残っています。')
+  throw new Error('慣用色名ドリルを共通問題ナビへ混入させないでください。専用リーダー内の導線だけを使います。')
 }
 
 const conventionalModule = '/src/conventionalColorNamesStudy.js'
+const conventionalQuizModule = '/src/conventionalColorNamesQuiz.js'
 const conventionalPosition = index.indexOf(conventionalModule)
+const conventionalQuizPosition = index.indexOf(conventionalQuizModule)
 if (conventionalPosition < 0) throw new Error('慣用色名63色リーダーが登録されていません。')
+if (conventionalQuizPosition < 0) throw new Error('慣用色名63色の4択ドリルが登録されていません。')
+if (conventionalQuizPosition < conventionalPosition) {
+  throw new Error('慣用色名4択ドリルは、確認済み63色リーダーの後に読み込む必要があります。')
+}
 
 const conventionalDataCount = (conventional.match(/\{ group: '(?:和色名|外来色名)'/g) ?? []).length
 if (conventionalDataCount !== 63) {
   throw new Error(`慣用色名の確認済み色数が想定外です: ${conventionalDataCount}色`)
+}
+
+const conventionalQuizRequiredTokens = [
+  'EXPECTED_ITEM_COUNT = 63',
+  "const READER_KEY = 'conventional-color-names'",
+  "reader.querySelectorAll('.conventional-color-card')",
+  'readVerifiedItems',
+  '色面 → 慣用色名',
+  'data-quiz-start-weak',
+  'MASTERED_STREAK = 2',
+  '__QUALIFY_CONVENTIONAL_COLOR_QUIZ__',
+]
+const missingQuizTokens = conventionalQuizRequiredTokens.filter((token) => !conventionalQuiz.includes(token))
+if (missingQuizTokens.length) {
+  throw new Error(`慣用色名63色ドリルの検証済みデータ連携が不足しています: ${missingQuizTokens.join(', ')}`)
+}
+
+if (/qualificationId\s*:\s*['\"]color-2['\"]/.test(conventionalQuiz)) {
+  throw new Error('慣用色名ドリルを共通問題配列へ登録しないでください。専用ドリルとして分離します。')
 }
 
 if (packageJson.dependencies?.munsell !== '1.1.6') {
@@ -105,4 +131,4 @@ if (!conventional.includes("sub: 'jaune brillant'")) {
   throw new Error('ジョンブリアンの英語表記が jaune brillant に固定されていません。')
 }
 
-console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / Renotation基準sRGB / 問題は教科書・過去問限定 / 共通独自問題0`)
+console.log(`色彩検定2級 検証OK: 確認済み用語${termCount}語 / 慣用色名${conventionalDataCount}色 / Renotation基準sRGB / 共通問題は教科書・過去問限定 / 慣用色名63色専用ドリル / 共通独自問題0`)
