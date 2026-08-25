@@ -1,1 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420"><rect width="1000" height="420" fill="#f7f5ef"/><g font-family="sans-serif" fill="#222"><text x="50" y="35" font-size="18">B 色票</text><text x="220" y="35" font-size="18">C 色票</text><text x="390" y="35" font-size="18">D 緑系5色</text><text x="50" y="245" font-size="18">E / F 色相関係の学習用色票</text></g><rect x="55" y="60" width="120" height="120" fill="#151515"/><rect x="225" y="60" width="120" height="120" fill="#f2bc00"/><g><rect x="395" y="60" width="90" height="90" fill="#879b55"/><rect x="490" y="60" width="90" height="90" fill="#7d9c3c"/><rect x="585" y="60" width="90" height="90" fill="#6f9c24"/><rect x="680" y="60" width="90" height="90" fill="#669d13"/><rect x="775" y="60" width="90" height="90" fill="#63a000"/></g><g><rect x="60" y="275" width="90" height="90" fill="#d0152b"/><rect x="180" y="275" width="90" height="90" fill="#f0b900"/><rect x="300" y="275" width="90" height="90" fill="#128849"/><rect x="420" y="275" width="90" height="90" fill="#176a93"/><rect x="540" y="275" width="90" height="90" fill="#684187"/><rect x="660" y="275" width="90" height="90" fill="#ed7d00"/><rect x="780" y="275" width="90" height="90" fill="#92a800"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" role="img" aria-label="2025年度冬期 問題5の色票と配色図">
+  <rect width="1200" height="820" fill="#f7f5ef"/>
+  <g font-family="sans-serif" fill="#222">
+    <text x="60" y="48" font-size="22" font-weight="700">B</text>
+    <rect x="60" y="72" width="145" height="145" fill="#141414"/>
+
+    <text x="270" y="48" font-size="22" font-weight="700">C</text>
+    <rect x="270" y="72" width="145" height="145" fill="#eeba04"/>
+
+    <text x="480" y="48" font-size="22" font-weight="700">D</text>
+    <g transform="translate(480 92)">
+      <rect x="0" y="0" width="110" height="110" fill="#7b8f48"/>
+      <rect x="122" y="0" width="110" height="110" fill="#78933c"/>
+      <rect x="244" y="0" width="110" height="110" fill="#759530"/>
+      <rect x="366" y="0" width="110" height="110" fill="#6f971d"/>
+      <rect x="488" y="0" width="110" height="110" fill="#71a10f"/>
+    </g>
+
+    <text x="60" y="300" font-size="22" font-weight="700">E</text>
+    <text x="60" y="330" font-size="16">図1</text>
+    <rect x="60" y="348" width="130" height="130" fill="#bf101d"/>
+
+    <g font-size="20" text-anchor="middle">
+      <text x="330" y="326">①</text>
+      <rect x="245" y="348" width="78" height="112" fill="#017834"/>
+      <rect x="337" y="348" width="78" height="112" fill="#66336e"/>
+
+      <text x="570" y="326">②</text>
+      <rect x="485" y="348" width="78" height="112" fill="#efb901"/>
+      <rect x="577" y="348" width="78" height="112" fill="#027a79"/>
+
+      <text x="810" y="326">③</text>
+      <rect x="725" y="348" width="78" height="112" fill="#65326d"/>
+      <rect x="817" y="348" width="78" height="112" fill="#efb803"/>
+
+      <text x="1050" y="326">④</text>
+      <rect x="965" y="348" width="78" height="112" fill="#017978"/>
+      <rect x="1057" y="348" width="78" height="112" fill="#017a35"/>
+    </g>
+
+    <text x="60" y="565" font-size="22" font-weight="700">F</text>
+    <g font-size="20" text-anchor="middle">
+      <text x="190" y="605">①</text>
+      <rect x="90" y="626" width="88" height="118" fill="#eeb702"/>
+      <rect x="194" y="626" width="88" height="118" fill="#027935"/>
+
+      <text x="455" y="605">②</text>
+      <rect x="355" y="626" width="88" height="118" fill="#015a84"/>
+      <rect x="459" y="626" width="88" height="118" fill="#edb901"/>
+
+      <text x="720" y="605">③</text>
+      <rect x="620" y="626" width="88" height="118" fill="#bf101d"/>
+      <rect x="724" y="626" width="88" height="118" fill="#829915"/>
+
+      <text x="985" y="605">④</text>
+      <rect x="885" y="626" width="88" height="118" fill="#d97402"/>
+      <rect x="989" y="626" width="88" height="118" fill="#66336e"/>
+    </g>
+  </g>
+</svg>
