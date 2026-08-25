@@ -1,80 +1,25 @@
-// 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに4択練習として収録します。
+const sourcePrompt = `次の[A]〜[H]の空欄にあてはまる最も適切なものを、それぞれの①②③④からひとつ選びその番号をマークしなさい。
+
+図1の文字を[A]の色にしたところ、文字の色と背景色の境界線があいまいになり、ちらつきが生じた。この現象は[B]と呼ばれる。図1の場合、[A]の色の色相を変更せずに[B]を避けるには、たとえば、文字の色を[C]にするとよい。
+図2の黄と青の図形の②の部分を[D]の色にすると、黄と青の色フィルムを重ねあわせたような印象が生じる。このような見え方は[E]と呼ばれる。
+図3の①と②を交互に10秒間ずつ、計10回程度見続けた後に、①に目を移すと、①の縦線は[F]に、横線は[G]に色づいて見える。この現象は[H]と呼ばれる。`
+
+const q06Image = { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' }
+
 export const q06 = {
   number: 6,
   questionPage: 6,
   answerPage: 18,
   defaultPoints: 2,
-  caution: '教科書の問題(6)に沿って、図の見え方と錯視・残効の名称を対応づける。',
+  caution: '原本のA〜H空欄文章・図1〜図3・色票・選択肢・公式解答を基準にする。',
   items: [
-    {
-      part: 'A',
-      prompt: '図1の文字色をどの色にしたとき、文字の色と背景色の境界線が激しくまたたくような現象が生じやすいか。',
-      choices: ['色票①', '色票②', '色票③', '色票④'],
-      correctIndex: 1,
-      explanation: '教科書の正答は②。緑の背景に近い明度の赤を組みあわせると、境界がちらついて見えやすい。',
-      questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'B',
-      prompt: '図1のように文字色と背景色の境界線が激しくまたたくように見える現象はどれか。',
-      choices: ['主観色', 'エーレンシュタイン効果', '補色残像', 'リープマン効果'],
-      correctIndex: 3,
-      explanation: '教科書の正答は④。このような境界のちらつきはリープマン効果と呼ばれる。',
-      questionType: 'visual-diagram',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'C',
-      prompt: '図1で文字色の色相を変更せずに、境界のまたたきを避ける方法として最も適切なものはどれか。',
-      choices: ['ペールトーン', '高彩度色', '中彩度色', '背景色と同じ明度の色'],
-      correctIndex: 0,
-      explanation: '教科書の正答は①。文字色をペールトーンにして背景との明度差を確保すると、境界のちらつきを避けやすい。',
-    },
-    {
-      part: 'D',
-      prompt: '図2の黄色と青の図形の重なった部分をどの色にすると、奥と手前の色フィルムを重ねあわせたような印象が生じやすいか。',
-      choices: ['色票①', '色票②', '色票③', '色票④'],
-      correctIndex: 1,
-      explanation: '教科書の正答は②。重なり部分を緑にすることで、黄色と青の透明な色面が重なったような見え方になる。',
-      questionType: 'visual-color',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'E',
-      prompt: '図2のように、色面が重なって半透明の層のように知覚される見え方はどれか。',
-      choices: ['透明視', 'セパレーション', 'ドミナント効果', 'マッハバンド'],
-      correctIndex: 0,
-      explanation: '教科書の正答は①。このような見え方は透明視と呼ばれる。',
-      questionType: 'visual-diagram',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'F',
-      prompt: '図3の色の縞を交互に見た後、白黒の縦縞を観察すると、何色に色づいて見えやすいか。',
-      choices: ['黄', '青緑', '赤', '黄緑'],
-      correctIndex: 2,
-      explanation: '教科書の正答は③。緑の縦縞への順応後、白黒の縦縞には補色方向の赤みが見えやすい。',
-      questionType: 'visual-diagram',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'G',
-      prompt: '同じ操作の後、白黒の横縞を観察すると、何色に色づいて見えやすいか。',
-      choices: ['緑', '橙', '赤紫', '紫'],
-      correctIndex: 0,
-      explanation: '教科書の正答は①。赤の横縞への順応後、白黒の横縞には補色方向の緑みが見えやすい。',
-      questionType: 'visual-diagram',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
-    {
-      part: 'H',
-      prompt: '図3のように、縞の方向と色の組みあわせに依存して補色の残効が生じる現象はどれか。',
-      choices: ['ネオンカラー効果', 'マッカロー効果', '色相の同化', 'ハーマングリッド'],
-      correctIndex: 1,
-      explanation: '教科書の正答は②。この方向選択的な色の残効はマッカロー効果と呼ばれる。',
-      questionType: 'visual-diagram',
-      image: { src: '/color2-2026-summer-practice/q06-effects.svg', alt: '2026年度夏期 問題6の図1〜図3と色票選択肢' },
-    },
+    { part: 'A', prompt: sourcePrompt, choices: ['色票①', '色票②', '色票③', '色票④'], correctIndex: 1, explanation: '解答は②。原本の色票②を使うと、文字と背景の境界線があいまいになりちらつきが生じる。', questionType: 'visual-color', image: q06Image },
+    { part: 'B', prompt: sourcePrompt, choices: ['主観色', 'エーレンシュタイン効果', '補色残像', 'リープマン効果'], correctIndex: 3, explanation: '解答は④。この現象はリープマン効果と呼ばれる。', questionType: 'visual-diagram', image: q06Image },
+    { part: 'C', prompt: sourcePrompt, choices: ['ペールトーン', '高彩度色', '中彩度色', '背景色と同じ明度の色'], correctIndex: 0, explanation: '解答は①。文字色をペールトーンにすると背景との明度差を確保できる。', questionType: 'visual-diagram', image: q06Image },
+    { part: 'D', prompt: sourcePrompt, choices: ['色票①', '色票②', '色票③', '色票④'], correctIndex: 1, explanation: '解答は②。原本の色票②を重なり部分に用いる。', questionType: 'visual-color', image: q06Image },
+    { part: 'E', prompt: sourcePrompt, choices: ['透明視', 'セパレーション', 'ドミナント効果', 'マッハバンド'], correctIndex: 0, explanation: '解答は①。このような見え方は透明視と呼ばれる。', questionType: 'visual-diagram', image: q06Image },
+    { part: 'F', prompt: sourcePrompt, choices: ['黄', '青緑', '赤', '黄緑'], correctIndex: 2, explanation: '解答は③。観察後、縦線は赤に色づいて見える。', questionType: 'visual-diagram', image: q06Image },
+    { part: 'G', prompt: sourcePrompt, choices: ['緑', '橙', '赤紫', '紫'], correctIndex: 0, explanation: '解答は①。観察後、横線は緑に色づいて見える。', questionType: 'visual-diagram', image: q06Image },
+    { part: 'H', prompt: sourcePrompt, choices: ['ネオンカラー効果', 'マッカロー効果', '色相の同化', 'ハーマングリッド'], correctIndex: 1, explanation: '解答は②。この現象はマッカロー効果と呼ばれる。', questionType: 'visual-diagram', image: q06Image },
   ],
 }

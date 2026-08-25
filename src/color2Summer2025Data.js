@@ -14,6 +14,22 @@ function normalizeImage(image) {
   }
 }
 
+function normalizeChoice(choice) {
+  if (choice && typeof choice === 'object' && !Array.isArray(choice)) {
+    return {
+      text: String(choice.text ?? '').trim(),
+      colors: Array.isArray(choice.colors)
+        ? choice.colors.map((color) => String(color).trim()).filter(Boolean)
+        : [],
+    }
+  }
+  return String(choice ?? '').trim()
+}
+
+export function color2Summer2025ChoiceText(choice) {
+  return typeof choice === 'string' ? choice : String(choice?.text ?? '')
+}
+
 export const color2Summer2025Questions = summer2025Entries.map((question, index) => ({
   id: `2025-summer-${String(question.originalQuestionNumber).padStart(2, '0')}-${String(question.originalQuestionPart).toLowerCase()}-${index + 1}`,
   groupNumber: question.originalQuestionNumber,
@@ -21,7 +37,7 @@ export const color2Summer2025Questions = summer2025Entries.map((question, index)
   order: question.originalQuestionOrder,
   points: Number(question.points ?? 1),
   prompt: String(question.prompt ?? '').trim(),
-  choices: Array.isArray(question.choices) ? question.choices.map((choice) => String(choice)) : [],
+  choices: Array.isArray(question.choices) ? question.choices.map(normalizeChoice) : [],
   correctIndex: Number(question.correctIndex),
   explanation: String(question.explanation ?? '').trim(),
   caution: String(question.caution ?? '').trim(),

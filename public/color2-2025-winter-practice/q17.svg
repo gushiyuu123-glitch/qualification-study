@@ -1,1 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 760"><rect width="650" height="760" fill="#f7f5ef"/><rect x="130" y="60" width="390" height="620" fill="#3a1d0f"/><g fill="#2c8bb9" font-family="sans-serif" font-weight="700"><text x="300" y="135" font-size="34">modern</text><text x="300" y="190" font-size="34">furniture</text><text x="300" y="245" font-size="34">collection</text><text x="315" y="350" font-size="34">2025</text><text x="315" y="405" font-size="34">winter</text><rect x="220" y="165" width="7" height="140"/><rect x="180" y="300" width="100" height="18"/><rect x="195" y="318" width="70" height="20"/><path d="M185 485H275L260 570H200Z"/><path d="M190 575H270" stroke="#2c8bb9" stroke-width="9"/><path d="M205 570L200 650M255 570L260 650" stroke="#2c8bb9" stroke-width="8"/><path d="M350 510Q395 455 440 510H470V590H335V510Z"/><path d="M350 590L330 650M455 590L480 650M360 600L465 635M455 600L340 635" stroke="#2c8bb9" stroke-width="7" fill="none"/></g><text x="325" y="720" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#777">教科書図版を学習用に再構成</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 840" role="img" aria-label="2025年度冬期 問題17 図1の家具ポスター学習用再構成">
+  <rect width="700" height="840" fill="#f7f5ef"/>
+  <rect x="105" y="55" width="490" height="685" fill="#231307"/>
+  <g fill="#356983" stroke="#356983" font-family="sans-serif" font-weight="700">
+    <text x="340" y="125" font-size="34" letter-spacing="9">modern</text>
+    <text x="340" y="185" font-size="34" letter-spacing="9">furniture</text>
+    <text x="340" y="245" font-size="34" letter-spacing="9">collection</text>
+    <text x="350" y="355" font-size="34" letter-spacing="8">2025</text>
+    <text x="350" y="415" font-size="34" letter-spacing="8">winter</text>
+
+    <rect x="210" y="65" width="5" height="170" stroke="none"/>
+    <rect x="202" y="230" width="22" height="36" stroke="none"/>
+    <path d="M165 268H273L257 294H180Z" stroke="none"/>
+    <rect x="183" y="294" width="72" height="14" stroke="none"/>
+
+    <path d="M170 500H285L270 590H183Z" stroke="none"/>
+    <path d="M175 593H281" fill="none" stroke-width="10"/>
+    <path d="M191 587L186 690M264 587L270 690" fill="none" stroke-width="8"/>
+    <path d="M182 617C210 600 248 600 275 617" fill="none" stroke-width="8"/>
+
+    <path d="M365 530Q415 475 466 530H496V610Q496 628 478 628H365Q347 628 347 610V530Z" stroke="none"/>
+    <path d="M370 628L345 690M475 628L500 690M382 640L483 680M470 640L360 680" fill="none" stroke-width="7"/>
+  </g>
+  <text x="350" y="790" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#777">教科書図版を学習用に再構成</text>
+</svg>

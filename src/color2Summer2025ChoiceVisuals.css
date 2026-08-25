@@ -1,0 +1,38 @@
+.color2-summer-2025-choice-visual {
+  display: grid;
+  grid-template-columns: minmax(110px, 210px) minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+}
+
+.color2-summer-2025-choice-swatches {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  min-height: 42px;
+  border: 1px solid rgba(23, 23, 23, 0.14);
+  overflow: hidden;
+}
+
+.color2-summer-2025-choice-swatch {
+  display: block;
+  min-width: 0;
+  min-height: 42px;
+}
+
+.color2-summer-2025-choice-label {
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .color2-summer-2025-choice-visual {
+    grid-template-columns: minmax(96px, 145px) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .color2-summer-2025-choice-swatches,
+  .color2-summer-2025-choice-swatch {
+    min-height: 36px;
+  }
+}

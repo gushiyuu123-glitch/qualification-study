@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 340" role="img" aria-label="2025年度夏期 問題4の図1と図2を学習用に再構成した色票">
+  <rect width="620" height="340" fill="#f7f5ef"/>
+  <g font-family="sans-serif" fill="#222" font-size="20" text-anchor="middle">
+    <g transform="translate(90 65)"><rect width="170" height="170" fill="#004a8b"/><text x="85" y="205">図1</text></g>
+    <g transform="translate(360 65)"><rect width="170" height="170" fill="#3e3e40"/><text x="85" y="205">図2</text></g>
+  </g>
+</svg>

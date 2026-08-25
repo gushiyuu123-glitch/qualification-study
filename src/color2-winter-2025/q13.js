@@ -1,2 +1,20 @@
 import { defineWinterGroup } from './utils.js'
-export const q13=defineWinterGroup({"number":13,"defaultPoints":1,"caution":"2025年度冬期の出題内容を、教科書の過去問に沿って学習用4択として収録。","items":[{"part":"A","prompt":"インテリアスタイル「オーソドックス」を表す特徴はどれか。","choices":["落ち着きのある中立的な","西洋風の伝統様式を表現する","シャープでクールな","重厚で様式的な"],"correctIndex":0,"explanation":"オーソドックスは落ち着きのある中立的なスタイル。","questionType":"choice"},{"part":"B","prompt":"オーソドックススタイルの床材として適切なものはどれか。","choices":["明るい色調のフローリング","低・中彩度の暖色系の堅い材質の木材","無彩色のタイル","低・中明度色のフローリングやカーペット"],"correctIndex":3,"explanation":"床には低〜中明度のフローリングやカーペットを用いる。","questionType":"choice"},{"part":"C","prompt":"オーソドックススタイルの建具・家具・窓まわりに適切な色はどれか。","choices":["中明度で中彩度の寒色系","ブラウンやベージュ系の低彩度トーン","床と明度差のある無彩色","高彩度のオレンジやグリーン"],"correctIndex":1,"explanation":"ブラウンやベージュ系の低彩度トーンが適する。","questionType":"choice"},{"part":"D","prompt":"エレガントスタイルの形態的特徴はどれか。","choices":["優雅な曲線の","直線的でシャープなラインの","重厚で様式的な","直線的でシンプルな"],"correctIndex":0,"explanation":"エレガントは優雅な曲線が特徴。","questionType":"choice"},{"part":"E","prompt":"エレガントスタイルの主体色として適切なものはどれか。","choices":["高・中彩度の暖色","明度差のある無彩色","高明度のベージュ系","グレイッシュな低彩度色"],"correctIndex":3,"explanation":"エレガントはグレイッシュな低彩度色を主体にする。","questionType":"choice"},{"part":"F","prompt":"エレガントスタイルのアクセントカラーに効果的な色相範囲はどれか。","choices":["GY〜G","PB〜P","RP〜R","YR〜Y"],"correctIndex":2,"explanation":"アクセントにはRP〜R系が効果的。","questionType":"choice"}]})
+
+const sourcePrompt = `次の[A]〜[F]の空欄にあてはまる最も適切なものを、それぞれの①②③④からひとつ選びその番号をマークしなさい。
+
+インテリアスタイルの「オーソドックス」は[A]スタイルで、床には[B]を使用し、ドアなどの建具や家具、窓まわりなどには[C]でコーディネートするとよい。
+また、インテリアスタイルの「エレガント」は[D]フォルムと、上品で繊細な装飾が特徴で、[E]を主体に配色し、アクセントカラーに[F]系の色を使用すると効果的である。`
+
+export const q13 = defineWinterGroup({
+  number: 13,
+  defaultPoints: 1,
+  caution: '原本のA〜F空欄文章・選択肢・解答を基準にする。各設問では画面上部のA〜Fラベルに対応する空欄を解く。',
+  items: [
+    { part: 'A', prompt: sourcePrompt, choices: ['落ち着きのある中立的な', '西洋風の伝統様式を表現する', 'シャープでクールな', '重厚で様式的な'], correctIndex: 0, explanation: '解答は①。オーソドックスは落ち着きのある中立的なスタイルである。' },
+    { part: 'B', prompt: sourcePrompt, choices: ['明るい色調のフローリング', '低・中彩度の暖色系の堅い材質の木材', '無彩色のタイル', '低・中明度色のフローリングやカーペット'], correctIndex: 3, explanation: '解答は④。床には低・中明度色のフローリングやカーペットを使用する。' },
+    { part: 'C', prompt: sourcePrompt, choices: ['中明度で中彩度の寒色系', 'ブラウンやベージュ系の低彩度のトーン', '床と明度差のある無彩色', '高彩度のオレンジやグリーン系'], correctIndex: 1, explanation: '解答は②。建具・家具・窓まわりなどはブラウンやベージュ系の低彩度のトーンでコーディネートする。' },
+    { part: 'D', prompt: sourcePrompt, choices: ['優雅な曲線の', '直線的でシャープなラインの', '重厚で様式的な', '直線的でシンプルな'], correctIndex: 0, explanation: '解答は①。エレガントは優雅な曲線のフォルムが特徴である。' },
+    { part: 'E', prompt: sourcePrompt, choices: ['高・中彩度の暖色', '明度差のある無彩色', '高明度のベージュ系', 'グレイッシュな低彩度色'], correctIndex: 3, explanation: '解答は④。エレガントではグレイッシュな低彩度色を主体に配色する。' },
+    { part: 'F', prompt: sourcePrompt, choices: ['GY〜G', 'PB〜P', 'RP〜R', 'YR〜Y'], correctIndex: 2, explanation: '解答は③。アクセントカラーにはRP〜R系の色を使用すると効果的である。' },
+  ],
+})

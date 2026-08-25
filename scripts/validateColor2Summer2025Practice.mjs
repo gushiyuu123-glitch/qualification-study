@@ -11,6 +11,8 @@ const root = process.cwd()
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
 const index = read('index.html')
 const practice = read('src/color2Summer2025Practice.js')
+const choiceVisuals = read('src/color2Summer2025ChoiceVisuals.js')
+const choiceVisualsCss = read('src/color2Summer2025ChoiceVisuals.css')
 
 if (color2Summer2025Questions.length !== EXPECTED_QUESTION_COUNT_2025) {
   throw new Error(`2025夏期の問題数が想定外です: ${color2Summer2025Questions.length}`)
@@ -78,11 +80,16 @@ if (q10f.choices[q10f.correctIndex] !== 'ベーシックカラー') {
 }
 
 const q11a = getQuestion(11, 'A')
-const q11aExpectedChoices = ['ナチュラル配色', 'トーンイントーン配色', 'ダイアード配色', 'トリコロール配色']
+const q11aExpectedChoices = [
+  'ナチュラル配色によるコーディネートである。',
+  'トーンイントーン配色によるコーディネートである。',
+  'ダイアード配色によるコーディネートである。',
+  'トリコロール配色によるコーディネートである。',
+]
 if (!q11a || JSON.stringify(q11a.choices) !== JSON.stringify(q11aExpectedChoices)) {
   throw new Error('原本照合: 問題(11)A の選択肢が原本と不一致です。')
 }
-if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色') {
+if (q11a.choices[q11a.correctIndex] !== 'ナチュラル配色によるコーディネートである。') {
   throw new Error('原本照合: 問題(11)A は教科書解答表どおり①ナチュラル配色で固定してください。')
 }
 
@@ -131,6 +138,28 @@ q17.forEach((question, itemIndex) => {
   }
 })
 
+// 色票を選択肢そのものとして持つ設問は、文字列化せず色を表示できる構造を保持する。
+const visualChoiceQuestions = color2Summer2025Questions.filter((question) =>
+  question.choices.some((choice) =>
+    choice && typeof choice === 'object' && !Array.isArray(choice) &&
+    Array.isArray(choice.colors) && choice.colors.length > 0,
+  ),
+)
+if (!visualChoiceQuestions.length) {
+  throw new Error('原本照合: 色票を選択肢として持つ2025夏期問題が失われています。')
+}
+for (const question of visualChoiceQuestions) {
+  for (const choice of question.choices) {
+    if (!choice || typeof choice !== 'object' || Array.isArray(choice)) continue
+    if (typeof choice.text !== 'string' || !choice.text.trim()) {
+      throw new Error(`色票選択肢データ不備: ${question.id} のラベルがありません。`)
+    }
+    if (!Array.isArray(choice.colors) || !choice.colors.length || choice.colors.some((color) => typeof color !== 'string' || !color.trim())) {
+      throw new Error(`色票選択肢データ不備: ${question.id} の色データが不足しています。`)
+    }
+  }
+}
+
 const invalidChoices = color2Summer2025Questions.filter(
   (question) => !Array.isArray(question.choices) || question.choices.length !== 4 || question.correctIndex < 0 || question.correctIndex > 3,
 )
@@ -148,12 +177,18 @@ const missingAssets = color2Summer2025Questions
 if (missingAssets.length) throw new Error(`2025夏期の図版が不足しています: ${missingAssets.map((q) => q.id).join(', ')}`)
 
 const modulePath = '/src/color2Summer2025Practice.js'
+const choiceVisualsPath = '/src/color2Summer2025ChoiceVisuals.js'
+const winterPath = '/src/color2Winter2025Practice.js'
 const modulePosition = index.indexOf(modulePath)
+const choiceVisualsPosition = index.indexOf(choiceVisualsPath)
+const winterPosition = index.indexOf(winterPath)
 const referencePosition = index.indexOf('/src/color2ReferenceOnly.js')
 const mainPosition = index.indexOf('/src/main.jsx')
 if (modulePosition < 0) throw new Error('2025夏期4択モジュールがindex.htmlに登録されていません。')
 if (referencePosition < 0 || modulePosition < referencePosition) throw new Error('2025夏期4択は色彩2級解説専用設定の後に読み込んでください。')
-if (mainPosition < 0 || modulePosition > mainPosition) throw new Error('2025夏期4択はmain.jsxより前に読み込んでください。')
+if (choiceVisualsPosition < 0 || choiceVisualsPosition < modulePosition) throw new Error('2025夏期の色票選択肢表示モジュールは本体の後に読み込んでください。')
+if (winterPosition >= 0 && choiceVisualsPosition > winterPosition) throw new Error('2025夏期の色票選択肢表示モジュールは2025冬期モジュールより前に読み込んでください。')
+if (mainPosition < 0 || choiceVisualsPosition > mainPosition) throw new Error('2025夏期の色票選択肢表示モジュールはmain.jsxより前に読み込んでください。')
 
 const requiredRuntimeTokens = [
   'STORAGE_KEY', 'MASTERED_STREAK = 2', 'recordWeaknessAnswer',
@@ -164,4 +199,19 @@ const requiredRuntimeTokens = [
 const missingRuntimeTokens = requiredRuntimeTokens.filter((token) => !practice.includes(token))
 if (missingRuntimeTokens.length) throw new Error(`2025夏期4択の練習機能が不足しています: ${missingRuntimeTokens.join(', ')}`)
 
-console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 教科書解答照合 / 図版形式照合 / 原本色票サンプル照合 / 全問4択 / 全問解説 / 大問指定 / ランダム / 蓄積ミス保存`)
+const requiredVisualRuntimeTokens = [
+  'color2Summer2025ChoiceText',
+  'data-summer2025-choice',
+  'data-summer2025-answer',
+  'color2-summer-2025-choice-swatches',
+  'MutationObserver',
+]
+const missingVisualRuntimeTokens = requiredVisualRuntimeTokens.filter((token) => !choiceVisuals.includes(token))
+if (missingVisualRuntimeTokens.length) {
+  throw new Error(`2025夏期の色票選択肢表示機能が不足しています: ${missingVisualRuntimeTokens.join(', ')}`)
+}
+for (const selector of ['.color2-summer-2025-choice-visual', '.color2-summer-2025-choice-swatches', '.color2-summer-2025-choice-swatch']) {
+  if (!choiceVisualsCss.includes(selector)) throw new Error(`2025夏期の色票選択肢CSSが不足しています: ${selector}`)
+}
+
+console.log(`色彩検定2級 2025夏期 検証OK: ${EXPECTED_QUESTION_COUNT_2025}問 / ${EXPECTED_POINT_TOTAL_2025}点 / 教科書解答照合 / 図版形式照合 / 原本色票サンプル照合 / 色票選択肢視覚表示 / 全問4択 / 全問解説 / 大問指定 / ランダム / 蓄積ミス保存`)

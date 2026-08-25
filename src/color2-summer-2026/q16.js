@@ -1,4 +1,6 @@
-// 2026年度夏期の教科書過去問を、色票から慣用色名を判断する形式を崩さず4択練習として収録します。
+// 2026年度夏期の教科書過去問を、色票から慣用色名を判断する形式を崩さず選択練習として収録します。
+const sourcePrompt = '次のA〜Fの色について、最も適切なJISの物体色の慣用色名を、それぞれの①②③④からひとつ選びその番号をマークしなさい。'
+
 export const q16 = {
   number: 16,
   questionPage: 16,
@@ -8,7 +10,7 @@ export const q16 = {
   items: [
     {
       part: 'A',
-      prompt: '色票Aに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['橙金色', '黄丹', '黄葉色', '蘇芳'],
       correctIndex: 0,
       explanation: '教科書の正答は①。色票Aは橙金色である。',
@@ -17,7 +19,7 @@ export const q16 = {
     },
     {
       part: 'B',
-      prompt: '色票Bに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['刈安色', '鶸色', '常磐色', '海松色'],
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Bは常磐色である。',
@@ -26,7 +28,7 @@ export const q16 = {
     },
     {
       part: 'C',
-      prompt: '色票Cに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['海老茶', '煙覗き', '茶鼠', '鉄色'],
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Cは茶鼠である。',
@@ -35,7 +37,7 @@ export const q16 = {
     },
     {
       part: 'D',
-      prompt: '色票Dに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['バーントアンバー', 'ポピーレッド', 'マルーン', 'ローズピンク'],
       correctIndex: 3,
       explanation: '教科書の正答は④。色票Dはローズピンクである。',
@@ -44,7 +46,7 @@ export const q16 = {
     },
     {
       part: 'E',
-      prompt: '色票Eに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['アンバー', 'チョコッタ', 'ジョンブリアン', 'ローシェンナ'],
       correctIndex: 2,
       explanation: '教科書の正答は③。色票Eはジョンブリアンである。',
@@ -53,7 +55,7 @@ export const q16 = {
     },
     {
       part: 'F',
-      prompt: '色票Fに最も適切なJISの物体色の慣用色名はどれか。',
+      prompt: sourcePrompt,
       choices: ['ウイスタリア', 'セルリアンブルー', 'ナイルブルー', 'ミッドナイトブルー'],
       correctIndex: 1,
       explanation: '教科書の正答は②。色票Fはセルリアンブルーである。',
