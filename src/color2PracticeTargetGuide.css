@@ -1,52 +1,82 @@
-.color2-practice-target-guide {
-  margin: 24px 0 0;
-  padding: 11px 0 12px;
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr);
-  align-items: baseline;
-  gap: 8px 14px;
-  border-top: 1px solid rgba(23, 23, 23, 0.2);
-  border-bottom: 1px solid rgba(23, 23, 23, 0.2);
+.color2-practice-web-context {
+  margin: 14px 0 2px;
+  padding: 12px 0 13px;
+  border-top: 1px solid rgba(23, 23, 23, 0.18);
+  border-bottom: 1px solid rgba(23, 23, 23, 0.18);
 }
 
-.color2-practice-target-guide > span {
+.color2-practice-web-context > span {
+  display: block;
+  margin-bottom: 7px;
   color: #77716a;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.color2-practice-target-guide > strong {
-  color: #8d3b3b;
-  font-size: 15px;
   font-weight: 750;
+  letter-spacing: 0.06em;
 }
 
-.color2-practice-target-guide > small {
-  color: #817b74;
-  font-size: 10px;
-  line-height: 1.55;
-}
-
-.color2-practice-target-guide + h2 {
-  margin-top: 20px !important;
+.color2-practice-web-context > p {
+  margin: 0;
+  color: #282522;
+  font-size: 14px;
+  line-height: 1.8;
 }
 
 .color2-practice-target-token {
   color: #8d3b3b;
-  font-weight: 800;
+  font-weight: 850;
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.16em;
 }
 
+.color2-practice-context-token {
+  color: #8b8680;
+  font-weight: 650;
+}
+
+.color2-practice-source-details {
+  margin: 10px 0 0;
+  padding: 0 0 10px;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+}
+
+.color2-practice-source-details > summary {
+  width: fit-content;
+  cursor: pointer;
+  color: #77716a;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.color2-practice-source-details > p {
+  margin: 10px 0 0;
+  padding: 12px 0 2px;
+  color: #625d57;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.color2-practice-source-details + .color2-summer-quiz__figure,
+.color2-practice-source-details + .color2-summer2025-quiz__figure,
+.color2-practice-source-details + .color2-w25-quiz__figure,
+.color2-practice-source-details + .color2-tb-quiz__figure {
+  margin-top: 16px;
+}
+
 @media (max-width: 640px) {
-  .color2-practice-target-guide {
-    grid-template-columns: auto 1fr;
-    gap: 6px 12px;
+  .color2-practice-web-context {
+    margin-top: 12px;
+    padding: 10px 0 11px;
   }
 
-  .color2-practice-target-guide > small {
-    grid-column: 1 / -1;
+  .color2-practice-web-context > p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .color2-practice-source-details > p {
+    font-size: 11px;
   }
 }

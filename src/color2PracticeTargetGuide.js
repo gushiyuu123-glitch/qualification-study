@@ -1,4 +1,5 @@
 import './color2PracticeTargetGuide.css'
+import { buildColor2PracticePromptView } from './color2PracticePromptAdapter.js'
 
 const practiceConfigs = [
   { prompt: '[data-summer-prompt]', label: '[data-summer-question-label]' },
@@ -7,86 +8,104 @@ const practiceConfigs = [
   { prompt: '[data-tb-prompt]', label: '[data-tb-question-label]' },
 ]
 
+const companionClasses = [
+  'color2-practice-web-context',
+  'color2-practice-source-details',
+]
+
 function currentPart(labelText) {
   return String(labelText ?? '').match(/問題\(\d+\)\s+([A-Z])/)?.[1] ?? ''
 }
 
-function stripPartBrackets(value) {
-  return String(value ?? '')
-    .replaceAll('[', '')
-    .replaceAll(']', '')
-    .replaceAll('［', '')
-    .replaceAll('］', '')
-}
+function sourcePrompt(prompt, labelText) {
+  const currentText = prompt.textContent ?? ''
+  const previousRendered = prompt.dataset.practiceWebRendered ?? ''
+  const previousLabel = prompt.dataset.practiceWebLabel ?? ''
 
-function sharedRange(promptText) {
-  const normalized = stripPartBrackets(promptText)
-  const range = normalized.match(/([A-Z])[〜～]([A-Z])/)
-  if (range) return `${range[1]}〜${range[2]}`
-
-  const pair = normalized.match(/([A-Z])、([A-Z])/)
-  if (pair) return `${pair[1]}・${pair[2]}`
-  return ''
-}
-
-function targetToken(promptText, part) {
-  if (promptText.includes(`[${part}]`)) return `[${part}]`
-  if (promptText.includes(`［${part}］`)) return `［${part}］`
-  return part
-}
-
-function highlightTarget(prompt, promptText, part) {
-  const exactToken = [`[${part}]`, `［${part}］`].find((token) => promptText.includes(token))
-  if (!exactToken) {
-    prompt.textContent = promptText
-    return false
+  if (previousLabel !== labelText || currentText !== previousRendered) {
+    prompt.dataset.practiceWebSource = currentText
   }
 
-  const fragment = document.createDocumentFragment()
-  promptText.split(exactToken).forEach((piece, index, pieces) => {
-    fragment.append(document.createTextNode(piece))
-    if (index < pieces.length - 1) {
-      const marker = document.createElement('span')
-      marker.className = 'color2-practice-target-token'
-      marker.textContent = exactToken
-      fragment.append(marker)
-    }
-  })
-  prompt.replaceChildren(fragment)
-  return true
+  prompt.dataset.practiceWebLabel = labelText
+  return prompt.dataset.practiceWebSource ?? currentText
 }
 
-function guideBefore(prompt) {
-  const previous = prompt.previousElementSibling
-  return previous?.classList.contains('color2-practice-target-guide') ? previous : null
+function nextCompanion(prompt) {
+  const next = prompt.nextElementSibling
+  return next && companionClasses.some((className) => next.classList.contains(className))
+    ? next
+    : null
 }
 
-function removeGuide(prompt, promptText) {
-  guideBefore(prompt)?.remove()
-  if (prompt.querySelector('.color2-practice-target-token')) prompt.textContent = promptText
-  delete prompt.dataset.targetGuideKey
-}
-
-function renderGuide(prompt, range, part, displayToken) {
-  let guide = guideBefore(prompt)
-  if (!guide) {
-    guide = document.createElement('div')
-    guide.className = 'color2-practice-target-guide'
-    guide.setAttribute('role', 'note')
-    prompt.before(guide)
+function removeCompanions(prompt) {
+  let companion = nextCompanion(prompt)
+  while (companion) {
+    companion.remove()
+    companion = nextCompanion(prompt)
   }
 
-  const rangeLabel = document.createElement('span')
-  rangeLabel.textContent = `${range} 共通本文`
+  const oldGuide = prompt.previousElementSibling
+  if (oldGuide?.classList.contains('color2-practice-target-guide')) oldGuide.remove()
+}
 
-  const target = document.createElement('strong')
-  target.textContent = `今回は ${displayToken}`
+function appendTokenizedText(element, text, targetToken) {
+  const tokenPattern = /(\[[A-Z]\]|［[A-Z]］)/g
+  let cursor = 0
 
-  const note = document.createElement('small')
-  note.textContent = '本文内のほかの記号や図の記述は別パート用です。'
+  for (const match of text.matchAll(tokenPattern)) {
+    const index = match.index ?? 0
+    if (index > cursor) element.append(document.createTextNode(text.slice(cursor, index)))
 
-  guide.replaceChildren(rangeLabel, target, note)
-  guide.setAttribute('aria-label', `${range}共通本文。この画面の解答対象は${part}です。`)
+    const token = document.createElement('span')
+    token.textContent = match[0]
+    token.className = match[0] === targetToken
+      ? 'color2-practice-target-token'
+      : 'color2-practice-context-token'
+    element.append(token)
+    cursor = index + match[0].length
+  }
+
+  if (cursor < text.length) element.append(document.createTextNode(text.slice(cursor)))
+}
+
+function renderPromptTitle(prompt, view) {
+  prompt.replaceChildren()
+  appendTokenizedText(prompt, view.title, view.targetToken)
+  prompt.dataset.practiceWebRendered = prompt.textContent ?? ''
+}
+
+function renderContext(prompt, view) {
+  if (!view.context) return null
+
+  const context = document.createElement('div')
+  context.className = 'color2-practice-web-context'
+  context.setAttribute('role', 'note')
+
+  const label = document.createElement('span')
+  label.textContent = '必要な文脈'
+
+  const paragraph = document.createElement('p')
+  appendTokenizedText(paragraph, view.context, view.targetToken)
+
+  context.append(label, paragraph)
+  prompt.after(context)
+  return context
+}
+
+function renderSourceDetails(prompt, view, context) {
+  if (!view.source || view.source === view.title) return
+
+  const details = document.createElement('details')
+  details.className = 'color2-practice-source-details'
+
+  const summary = document.createElement('summary')
+  summary.textContent = '原本の問題文を見る'
+
+  const source = document.createElement('p')
+  source.textContent = view.source
+
+  details.append(summary, source)
+  ;(context ?? prompt).after(details)
 }
 
 function enhancePractice({ prompt: promptSelector, label: labelSelector }) {
@@ -94,25 +113,23 @@ function enhancePractice({ prompt: promptSelector, label: labelSelector }) {
   const label = document.querySelector(labelSelector)
   if (!prompt || !label) return
 
-  const promptText = prompt.textContent ?? ''
-  const part = currentPart(label.textContent)
-  const range = sharedRange(promptText)
-  if (!part || !range) {
-    removeGuide(prompt, promptText)
-    return
-  }
+  const labelText = label.textContent ?? ''
+  const part = currentPart(labelText)
+  if (!part) return
 
-  const displayToken = targetToken(promptText, part)
-  const key = `${part}\u0000${promptText}`
-  const expectsHighlight = displayToken !== part
-  const hasHighlight = Boolean(prompt.querySelector('.color2-practice-target-token'))
-  const hasGuide = Boolean(guideBefore(prompt))
+  const source = sourcePrompt(prompt, labelText)
+  if (!source.trim()) return
 
-  if (prompt.dataset.targetGuideKey === key && hasGuide && (!expectsHighlight || hasHighlight)) return
+  const key = `${labelText}\u0000${source}`
+  const hasExpectedCompanion = Boolean(nextCompanion(prompt)) || source === prompt.textContent
+  if (prompt.dataset.practiceWebKey === key && hasExpectedCompanion) return
 
-  prompt.dataset.targetGuideKey = key
-  renderGuide(prompt, range, part, displayToken)
-  highlightTarget(prompt, promptText, part)
+  const view = buildColor2PracticePromptView(source, part)
+  removeCompanions(prompt)
+  renderPromptTitle(prompt, view)
+  const context = renderContext(prompt, view)
+  renderSourceDetails(prompt, view, context)
+  prompt.dataset.practiceWebKey = key
 }
 
 function scanPractices() {
