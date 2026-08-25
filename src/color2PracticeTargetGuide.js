@@ -2,10 +2,10 @@ import './color2PracticeTargetGuide.css'
 import { buildColor2PracticePromptView } from './color2PracticePromptAdapter.js'
 
 const practiceConfigs = [
-  { prompt: '[data-summer-prompt]', label: '[data-summer-question-label]' },
-  { prompt: '[data-summer2025-prompt]', label: '[data-summer2025-question-label]' },
-  { prompt: '[data-w25-prompt]', label: '[data-w25-question-label]' },
-  { prompt: '[data-tb-prompt]', label: '[data-tb-question-label]' },
+  { set: '2026-summer', prompt: '[data-summer-prompt]', label: '[data-summer-question-label]' },
+  { set: '2025-summer', prompt: '[data-summer2025-prompt]', label: '[data-summer2025-question-label]' },
+  { set: '2025-winter', prompt: '[data-w25-prompt]', label: '[data-w25-question-label]' },
+  { set: 'textbook', prompt: '[data-tb-prompt]', label: '[data-tb-question-label]' },
 ]
 
 const companionClasses = [
@@ -13,8 +13,10 @@ const companionClasses = [
   'color2-practice-source-details',
 ]
 
-function currentPart(labelText) {
-  return String(labelText ?? '').match(/問題\(\d+\)\s+([A-Z])/)?.[1] ?? ''
+function currentQuestionMeta(labelText) {
+  const match = String(labelText ?? '').match(/問題\((\d+)\)\s+([A-Z])/) 
+  if (!match) return null
+  return { groupNumber: Number(match[1]), part: match[2] }
 }
 
 function sourcePrompt(prompt, labelText) {
@@ -82,7 +84,7 @@ function renderContext(prompt, view) {
   context.setAttribute('role', 'note')
 
   const label = document.createElement('span')
-  label.textContent = '必要な文脈'
+  label.textContent = 'この問題に必要な文脈'
 
   const paragraph = document.createElement('p')
   appendTokenizedText(paragraph, view.context, view.targetToken)
@@ -108,23 +110,26 @@ function renderSourceDetails(prompt, view, context) {
   ;(context ?? prompt).after(details)
 }
 
-function enhancePractice({ prompt: promptSelector, label: labelSelector }) {
+function enhancePractice({ set, prompt: promptSelector, label: labelSelector }) {
   const prompt = document.querySelector(promptSelector)
   const label = document.querySelector(labelSelector)
   if (!prompt || !label) return
 
   const labelText = label.textContent ?? ''
-  const part = currentPart(labelText)
-  if (!part) return
+  const meta = currentQuestionMeta(labelText)
+  if (!meta) return
 
   const source = sourcePrompt(prompt, labelText)
   if (!source.trim()) return
 
-  const key = `${labelText}\u0000${source}`
+  const key = `${set}\u0000${labelText}\u0000${source}`
   const hasExpectedCompanion = Boolean(nextCompanion(prompt)) || source === prompt.textContent
   if (prompt.dataset.practiceWebKey === key && hasExpectedCompanion) return
 
-  const view = buildColor2PracticePromptView(source, part)
+  const view = buildColor2PracticePromptView(source, meta.part, {
+    set,
+    groupNumber: meta.groupNumber,
+  })
   removeCompanions(prompt)
   renderPromptTitle(prompt, view)
   const context = renderContext(prompt, view)
