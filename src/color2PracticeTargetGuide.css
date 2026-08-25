@@ -1,5 +1,13 @@
+.color2-practice-source-mode {
+  margin: 8px 0 0;
+  color: #77716a;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 .color2-practice-web-context {
-  margin: 14px 0 2px;
+  margin: 12px 0 2px;
   padding: 12px 0 13px;
   border-top: 1px solid rgba(23, 23, 23, 0.18);
   border-bottom: 1px solid rgba(23, 23, 23, 0.18);
@@ -66,8 +74,13 @@
 }
 
 @media (max-width: 640px) {
+  .color2-practice-source-mode {
+    margin-top: 7px;
+    font-size: 10px;
+  }
+
   .color2-practice-web-context {
-    margin-top: 12px;
+    margin-top: 10px;
     padding: 10px 0 11px;
   }
 
