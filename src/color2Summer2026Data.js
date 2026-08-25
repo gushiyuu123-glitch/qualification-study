@@ -32,7 +32,7 @@ function stripLegacyChoiceNumber(value) {
 }
 
 function fourChoiceIndexes(groupNumber, part, choices, correctIndex) {
-  if (choices.length === 4) return [0, 1, 2, 3]
+  if (choices.length <= 4) return choices.map((_, index) => index)
 
   if (groupNumber === 17 && part === 'D') return [0, 1, 2, 3]
   if (groupNumber === 17 && part === 'E') return [2, 3, 6, 7]
@@ -60,8 +60,8 @@ function normalizeItem(group, item, order) {
   const selectedChoices = selectedIndexes.map((index) => stripLegacyChoiceNumber(choices[index]))
   const correctIndex = selectedIndexes.indexOf(item.correctIndex)
 
-  if (selectedChoices.length !== 4 || correctIndex < 0) {
-    throw new Error(`2026夏期 問題(${group.number})${item.part}: 4択への変換に失敗しました。`)
+  if (selectedChoices.length < 2 || selectedChoices.length > 4 || correctIndex < 0) {
+    throw new Error(`2026夏期 問題(${group.number})${item.part}: 原本の選択肢を保った練習形式への変換に失敗しました。`)
   }
 
   return {
