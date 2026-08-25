@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 260" role="img" aria-label="2025年度夏期 問題10 図1の5色を学習用に再構成した色票">
+  <rect width="820" height="260" fill="#f7f5ef"/>
+  <g transform="translate(70 55)" stroke="#9b9891" stroke-width="2">
+    <rect width="120" height="120" fill="#fefefe"/>
+    <rect x="135" width="120" height="120" fill="#848486"/>
+    <rect x="270" width="120" height="120" fill="#3c3c3e"/>
+    <rect x="405" width="120" height="120" fill="#4a395d"/>
+    <rect x="540" width="120" height="120" fill="#8c7556"/>
+  </g>
+  <text x="410" y="215" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#222">図1</text>
+</svg>
