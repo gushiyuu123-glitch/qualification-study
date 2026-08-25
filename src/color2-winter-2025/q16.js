@@ -1,2 +1,18 @@
 import { defineWinterGroup } from './utils.js'
-export const q16=defineWinterGroup({"number":16,"defaultPoints":2,"caution":"2025年度冬期の出題内容を、教科書の過去問に沿って学習用4択として収録。","items":[{"part":"A","prompt":"色票AのJIS慣用色名はどれか。","choices":["韓紅花","鶴色","代赭","鉄色"],"correctIndex":0,"explanation":"鮮やかな赤は韓紅花。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Aの学習用図版"}},{"part":"B","prompt":"色票BのJIS慣用色名はどれか。","choices":["煤竹色","常磐色","桧皮色","海松色"],"correctIndex":3,"explanation":"暗い黄緑みの色は海松色。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Bの学習用図版"}},{"part":"C","prompt":"色票CのJIS慣用色名はどれか。","choices":["古代紫","弁柄色","利休鼠","緑青色"],"correctIndex":0,"explanation":"暗く渋い紫は古代紫。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Cの学習用図版"}},{"part":"D","prompt":"色票DのJIS慣用色名はどれか。","choices":["オールドローズ","テラコッタ","バーガンディー","ポピーレッド"],"correctIndex":2,"explanation":"非常に暗い赤紫系はバーガンディー。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Dの学習用図版"}},{"part":"E","prompt":"色票EのJIS慣用色名はどれか。","choices":["アンバー","エクルベイジュ","ゴールデンイエロー","ネープルスイエロー"],"correctIndex":3,"explanation":"黄みの明るい色はネープルスイエロー。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Eの学習用図版"}},{"part":"F","prompt":"色票FのJIS慣用色名はどれか。","choices":["シャトルーズグリーン","ボトルグリーン","セルリアンブルー","ナイルブルー"],"correctIndex":3,"explanation":"青緑系の色票はナイルブルー。","questionType":"visual-color","image":{"src":"/color2-2025-winter-practice/q16.svg","alt":"2025年度冬期 問題Fの学習用図版"}}]})
+
+const sourcePrompt = '次のA〜Fの色について、最も適切なJISの物体色の慣用色名を、それぞれの①②③④からひとつ選び、その番号をマークしなさい。'
+const q16Image = { src: '/color2-2025-winter-practice/q16.svg', alt: '2025年度冬期 問題16の色票A〜F' }
+
+export const q16 = defineWinterGroup({
+  number: 16,
+  defaultPoints: 2,
+  caution: '原本の色票・慣用色名表記・公式解答を基準にする。画面上の色票は印刷原本をレンダリングした中央部の色を基準にした近似色。',
+  items: [
+    { part: 'A', prompt: sourcePrompt, choices: ['韓紅花', '鶸色', '代赭', '鉄色'], correctIndex: 0, explanation: '解答は①、韓紅花。', questionType: 'visual-color', image: q16Image },
+    { part: 'B', prompt: sourcePrompt, choices: ['煤竹色', '常磐色', '桧皮色', '海松色'], correctIndex: 3, explanation: '解答は④、海松色。', questionType: 'visual-color', image: q16Image },
+    { part: 'C', prompt: sourcePrompt, choices: ['古代紫', '弁柄色', '利休鼠', '緑青色'], correctIndex: 0, explanation: '解答は①、古代紫。', questionType: 'visual-color', image: q16Image },
+    { part: 'D', prompt: sourcePrompt, choices: ['オールドローズ', 'テラコッタ', 'バーガンディー', 'ポピーレッド'], correctIndex: 2, explanation: '解答は③、バーガンディー。', questionType: 'visual-color', image: q16Image },
+    { part: 'E', prompt: sourcePrompt, choices: ['アンバー', 'エクルベイジュ', 'ゴールデンイエロー', 'ネープルスイエロー'], correctIndex: 3, explanation: '解答は④、ネープルスイエロー。', questionType: 'visual-color', image: q16Image },
+    { part: 'F', prompt: sourcePrompt, choices: ['シャトルーズグリーン', 'ボトルグリーン', 'セルリアンブルー', 'ナイルブルー'], correctIndex: 3, explanation: '解答は④、ナイルブルー。', questionType: 'visual-color', image: q16Image },
+  ],
+})
