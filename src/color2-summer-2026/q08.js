@@ -1,50 +1,53 @@
 // 2026年度夏期の教科書過去問を、設問・選択肢・正答の意味を変えずに選択練習として収録します。
+const techniqueInstruction = '配色技法に関する、次のA〜Dの記述について、最も適切なものを、それぞれの①②③④からひとつ選びその番号をマークしなさい。'
+const imageInstruction = '配色イメージに関する、次のE、Fの記述に続く文として、最も適切なものを、それぞれの①②③④からひとつ選びその番号をマークしなさい。'
+
 export const q08 = {
   number: 8,
   questionPage: 8,
   answerPage: 18,
   defaultPoints: 2,
-  caution: '教科書の問題(8)に沿って、図の色相関係・トーン関係と配色イメージを判断する。',
+  caution: '原本の問題(8)の指示文・引き出し・ソファ・カップ・バッグ・色票・選択肢・解答を基準にする。図版では判定に必要な配色関係を保持し、配色技法名を答えとして書き込まない。',
   items: [
     {
       part: 'A',
-      prompt: '引き出しの色がトライアドになっているもの',
+      prompt: `${techniqueInstruction}\n\nA 引き出しの色がトライアドになっているもの`,
       choices: ['図①', '図②', '図③', '図④'],
       correctIndex: 1,
-      explanation: '教科書の正答は②。色相環を3等分する関係の3色で構成されている。',
+      explanation: '教科書の正答は②。',
       questionType: 'visual-color',
       image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
       part: 'B',
-      prompt: 'トリコロール配色',
+      prompt: `${techniqueInstruction}\n\nB トリコロール配色`,
       choices: ['図①', '図②', '図③', '図④'],
       correctIndex: 2,
-      explanation: '教科書の正答は③。明快な3色を対照的に用いたトリコロール配色である。',
+      explanation: '教科書の正答は③。',
       questionType: 'visual-color',
       image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
       part: 'C',
-      prompt: 'カマイユ配色',
+      prompt: `${techniqueInstruction}\n\nC カマイユ配色`,
       choices: ['図①', '図②', '図③', '図④'],
       correctIndex: 2,
-      explanation: '教科書の正答は③。色相差とトーン差がともに小さく、一見単色に近く見える配色である。',
+      explanation: '教科書の正答は③。',
       questionType: 'visual-color',
       image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
       part: 'D',
-      prompt: '下の図のアに入ってテトラードになる色',
+      prompt: `${techniqueInstruction}\n\nD 下の図のアに入ってテトラードになる色`,
       choices: ['色票①', '色票②', '色票③', '色票④'],
       correctIndex: 3,
-      explanation: '教科書の正答は④。既存の3色と合わせて色相環上を4等分する関係になる。',
+      explanation: '教科書の正答は④。',
       questionType: 'visual-color',
       image: { src: '/color2-2026-summer-practice/q08-techniques.svg', alt: '2026年度夏期 問題8の選択図A〜D' },
     },
     {
       part: 'E',
-      prompt: 'クラシックなイメージの配色では、',
+      prompt: `${imageInstruction}\n\nE クラシックなイメージの配色では、`,
       choices: [
         'ベースカラーに低明度では、中彩度のトーンのブラウン系を用いる。',
         'ベースカラーと類似色相のトーンをアソートカラーに用いると効果的である。',
@@ -52,11 +55,11 @@ export const q08 = {
         'アクセントカラーにパープル系の明清色を用いると味わい深さが表現できる。',
       ],
       correctIndex: 0,
-      explanation: '教科書の正答は①。クラシックでは低明度・中彩度程度のブラウン系をベースに用いる。',
+      explanation: '教科書の正答は①。原本の表記をそのまま保持する。',
     },
     {
       part: 'F',
-      prompt: 'モダンなイメージの配色にしたいときには、',
+      prompt: `${imageInstruction}\n\nF モダンなイメージの配色にしたいときには、`,
       choices: [
         '無彩色にpトーンやltトーンの赤紫〜赤みの黄を中心にあわせる。',
         'ベースカラーにライトグレイを用いるのが適している。',
@@ -64,7 +67,7 @@ export const q08 = {
         '無彩色にブラウン系の色を中心にあわせるとイメージの表現につながる。',
       ],
       correctIndex: 1,
-      explanation: '教科書の正答は②。モダンなイメージではライトグレイなどの無彩色をベースに用いる。',
+      explanation: '教科書の正答は②。',
     },
   ],
 }
