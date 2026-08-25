@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 660" role="img" aria-label="2025年度夏期 問題2の図1から図3と色票選択肢を学習用に再構成した図">
+  <rect width="1120" height="660" fill="#f7f5ef"/>
+  <g font-family="sans-serif" fill="#222">
+    <g transform="translate(55 50)">
+      <text x="0" y="0" font-size="18" font-weight="700">図1</text>
+      <path d="M48 245V45M48 245H330" stroke="#333" stroke-width="2" fill="none"/>
+      <path d="M48 232C86 226 120 211 154 187C198 157 246 110 330 48" stroke="#333" stroke-width="5" fill="none"/>
+      <text x="150" y="278" font-size="14">波長 (nm)</text><text x="7" y="77" font-size="13">比エネルギー</text>
+      <g font-size="12" fill="#555"><text x="38" y="263">400</text><text x="125" y="263">500</text><text x="212" y="263">600</text><text x="298" y="263">700</text></g>
+    </g>
+    <g transform="translate(410 50)">
+      <text x="0" y="0" font-size="18" font-weight="700">図2</text>
+      <path d="M48 245V45M48 245H330" stroke="#333" stroke-width="2" fill="none"/>
+      <path d="M48 236C95 235 137 236 160 229C178 221 187 189 194 142C201 95 218 69 246 63C275 58 303 60 330 61" stroke="#333" stroke-width="5" fill="none"/>
+      <text x="150" y="278" font-size="14">波長 (nm)</text><text x="8" y="77" font-size="13">反射率</text>
+      <g font-size="12" fill="#555"><text x="38" y="263">400</text><text x="125" y="263">500</text><text x="212" y="263">600</text><text x="298" y="263">700</text></g>
+    </g>
+    <g transform="translate(765 50)">
+      <text x="0" y="0" font-size="18" font-weight="700">図3</text>
+      <path d="M48 245V45M48 245H300" stroke="#333" stroke-width="2" fill="none"/>
+      <path d="M48 242C73 238 91 206 112 158C137 100 158 60 184 53C212 47 235 82 252 131C268 177 279 221 300 240" stroke="#333" stroke-width="5" fill="none"/>
+      <path d="M48 242C65 232 81 185 101 125C120 68 138 51 157 55C178 62 190 100 199 144C208 189 216 224 238 241" stroke="#777" stroke-width="4" stroke-dasharray="8 7" fill="none"/>
+      <text x="128" y="278" font-size="14">波長 (nm)</text><text x="9" y="77" font-size="13">感度</text>
+    </g>
+    <g transform="translate(135 405)">
+      <text x="0" y="0" font-size="18" font-weight="700">D 色票</text>
+      <g transform="translate(0 35)" font-size="16" text-anchor="middle">
+        <text x="65" y="-8">①</text><rect x="5" width="120" height="120" fill="#d62a2a"/>
+        <text x="265" y="-8">②</text><rect x="205" width="120" height="120" fill="#c91d73"/>
+        <text x="465" y="-8">③</text><rect x="405" width="120" height="120" fill="#0a8034"/>
+        <text x="665" y="-8">④</text><rect x="605" width="120" height="120" fill="#f1d318"/>
+      </g>
+    </g>
+  </g>
+</svg>
