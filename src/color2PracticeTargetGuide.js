@@ -95,7 +95,7 @@ function renderContext(anchor, view) {
   context.setAttribute('role', 'note')
 
   const label = document.createElement('span')
-  label.textContent = 'この設問で読む原文'
+  label.textContent = 'この問題に必要な文脈（原文）'
 
   const paragraph = document.createElement('p')
   appendTokenizedText(paragraph, view.context, view.targetToken)
@@ -112,7 +112,7 @@ function renderSourceDetails(anchor, view) {
   details.className = 'color2-practice-source-details'
 
   const summary = document.createElement('summary')
-  summary.textContent = '原本の問題文をすべて見る'
+  summary.textContent = '原本の問題文を見る（全文）'
 
   const source = document.createElement('p')
   source.textContent = view.source
