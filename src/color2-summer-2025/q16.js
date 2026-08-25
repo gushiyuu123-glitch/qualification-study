@@ -1,5 +1,7 @@
 import { defineSummerGroup } from './utils.js'
 
+const sourcePrompt = '次のA〜Fの色について、最も適切なJISの物体色の慣用色名を、それぞれの①②③④からひとつ選びその番号をマークしなさい。'
+
 export const q16 = defineSummerGroup({
   number: 16,
   questionPage: 22,
@@ -9,8 +11,8 @@ export const q16 = defineSummerGroup({
   items: [
     {
       part: 'A',
-      prompt: 'Aの色について、最も適切なJISの物体色の慣用色名',
-      choices: ['鴇色', '鳩色', '薄色', '鶸色'],
+      prompt: sourcePrompt,
+      choices: ['鶯色', '鴇色', '鳶色', '鶸色'],
       correctIndex: 1,
       explanation: '原本解答表はA-②。選択肢本文も原本問題ページどおり保持する。',
       questionType: 'visual-color',
@@ -18,7 +20,7 @@ export const q16 = defineSummerGroup({
     },
     {
       part: 'B',
-      prompt: 'Bの色について、最も適切なJISの物体色の慣用色名',
+      prompt: sourcePrompt,
       choices: ['黄丹', '海老茶', '黄葉色', '琥珀色'],
       correctIndex: 3,
       explanation: '原本解答表はB-④。選択肢本文も原本問題ページどおり保持する。',
@@ -27,7 +29,7 @@ export const q16 = defineSummerGroup({
     },
     {
       part: 'C',
-      prompt: 'Cの色について、最も適切なJISの物体色の慣用色名',
+      prompt: sourcePrompt,
       choices: ['新橋色', '藤色', '海松色', '緑青色'],
       correctIndex: 0,
       explanation: '原本解答表はC-①。選択肢本文も原本問題ページどおり保持する。',
@@ -36,7 +38,7 @@ export const q16 = defineSummerGroup({
     },
     {
       part: 'D',
-      prompt: 'Dの色について、最も適切なJISの物体色の慣用色名',
+      prompt: sourcePrompt,
       choices: ['ローアンバー', 'タン', 'バーガンディー', 'ポピーレッド'],
       correctIndex: 3,
       explanation: '原本解答表はD-④。選択肢本文も原本問題ページどおり保持する。',
@@ -45,7 +47,7 @@ export const q16 = defineSummerGroup({
     },
     {
       part: 'E',
-      prompt: 'Eの色について、最も適切なJISの物体色の慣用色名',
+      prompt: sourcePrompt,
       choices: ['テラコッタ', 'バーミリオン', 'バーントアンバー', 'ローシェンナ'],
       correctIndex: 2,
       explanation: '原本解答表はE-③。選択肢本文も原本問題ページどおり保持する。',
@@ -54,7 +56,7 @@ export const q16 = defineSummerGroup({
     },
     {
       part: 'F',
-      prompt: 'Fの色について、最も適切なJISの物体色の慣用色名',
+      prompt: sourcePrompt,
       choices: ['ウイスタリア', 'サックスブルー', 'スレートグレイ', 'ライラック'],
       correctIndex: 1,
       explanation: '原本解答表はF-②。選択肢本文も原本問題ページどおり保持する。',
