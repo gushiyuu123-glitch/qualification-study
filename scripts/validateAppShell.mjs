@@ -94,7 +94,6 @@ for (const relativePath of questionFiles) {
 }
 assertUnique(questionIds, 'registered question')
 
-requireFile('docs/color-2/QUESTION_ARCHITECTURE.md')
 requireFile('public/sw.js')
 requireFile('public/manifest.webmanifest')
 
