@@ -1,0 +1,93 @@
+.color2-noah-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: end;
+  margin: 24px 0;
+  padding: 22px;
+  border: 1px solid #dcdcdc;
+  border-left: 4px solid #222222;
+  background: #ffffff;
+}
+
+.color2-noah-entry__copy > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6a6a6a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.color2-noah-entry__copy h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.color2-noah-entry__copy p,
+.color2-noah-entry__copy small {
+  display: block;
+  margin: 0;
+  color: #555555;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.color2-noah-entry__copy small {
+  margin-top: 7px;
+  color: #777777;
+  font-size: 10px;
+}
+
+.color2-noah-entry__actions button {
+  min-width: 168px;
+  min-height: 58px;
+  padding: 12px 14px;
+  border: 1px solid #222222;
+  background: #222222;
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+}
+
+.color2-noah-entry__actions button span,
+.color2-noah-entry__actions button b {
+  display: block;
+}
+
+.color2-noah-entry__actions button span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.color2-noah-entry__actions button b {
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.72;
+}
+
+.color2-noah-quiz__lead small {
+  display: block;
+  margin-top: 12px;
+  color: #6c6c6c;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.color2-noah-quiz [data-noah-caution] {
+  display: block;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .color2-noah-entry {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 18px;
+  }
+
+  .color2-noah-entry__actions button {
+    width: 100%;
+  }
+}

@@ -10,8 +10,9 @@ const color2 = qualifications.find((item) => item.id === COLOR2_ID)
 
 if (color2) {
   color2.note = `本編は確認済み内容だけの解説専用
-練習は教科書・過去問に収録された問題だけ
-弱点は各過去問・練習問題の誤答から蓄積`
+再現練習は教科書・過去問に実際に収録された問題だけ
+非公式の「ノア監修オリジナル練習問題」は別枠で明示
+弱点は各練習問題の誤答から蓄積`
   color2.resources = []
   color2.categories = []
 }
@@ -77,7 +78,7 @@ function syncSourceOnlyCopy(screen) {
   const heroCopy = screen.querySelector('.color2-reference-hero > p')
   setTextIfChanged(
     heroCopy,
-    '本編は確認済み内容だけの解説専用。練習問題は教科書・過去問に実際に収録された問題だけを使用する。',
+    '本編は確認済み内容だけの解説専用。再現練習は教科書・過去問に実際に収録された問題だけを使用。非公式の「ノア監修オリジナル練習問題」は別枠で明示して分離する。',
   )
 
   const statusStrong = screen.querySelectorAll('.color2-reference-status strong')
@@ -198,7 +199,7 @@ function enhanceHomeCard() {
     const name = card.querySelector('.qualification-body > strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const progress = card.querySelector('.card-progress')
-    if (progress) progress.textContent = '確認済み用語集 · 教科書/過去問のみ'
+    if (progress) progress.textContent = '確認済み用語集 · 過去問 + 非公式オリジナル'
     card.dataset.color2ReferenceCard = 'true'
   })
 }
@@ -209,7 +210,7 @@ function enhanceCompletionOverview() {
     const name = row.querySelector('.qualify-completion-copy strong')?.textContent?.trim()
     if (name !== '色彩検定2級') return
     const status = row.querySelector('.qualify-completion-copy small')
-    if (status) status.textContent = '確認済み用語集 / 教科書・過去問のみ'
+    if (status) status.textContent = '確認済み用語集 / 過去問 + 非公式オリジナル'
     row.querySelector('.qualify-completion-bar')?.remove()
     row.dataset.color2ReferenceRow = 'true'
   })
