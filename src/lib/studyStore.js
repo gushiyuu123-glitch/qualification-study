@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'qualify-study-v1'
+const BACKUP_FORMAT = 'qualify-backup-v2'
+const AUXILIARY_STORAGE_PREFIXES = ['qualify:color2:']
 const DAY_MS = 24 * 60 * 60 * 1000
 
 export const mistakeReasons = [
@@ -167,8 +169,69 @@ export function clearStudyData() {
   return createEmptyStudyData()
 }
 
+function isAuxiliaryStorageKey(key) {
+  return AUXILIARY_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix))
+}
+
+function collectAuxiliaryStorage() {
+  if (typeof window === 'undefined') return {}
+
+  const snapshot = {}
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index)
+    if (!key || !isAuxiliaryStorageKey(key)) continue
+    const value = window.localStorage.getItem(key)
+    if (value !== null) snapshot[key] = value
+  }
+  return snapshot
+}
+
+function restoreAuxiliaryStorage(snapshot) {
+  if (
+    typeof window === 'undefined' ||
+    !snapshot ||
+    typeof snapshot !== 'object' ||
+    Array.isArray(snapshot)
+  ) {
+    return false
+  }
+
+  const currentKeys = []
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index)
+    if (key && isAuxiliaryStorageKey(key)) currentKeys.push(key)
+  }
+  currentKeys.forEach((key) => window.localStorage.removeItem(key))
+
+  let restored = false
+  Object.entries(snapshot).forEach(([key, value]) => {
+    if (!isAuxiliaryStorageKey(key) || typeof value !== 'string') return
+    window.localStorage.setItem(key, value)
+    restored = true
+  })
+  return restored
+}
+
+function normalizeStudyData(value) {
+  if (!value || value.version !== 1 || typeof value.records !== 'object') {
+    throw new Error('対応していないバックアップ形式です。')
+  }
+
+  return {
+    ...createEmptyStudyData(),
+    ...value,
+    records: value.records ?? {},
+  }
+}
+
 export function exportStudyData(data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
+  const payload = {
+    format: BACKUP_FORMAT,
+    exportedAt: new Date().toISOString(),
+    studyData: data,
+    auxiliaryStorage: collectAuxiliaryStorage(),
+  }
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: 'application/json',
   })
   const url = URL.createObjectURL(blob)
@@ -183,13 +246,26 @@ export async function importStudyData(file) {
   const text = await file.text()
   const parsed = JSON.parse(text)
 
-  if (!parsed || parsed.version !== 1 || typeof parsed.records !== 'object') {
-    throw new Error('対応していないバックアップ形式です。')
+  if (parsed?.format === BACKUP_FORMAT) {
+    const studyData = normalizeStudyData(parsed.studyData)
+    const restoredAuxiliary = restoreAuxiliaryStorage(parsed.auxiliaryStorage)
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          ...studyData,
+          updatedAt: new Date().toISOString(),
+        }),
+      )
+
+      if (restoredAuxiliary) {
+        window.setTimeout(() => window.location.reload(), 450)
+      }
+    }
+
+    return studyData
   }
 
-  return {
-    ...createEmptyStudyData(),
-    ...parsed,
-    records: parsed.records ?? {},
-  }
+  return normalizeStudyData(parsed)
 }
