@@ -348,6 +348,11 @@ function next() {
   advanceQuestion()
 }
 
+function skipCurrent() {
+  if (!root || root.hidden || answered || !currentQuestion) return
+  advanceQuestion()
+}
+
 function open() {
   const quiz = ensureRoot()
   bodyOverflowBeforeOpen = document.body.style.overflow
@@ -387,6 +392,10 @@ function scan() {
 const observer = new MutationObserver(scan)
 observer.observe(document.documentElement, { childList: true, subtree: true })
 scan()
+
+window.addEventListener('qualify:color2-skip', (event) => {
+  if (event.detail?.mode === 'adaptive') skipCurrent()
+})
 
 window.__QUALIFY_COLOR2_ADAPTIVE_RANDOM_PRACTICE__ = { open }
 window.dispatchEvent(new CustomEvent('qualify:color2-adaptive-random-ready'))
