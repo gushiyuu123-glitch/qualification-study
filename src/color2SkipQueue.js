@@ -217,7 +217,7 @@ function exportPayload() {
 
 async function copyReviewData(button) {
   const text = JSON.stringify(exportPayload(), null, 2)
-  let copied = false
+  let copied
 
   try {
     await navigator.clipboard.writeText(text)
@@ -320,7 +320,8 @@ function injectSkipButton(dialog, config) {
   }
 
   const feedback = dialog.querySelector(config.feedback)
-  holder.hidden = question.hidden || Boolean(feedback && !feedback.hidden)
+  const shouldHide = question.hidden || Boolean(feedback && !feedback.hidden)
+  if (holder.hidden !== shouldHide) holder.hidden = shouldHide
 }
 
 function bindDialog(dialog, config) {
