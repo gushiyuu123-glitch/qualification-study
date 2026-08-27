@@ -14,6 +14,8 @@ let session = []
 let index = 0
 let correctCount = 0
 let earnedPoints = 0
+let answeredPoints = 0
+let skippedCount = 0
 let answered = false
 let misses = []
 let weaknessBank = loadWeaknessBank()
@@ -102,7 +104,6 @@ function clearWeaknessBank() {
 }
 
 const choiceMark = (choiceIndex) => ['①', '②', '③', '④'][choiceIndex] ?? ''
-const sessionPoints = () => session.reduce((sum, question) => sum + question.points, 0)
 
 function ensureRoot() {
   if (root?.isConnected) return root
@@ -256,6 +257,8 @@ function startQuestions(questions) {
   index = 0
   correctCount = 0
   earnedPoints = 0
+  answeredPoints = 0
+  skippedCount = 0
   answered = false
   misses = []
   setVisible('[data-summer2025-setup]', false)
@@ -314,6 +317,7 @@ function answer(choiceIndex) {
   const question = session[index]
   const isCorrect = choiceIndex === question.correctIndex
   answered = true
+  answeredPoints += question.points
   if (isCorrect) {
     correctCount += 1
     earnedPoints += question.points
@@ -355,6 +359,13 @@ function next() {
   renderQuestion()
 }
 
+function skipCurrent() {
+  if (!root || root.hidden || answered || !session[index]) return
+  skippedCount += 1
+  index += 1
+  renderQuestion()
+}
+
 function retryMisses() {
   if (!misses.length) return showSetup()
   startQuestions(shuffle([...misses]))
@@ -363,14 +374,14 @@ function retryMisses() {
 function showResult() {
   setVisible('[data-summer2025-question]', false)
   setVisible('[data-summer2025-result]', true)
-  const maxPoints = sessionPoints()
-  const percent = maxPoints ? Math.round((earnedPoints / maxPoints) * 1000) / 10 : 0
+  const answeredCount = session.length - skippedCount
+  const percent = answeredPoints ? Math.round((earnedPoints / answeredPoints) * 1000) / 10 : null
   const score = root.querySelector('[data-summer2025-result-score]')
   const detail = root.querySelector('[data-summer2025-result-detail]')
   const retryButton = root.querySelector('[data-summer2025-retry-misses]')
   const progress = root.querySelector('[data-summer2025-progress]')
-  if (score) score.textContent = `${earnedPoints} / ${maxPoints}点`
-  if (detail) detail.textContent = `${correctCount} / ${session.length}問正解 · 得点率 ${percent}% · ミス ${misses.length}問`
+  if (score) score.textContent = `${earnedPoints} / ${answeredPoints}点`
+  if (detail) detail.textContent = `${correctCount} / ${answeredCount}問正解 · 得点率 ${percent === null ? '—' : `${percent}%`} · ミス ${misses.length}問 · スキップ ${skippedCount}問`
   if (retryButton) retryButton.disabled = misses.length === 0
   if (progress) progress.textContent = 'RESULT'
   refreshWeaknessUI()
@@ -420,6 +431,10 @@ function scan() {
 const observer = new MutationObserver(scan)
 observer.observe(document.documentElement, { childList: true, subtree: true })
 scan()
+
+window.addEventListener('qualify:color2-skip', (event) => {
+  if (event.detail?.mode === '2025-summer') skipCurrent()
+})
 
 window.__QUALIFY_COLOR2_SUMMER_2025_PRACTICE__ = { open }
 window.dispatchEvent(new CustomEvent('qualify:color2-summer-2025-ready'))
