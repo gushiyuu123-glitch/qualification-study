@@ -1,0 +1,40 @@
+.color2-all-random-average-stats {
+  margin-top: 28px;
+}
+
+.color2-all-random-average-stats strong {
+  color: #8d3b3b;
+}
+
+.color2-all-random-average-note {
+  margin: 10px 0 0;
+  color: #817b74;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.color2-all-random-live-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  margin-top: 13px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.16);
+  color: #7f7972;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.color2-all-random-live-stats strong {
+  margin-left: 4px;
+  color: #8d3b3b;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .color2-all-random-live-stats {
+    justify-content: space-between;
+    gap: 8px;
+  }
+}
