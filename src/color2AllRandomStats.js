@@ -8,6 +8,7 @@ const RECENT_WINDOW = 50
 
 let stats = loadStats()
 const dialogStates = new WeakMap()
+let patchQueued = false
 
 function emptyStats() {
   return { version: 1, questions: {}, recent: [] }
@@ -53,6 +54,12 @@ function saveStats() {
   } catch {
     // 保存不可の環境では、このページを開いている間だけ集計する。
   }
+}
+
+function setText(node, value) {
+  if (!node) return
+  const next = String(value)
+  if (node.textContent !== next) node.textContent = next
 }
 
 export function getAllRandomQuestionStats(questionKey) {
@@ -172,27 +179,25 @@ function refreshDialog(dialog) {
 
   dialog
     .querySelectorAll('[data-all-random-average], [data-all-random-live-average]')
-    .forEach((node) => {
-      node.textContent = percent(summary.averageAccuracy)
-    })
+    .forEach((node) => setText(node, percent(summary.averageAccuracy)))
   dialog
     .querySelectorAll('[data-all-random-recent], [data-all-random-live-recent]')
-    .forEach((node) => {
-      node.textContent = percent(summary.recentAccuracy)
-    })
-  dialog.querySelectorAll('[data-all-random-coverage]').forEach((node) => {
-    node.textContent = `${summary.answeredQuestions} / ${TOTAL_QUESTIONS}`
-  })
-  dialog.querySelectorAll('[data-all-random-live-coverage]').forEach((node) => {
-    node.textContent = `${summary.answeredQuestions}/${TOTAL_QUESTIONS}`
-  })
+    .forEach((node) => setText(node, percent(summary.recentAccuracy)))
+  dialog
+    .querySelectorAll('[data-all-random-coverage]')
+    .forEach((node) => setText(node, `${summary.answeredQuestions} / ${TOTAL_QUESTIONS}`))
+  dialog
+    .querySelectorAll('[data-all-random-live-coverage]')
+    .forEach((node) => setText(node, `${summary.answeredQuestions}/${TOTAL_QUESTIONS}`))
 
   const note = dialog.querySelector('[data-all-random-average-note]')
   if (note) {
-    note.textContent =
+    setText(
+      note,
       summary.totalAttempts === 0
         ? '平均正答率は、解いた各問題の正答率を同じ重みで平均します。得意問題の反復だけで数字が偏りにくい指標です。'
-        : `累計 ${summary.totalCorrect}/${summary.totalAttempts} 正解 · 単純累計 ${percent(summary.rawAccuracy)} · 直近は最大${RECENT_WINDOW}回答を使用`
+        : `累計 ${summary.totalCorrect}/${summary.totalAttempts} 正解 · 単純累計 ${percent(summary.rawAccuracy)} · 直近は最大${RECENT_WINDOW}回答を使用`,
+    )
   }
 }
 
@@ -243,17 +248,25 @@ function patch() {
   document.querySelectorAll(DIALOG_SELECTOR).forEach(patchDialog)
 }
 
-const observer = new MutationObserver(patch)
+function schedulePatch() {
+  if (patchQueued) return
+  patchQueued = true
+  queueMicrotask(() => {
+    patchQueued = false
+    patch()
+  })
+}
+
+const observer = new MutationObserver(schedulePatch)
 observer.observe(document.documentElement, {
   childList: true,
   subtree: true,
   attributes: true,
   attributeFilter: ['hidden', 'class', 'disabled'],
-  characterData: true,
 })
 
-window.addEventListener('qualify:color2-all-random-ready', patch)
-queueMicrotask(patch)
+window.addEventListener('qualify:color2-all-random-ready', schedulePatch)
+schedulePatch()
 
 window.__QUALIFY_COLOR2_ALL_RANDOM_STATS__ = {
   getSummary: getAllRandomStatsSummary,
