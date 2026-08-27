@@ -1,0 +1,246 @@
+.color2-skip-action {
+  margin-top: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.color2-skip-action[hidden] {
+  display: none !important;
+}
+
+.color2-skip-action > button {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid rgba(141, 59, 59, 0.72);
+  background: transparent;
+  color: #8d3b3b;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.color2-skip-action > small {
+  color: #8b857e;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.color2-skip-queue {
+  margin: 28px 0 8px;
+  padding: 22px 0;
+  border-top: 1px solid #171717;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.2);
+}
+
+.color2-skip-queue__head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.color2-skip-queue__head span {
+  display: block;
+  margin-bottom: 7px;
+  color: #8d3b3b;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+}
+
+.color2-skip-queue__head h3 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.color2-skip-queue__head > strong {
+  flex: 0 0 auto;
+  color: #8d3b3b;
+  font-size: 21px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.color2-skip-queue > p {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: #68625c;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.color2-skip-queue__actions {
+  margin-top: 19px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.color2-skip-queue__actions button,
+.color2-skip-queue__item button {
+  min-height: 42px;
+  border: 0;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.32);
+  background: transparent;
+  color: #171717;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.color2-skip-queue__actions button:first-child {
+  color: #8d3b3b;
+  border-bottom-color: #8d3b3b;
+}
+
+.color2-skip-queue__actions button:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.color2-skip-queue__details {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(23, 23, 23, 0.14);
+}
+
+.color2-skip-queue__details > summary {
+  width: fit-content;
+  cursor: pointer;
+  color: #6f6962;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.color2-skip-queue__details > div {
+  margin-top: 10px;
+}
+
+.color2-skip-queue__item {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.12);
+}
+
+.color2-skip-queue__item > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.color2-skip-queue__item strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.color2-skip-queue__item span {
+  color: #8a847d;
+  font-size: 9px;
+}
+
+.color2-skip-queue__item > div:last-child {
+  display: flex;
+  gap: 14px;
+}
+
+.color2-skip-queue__item button {
+  min-height: 34px;
+  font-size: 10px;
+}
+
+.color2-skip-queue__empty {
+  margin: 0;
+  color: #918b84;
+  font-size: 11px;
+}
+
+.color2-skip-queue > small {
+  display: block;
+  margin-top: 14px;
+  color: #918b84;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.color2-skip-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  z-index: 11000;
+  max-width: calc(100vw - 30px);
+  padding: 10px 14px;
+  border: 1px solid rgba(23, 23, 23, 0.16);
+  background: rgba(247, 245, 239, 0.97);
+  color: #171717;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.color2-skip-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 640px) {
+  .color2-skip-action {
+    margin-top: 11px;
+  }
+
+  .color2-skip-action > button {
+    min-height: 42px;
+    font-size: 11px;
+  }
+
+  .color2-skip-queue {
+    margin-top: 24px;
+    padding: 19px 0;
+  }
+
+  .color2-skip-queue__head {
+    align-items: start;
+    gap: 14px;
+  }
+
+  .color2-skip-queue__head h3 {
+    font-size: 25px;
+  }
+
+  .color2-skip-queue__head > strong {
+    padding-top: 18px;
+    font-size: 18px;
+  }
+
+  .color2-skip-queue__actions {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .color2-skip-queue__item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .color2-skip-queue__item > div:last-child {
+    gap: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .color2-skip-toast {
+    transition: none;
+  }
+}
