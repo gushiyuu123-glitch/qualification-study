@@ -59,6 +59,8 @@ let answered = false
 let answeredTotal = 0
 let correctTotal = 0
 let cycle = 0
+let reviewMode = false
+let reviewTotal = 0
 let bodyOverflowBeforeOpen = ''
 
 function shuffle(values) {
@@ -167,6 +169,8 @@ function ensureRoot() {
 }
 
 function showSetup() {
+  reviewMode = false
+  reviewTotal = 0
   setVisible('[data-all-random-setup]', true)
   setVisible('[data-all-random-question]', false)
   const progress = ensureRoot().querySelector('[data-all-random-progress]')
@@ -174,7 +178,7 @@ function showSetup() {
   ensureRoot().scrollTop = 0
 }
 
-function start() {
+function resetSession() {
   deck = []
   currentQuestion = null
   lastQuestionKey = null
@@ -182,13 +186,40 @@ function start() {
   answeredTotal = 0
   correctTotal = 0
   cycle = 0
+}
+
+function start() {
+  reviewMode = false
+  reviewTotal = 0
+  resetSession()
+  setVisible('[data-all-random-setup]', false)
+  setVisible('[data-all-random-question]', true)
+  advanceQuestion()
+}
+
+function startReview(randomKeys) {
+  const wanted = new Set(Array.isArray(randomKeys) ? randomKeys : [])
+  const selected = allQuestions.filter((question) => wanted.has(question.randomKey))
+  if (!selected.length) return
+
+  resetSession()
+  reviewMode = true
+  reviewTotal = selected.length
+  cycle = 1
+  deck = shuffle(selected)
   setVisible('[data-all-random-setup]', false)
   setVisible('[data-all-random-question]', true)
   advanceQuestion()
 }
 
 function advanceQuestion() {
-  if (deck.length === 0) refillDeck()
+  if (deck.length === 0) {
+    if (reviewMode) {
+      showSetup()
+      return
+    }
+    refillDeck()
+  }
   currentQuestion = deck.shift() ?? null
   answered = false
   renderQuestion()
@@ -232,7 +263,7 @@ function renderQuestion() {
   const question = currentQuestion
   if (!question) return
 
-  const positionInCycle = EXPECTED_TOTAL - deck.length
+  const positionInCycle = reviewMode ? reviewTotal - deck.length : EXPECTED_TOTAL - deck.length
   const label = root.querySelector('[data-all-random-question-label]')
   const number = root.querySelector('[data-all-random-question-number]')
   const prompt = root.querySelector('[data-all-random-prompt]')
@@ -244,12 +275,18 @@ function renderQuestion() {
   if (label) {
     label.textContent = `${question.examLabel} · 問題(${question.groupNumber}) ${question.part} · ${question.points}点`
   }
-  if (number) number.textContent = `${cycle}周目 · ${positionInCycle} / ${EXPECTED_TOTAL}`
+  if (number) {
+    number.textContent = reviewMode
+      ? `SKIP REVIEW · ${positionInCycle} / ${reviewTotal}`
+      : `${cycle}周目 · ${positionInCycle} / ${EXPECTED_TOTAL}`
+  }
   if (prompt) prompt.textContent = question.prompt
   if (progress) {
-    progress.textContent = answeredTotal > 0
-      ? `∞ · 正答率 ${Math.round((correctTotal / answeredTotal) * 100)}%`
-      : '∞ RANDOM'
+    progress.textContent = reviewMode
+      ? `SKIP ${positionInCycle}/${reviewTotal}`
+      : answeredTotal > 0
+        ? `∞ · 正答率 ${Math.round((correctTotal / answeredTotal) * 100)}%`
+        : '∞ RANDOM'
   }
 
   if (question.image?.src && figure && image) {
@@ -310,7 +347,7 @@ function answer(choiceIndex) {
     caution.textContent = question.caution
     caution.hidden = !question.caution
   }
-  if (progress) {
+  if (progress && !reviewMode) {
     progress.textContent = `∞ · 正答率 ${Math.round((correctTotal / answeredTotal) * 100)}%`
   }
 
@@ -323,12 +360,26 @@ function next() {
   advanceQuestion()
 }
 
+function skipCurrent() {
+  if (!root || root.hidden || answered || !currentQuestion) return
+  lastQuestionKey = currentQuestion.randomKey
+  advanceQuestion()
+}
+
 function open() {
   const quiz = ensureRoot()
   bodyOverflowBeforeOpen = document.body.style.overflow
   quiz.hidden = false
   document.body.style.overflow = 'hidden'
   showSetup()
+}
+
+function openReview(randomKeys) {
+  const quiz = ensureRoot()
+  bodyOverflowBeforeOpen = document.body.style.overflow
+  quiz.hidden = false
+  document.body.style.overflow = 'hidden'
+  startReview(randomKeys)
 }
 
 function close() {
@@ -374,5 +425,9 @@ const observer = new MutationObserver(scan)
 observer.observe(document.documentElement, { childList: true, subtree: true })
 scan()
 
-window.__QUALIFY_COLOR2_ALL_RANDOM_PRACTICE__ = { open }
+window.addEventListener('qualify:color2-skip', (event) => {
+  if (event.detail?.mode === 'all-random') skipCurrent()
+})
+
+window.__QUALIFY_COLOR2_ALL_RANDOM_PRACTICE__ = { open, openReview }
 window.dispatchEvent(new CustomEvent('qualify:color2-all-random-ready'))
