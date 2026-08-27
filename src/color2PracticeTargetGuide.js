@@ -6,6 +6,8 @@ const practiceConfigs = [
   { set: '2025-summer', prompt: '[data-summer2025-prompt]', label: '[data-summer2025-question-label]' },
   { set: '2025-winter', prompt: '[data-w25-prompt]', label: '[data-w25-question-label]' },
   { set: 'textbook', prompt: '[data-tb-prompt]', label: '[data-tb-question-label]' },
+  { set: 'auto', prompt: '[data-all-random-prompt]', label: '[data-all-random-question-label]' },
+  { set: 'auto', prompt: '[data-adaptive-prompt]', label: '[data-adaptive-question-label]' },
 ]
 
 const companionClasses = [
@@ -18,6 +20,14 @@ function currentQuestionMeta(labelText) {
   const match = String(labelText ?? '').match(/問題\((\d+)\)\s+([A-Z])/) 
   if (!match) return null
   return { groupNumber: Number(match[1]), part: match[2] }
+}
+
+function resolvePracticeSet(configuredSet, labelText) {
+  if (configuredSet !== 'auto') return configuredSet
+  if (String(labelText).includes('2026夏期')) return '2026-summer'
+  if (String(labelText).includes('2025夏期')) return '2025-summer'
+  if (String(labelText).includes('2025冬期')) return '2025-winter'
+  return ''
 }
 
 function sourcePrompt(prompt, labelText) {
@@ -130,15 +140,18 @@ function enhancePractice({ set, prompt: promptSelector, label: labelSelector }) 
   const meta = currentQuestionMeta(labelText)
   if (!meta) return
 
+  const resolvedSet = resolvePracticeSet(set, labelText)
+  if (!resolvedSet) return
+
   const source = sourcePrompt(prompt, labelText)
   if (!source.trim()) return
 
-  const key = `${set}\u0000${labelText}\u0000${source}`
+  const key = `${resolvedSet}\u0000${labelText}\u0000${source}`
   const hasExpectedCompanion = Boolean(nextCompanion(prompt)) || source === prompt.textContent
   if (prompt.dataset.practiceWebKey === key && hasExpectedCompanion) return
 
   const view = buildColor2PracticePromptView(source, meta.part, {
-    set,
+    set: resolvedSet,
     groupNumber: meta.groupNumber,
   })
   removeCompanions(prompt)
