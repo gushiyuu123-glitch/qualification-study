@@ -1,0 +1,101 @@
+:is(
+  .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+) .color2-summer-quiz__question > h2 {
+  max-width: 680px;
+  margin-top: 22px;
+  font-size: clamp(20px, 3vw, 27px);
+  line-height: 1.52;
+  letter-spacing: -0.02em;
+}
+
+:is(
+  .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+) .color2-summer-quiz__figure {
+  margin-top: 20px;
+}
+
+:is(
+  .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+) .color2-summer-quiz__choices {
+  margin-top: 22px;
+}
+
+:is(
+  .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+  .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+) .color2-summer-quiz__feedback {
+  margin-top: 26px;
+  scroll-margin-top: 86px;
+}
+
+@media (max-width: 640px) {
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__body {
+    padding-top: 30px;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__question-head {
+    padding-bottom: 10px;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__question > h2 {
+    margin-top: 18px;
+    font-size: 19px;
+    line-height: 1.55;
+    letter-spacing: -0.015em;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__figure {
+    margin-top: 16px;
+    padding-block: 12px;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__choices {
+    margin-top: 18px;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__choices button {
+    min-height: 54px;
+    padding-block: 11px;
+  }
+
+  :is(
+    .color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"],
+    .color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]
+  ) .color2-summer-quiz__feedback {
+    margin-top: 22px;
+    padding-top: 20px;
+    scroll-margin-top: 78px;
+  }
+}
