@@ -1,22 +1,29 @@
 import './color2SkipQueue.css'
-import { color2Summer2026Questions } from './color2Summer2026Data.js'
-import { color2Summer2025Questions } from './color2Summer2025Data.js'
-import { color2Winter2025Questions } from './color2Winter2025Data.js'
+import './color2Integrity.css'
+import {
+  ensureColor2QuestionIdentity,
+  getColor2QuestionIdentity,
+} from './color2QuestionIdentity.js'
+import { getColor2FigureRevision } from './color2FigureRegistry.js'
 
 const STORAGE_KEY = 'qualify:color2:skip-queue:v1'
 const PANEL_CLASS = 'color2-skip-queue'
 const SKIP_EVENT = 'qualify:color2-skip'
+const BUILD_REVISION = import.meta.env.VITE_QUALIFY_BUILD_SHA || 'local'
 
-const EXAMS = {
-  '2026-summer': { label: '2026夏期', questions: color2Summer2026Questions },
-  '2025-summer': { label: '2025夏期', questions: color2Summer2025Questions },
-  '2025-winter': { label: '2025冬期', questions: color2Winter2025Questions },
-}
+const REASONS = Object.freeze([
+  Object.freeze({ id: 'figure', label: '図・写真がおかしい' }),
+  Object.freeze({ id: 'prompt', label: '文が意味不明' }),
+  Object.freeze({ id: 'choices', label: '選択肢との対応' }),
+  Object.freeze({ id: 'hard', label: '単純に難しい' }),
+  Object.freeze({ id: 'other', label: 'その他' }),
+])
+
+const REASON_BY_ID = new Map(REASONS.map((reason) => [reason.id, reason]))
 
 const configs = [
   {
     mode: '2026-summer',
-    examKey: '2026-summer',
     dialog: '.color2-summer-quiz[aria-label="2026年度夏期 色彩検定2級 4択練習"]',
     question: '[data-summer-question]',
     label: '[data-summer-question-label]',
@@ -27,7 +34,6 @@ const configs = [
   },
   {
     mode: '2025-summer',
-    examKey: '2025-summer',
     dialog: '.color2-summer-quiz[aria-label="2025年度夏期 色彩検定2級 4択練習"]',
     question: '[data-summer2025-question]',
     label: '[data-summer2025-question-label]',
@@ -38,7 +44,6 @@ const configs = [
   },
   {
     mode: '2025-winter',
-    examKey: '2025-winter',
     dialog: '.color2-summer-quiz[aria-label="2025年度冬期 色彩検定2級 4択練習"]',
     question: '[data-w25-question]',
     label: '[data-w25-question-label]',
@@ -49,7 +54,6 @@ const configs = [
   },
   {
     mode: 'all-random',
-    examKey: 'auto',
     dialog: '.color2-summer-quiz[aria-label="色彩検定2級 全過去問 無限ランダム練習"]',
     question: '[data-all-random-question]',
     label: '[data-all-random-question-label]',
@@ -60,7 +64,6 @@ const configs = [
   },
   {
     mode: 'adaptive',
-    examKey: 'auto',
     dialog: '.color2-summer-quiz[aria-label="色彩検定2級 苦手優先ランダム練習"]',
     question: '[data-adaptive-question]',
     label: '[data-adaptive-question-label]',
@@ -71,29 +74,51 @@ const configs = [
   },
 ]
 
-const questionByLocation = new Map()
-for (const [examKey, exam] of Object.entries(EXAMS)) {
-  exam.questions.forEach((question) => {
-    questionByLocation.set(`${examKey}:${question.groupNumber}:${question.part}`, question)
-  })
-}
-
 let queue = loadQueue()
 const dialogObservers = new WeakMap()
 let toastTimer = 0
 
 function emptyQueue() {
-  return { version: 1, items: {} }
+  return { version: 2, items: {} }
+}
+
+function normalizeReasonCounts(value) {
+  const result = {}
+  REASONS.forEach((reason) => {
+    const count = Math.max(0, Math.trunc(Number(value?.[reason.id]) || 0))
+    if (count > 0) result[reason.id] = count
+  })
+  return result
+}
+
+function normalizeItem(item, fallbackKey) {
+  if (!item || typeof item !== 'object') return null
+  const randomKey = String(item.randomKey || fallbackKey || '')
+  if (!randomKey) return null
+  return {
+    ...item,
+    randomKey,
+    skipCount: Math.max(1, Math.trunc(Number(item.skipCount) || 1)),
+    firstSkippedAt: Math.max(0, Number(item.firstSkippedAt) || 0),
+    lastSkippedAt: Math.max(0, Number(item.lastSkippedAt) || 0),
+    modes: Array.isArray(item.modes) ? [...new Set(item.modes.filter(Boolean))] : [],
+    reasonCounts: normalizeReasonCounts(item.reasonCounts),
+    lastReason: REASON_BY_ID.has(item.lastReason) ? item.lastReason : null,
+    needsAudit: true,
+  }
 }
 
 function loadQueue() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? 'null')
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed.items)) return emptyQueue()
-    return {
-      version: 1,
-      items: parsed.items && typeof parsed.items === 'object' ? parsed.items : {},
-    }
+
+    const items = {}
+    Object.entries(parsed.items ?? {}).forEach(([key, value]) => {
+      const normalized = normalizeItem(value, key)
+      if (normalized) items[normalized.randomKey] = normalized
+    })
+    return { version: 2, items }
   } catch {
     return emptyQueue()
   }
@@ -109,30 +134,6 @@ function saveQueue() {
   window.dispatchEvent(new CustomEvent('qualify:color2-skip-queue-updated'))
 }
 
-function resolveExamKey(config, labelText) {
-  if (config.examKey !== 'auto') return config.examKey
-  if (labelText.includes('2026夏期')) return '2026-summer'
-  if (labelText.includes('2025夏期')) return '2025-summer'
-  if (labelText.includes('2025冬期')) return '2025-winter'
-  return ''
-}
-
-function currentMeta(dialog, config) {
-  const labelText = dialog.querySelector(config.label)?.textContent ?? ''
-  const match = labelText.match(/問題\((\d+)\)\s+([A-Z])/) 
-  if (!match) return null
-
-  const examKey = resolveExamKey(config, labelText)
-  if (!examKey || !EXAMS[examKey]) return null
-
-  const groupNumber = Number(match[1])
-  const part = match[2]
-  const question = questionByLocation.get(`${examKey}:${groupNumber}:${part}`)
-  if (!question) return null
-
-  return { examKey, groupNumber, part, question, labelText }
-}
-
 function visibleChoiceSnapshot(button) {
   const textHost = button.querySelector(':scope > span')
   const colors = [...button.querySelectorAll('.color2-summer-2025-choice-swatch')]
@@ -145,10 +146,18 @@ function visibleChoiceSnapshot(button) {
   }
 }
 
-function questionSnapshot(dialog, config) {
-  const meta = currentMeta(dialog, config)
-  if (!meta) return null
+function currentIdentity(dialog, config) {
+  const questionHost = dialog.querySelector(config.question)
+  if (!questionHost || questionHost.hidden) return null
+  ensureColor2QuestionIdentity(questionHost)
+  return getColor2QuestionIdentity(questionHost)
+}
 
+function questionSnapshot(dialog, config) {
+  const identity = currentIdentity(dialog, config)
+  if (!identity) return null
+
+  const { entry } = identity
   const prompt = dialog.querySelector(config.prompt)
   const sourceDetails = prompt?.nextElementSibling?.classList.contains('color2-practice-source-details')
     ? prompt.nextElementSibling
@@ -156,29 +165,36 @@ function questionSnapshot(dialog, config) {
   const sourcePrompt =
     prompt?.dataset.practiceWebSource?.trim() ||
     sourceDetails?.querySelector('p')?.textContent?.trim() ||
-    meta.question.prompt
+    entry.prompt
   const context = dialog.querySelector('.color2-practice-web-context > p')?.textContent?.trim() ?? ''
   const image = dialog.querySelector(`${config.question} .color2-summer-quiz__figure:not([hidden]) img`)
+  const imageSrc = image?.getAttribute('src') ?? entry.imageSrc ?? ''
   const choices = [...dialog.querySelectorAll(config.choice)].map(visibleChoiceSnapshot)
 
   return {
-    randomKey: `${meta.examKey}:${meta.question.id}`,
-    questionId: meta.question.id,
-    examKey: meta.examKey,
-    examLabel: EXAMS[meta.examKey].label,
-    groupNumber: meta.groupNumber,
-    part: meta.part,
-    points: meta.question.points,
+    randomKey: entry.key,
+    questionId: entry.questionId,
+    examKey: entry.examKey,
+    examLabel: entry.examLabel,
+    groupNumber: entry.groupNumber,
+    part: entry.part,
+    points: entry.points,
+    displayLabel: dialog.querySelector(config.label)?.textContent?.trim() ?? '',
     sourcePrompt,
     displayPrompt: prompt?.textContent?.trim() ?? '',
     context,
     choices,
-    image: image
+    correctIndex: Number(entry.question.correctIndex),
+    sourceExplanation: String(entry.question.explanation ?? ''),
+    sourceCaution: String(entry.question.caution ?? ''),
+    image: imageSrc
       ? {
-          src: image.getAttribute('src') ?? '',
-          alt: image.getAttribute('alt') ?? '',
+          src: imageSrc,
+          alt: image?.getAttribute('alt') ?? entry.question.image?.alt ?? '',
         }
       : null,
+    figureRevision: imageSrc ? getColor2FigureRevision(imageSrc) : null,
+    buildRevision: BUILD_REVISION,
   }
 }
 
@@ -186,29 +202,86 @@ function recordSkip(snapshot, mode) {
   const now = Date.now()
   const previous = queue.items[snapshot.randomKey]
   queue.items[snapshot.randomKey] = {
+    ...previous,
     ...snapshot,
     modes: [...new Set([...(Array.isArray(previous?.modes) ? previous.modes : []), mode])],
     skipCount: Math.max(0, Number(previous?.skipCount) || 0) + 1,
     firstSkippedAt: Number(previous?.firstSkippedAt) || now,
     lastSkippedAt: now,
+    reasonCounts: normalizeReasonCounts(previous?.reasonCounts),
+    lastReason: previous?.lastReason ?? null,
+    needsAudit: true,
+  }
+  saveQueue()
+  return snapshot.randomKey
+}
+
+function recordReason(randomKey, reasonId) {
+  const item = queue.items[randomKey]
+  const reason = REASON_BY_ID.get(reasonId)
+  if (!item || !reason) return
+
+  const counts = normalizeReasonCounts(item.reasonCounts)
+  counts[reasonId] = (counts[reasonId] ?? 0) + 1
+  queue.items[randomKey] = {
+    ...item,
+    reasonCounts: counts,
+    lastReason: reasonId,
+    needsAudit: true,
   }
   saveQueue()
 }
 
+function anomalyScore(item) {
+  const reasons = normalizeReasonCounts(item.reasonCounts)
+  return (
+    (Number(item.skipCount) || 0) * 10 +
+    (reasons.figure ?? 0) * 20 +
+    (reasons.prompt ?? 0) * 14 +
+    (reasons.choices ?? 0) * 14 +
+    (reasons.other ?? 0) * 5 +
+    (reasons.hard ?? 0)
+  )
+}
+
+function auditLevel(item) {
+  const reasons = normalizeReasonCounts(item.reasonCounts)
+  const structural = (reasons.figure ?? 0) + (reasons.prompt ?? 0) + (reasons.choices ?? 0)
+  if (structural > 0 || (item.skipCount ?? 0) >= 3) return 'high'
+  if ((item.skipCount ?? 0) >= 2 || (reasons.other ?? 0) > 0) return 'watch'
+  return 'signal'
+}
+
+function reasonSummary(item) {
+  const counts = normalizeReasonCounts(item.reasonCounts)
+  return REASONS
+    .filter((reason) => counts[reason.id] > 0)
+    .map((reason) => `${reason.label} ×${counts[reason.id]}`)
+    .join(' / ')
+}
+
 function sortedItems() {
   return Object.values(queue.items).sort(
-    (a, b) => (b.skipCount || 0) - (a.skipCount || 0) || (b.lastSkippedAt || 0) - (a.lastSkippedAt || 0),
+    (a, b) =>
+      anomalyScore(b) - anomalyScore(a) ||
+      (b.skipCount || 0) - (a.skipCount || 0) ||
+      (b.lastSkippedAt || 0) - (a.lastSkippedAt || 0),
   )
 }
 
 function exportPayload() {
   return {
-    schema: 'qualify-color2-skip-review-v1',
+    schema: 'qualify-color2-skip-review-v2',
     exportedAt: new Date().toISOString(),
-    instruction: '原本・教科書の問題内容、選択肢、正答、図版の意味は変更せず、Web表示・必要文脈・図版提示・可読性の改善対象として確認する。',
+    buildRevision: BUILD_REVISION,
+    instruction:
+      'スキップは「知識不足」と決めつけず、図版・必要文脈・Web変換・選択肢対応・原本再現の異常シグナルとして優先監査する。原本・教科書の問題内容、選択肢、正答、図版の意味は変更せず、原本を唯一の正としてWeb表示だけを改善する。',
     totalQuestions: sortedItems().length,
     items: sortedItems().map((item) => ({
       ...item,
+      auditLevel: auditLevel(item),
+      anomalyScore: anomalyScore(item),
+      reasonSummary: reasonSummary(item),
       firstSkippedAt: item.firstSkippedAt ? new Date(item.firstSkippedAt).toISOString() : null,
       lastSkippedAt: item.lastSkippedAt ? new Date(item.lastSkippedAt).toISOString() : null,
     })),
@@ -267,19 +340,41 @@ function openReview(randomKeys) {
   practice.openReview(randomKeys)
 }
 
-function showToast() {
+function showToast(randomKey) {
   let toast = document.querySelector('[data-color2-skip-toast]')
   if (!toast) {
     toast = document.createElement('div')
     toast.dataset.color2SkipToast = 'true'
     toast.className = 'color2-skip-toast'
-    toast.setAttribute('role', 'status')
+    toast.setAttribute('aria-live', 'polite')
     document.body.appendChild(toast)
   }
-  toast.textContent = 'スキップ保留に追加しました'
+
+  toast.replaceChildren()
+
+  const message = document.createElement('strong')
+  message.textContent = 'スキップ保留に追加。何かおかしい可能性として記録しました。'
+
+  const reasons = document.createElement('div')
+  reasons.className = 'color2-skip-toast__reasons'
+  REASONS.forEach((reason) => {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.textContent = reason.label
+    button.addEventListener('click', () => {
+      recordReason(randomKey, reason.id)
+      message.textContent = `理由も記録：${reason.label}`
+      reasons.hidden = true
+      window.clearTimeout(toastTimer)
+      toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1500)
+    })
+    reasons.appendChild(button)
+  })
+
+  toast.append(message, reasons)
   toast.classList.add('is-visible')
   window.clearTimeout(toastTimer)
-  toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1200)
+  toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 5200)
 }
 
 function onSkip(dialog, config) {
@@ -288,10 +383,13 @@ function onSkip(dialog, config) {
   if (!question || question.hidden || (feedback && !feedback.hidden)) return
 
   const snapshot = questionSnapshot(dialog, config)
-  if (!snapshot) return
+  if (!snapshot) {
+    window.alert('問題IDを確認できなかったため、スキップを保存できませんでした。ページを再読み込みしてください。')
+    return
+  }
 
-  recordSkip(snapshot, config.mode)
-  showToast()
+  const randomKey = recordSkip(snapshot, config.mode)
+  showToast(randomKey)
   window.dispatchEvent(new CustomEvent(SKIP_EVENT, { detail: { mode: config.mode } }))
 }
 
@@ -299,6 +397,8 @@ function injectSkipButton(dialog, config) {
   const choices = dialog.querySelector(config.choices)
   const question = dialog.querySelector(config.question)
   if (!choices || !question) return
+
+  ensureColor2QuestionIdentity(question)
 
   let holder = question.querySelector('[data-color2-skip-holder]')
   if (!holder) {
@@ -313,7 +413,7 @@ function injectSkipButton(dialog, config) {
     button.addEventListener('click', () => onSkip(dialog, config))
 
     const note = document.createElement('small')
-    note.textContent = '未回答として保留。正答率・ミスには含めません。'
+    note.textContent = '未回答として保留。正答率・ミスには含めず、異常シグナルとして残します。'
 
     holder.append(button, note)
     choices.after(holder)
@@ -339,6 +439,7 @@ function bindDialog(dialog, config) {
 }
 
 function scanDialogs() {
+  ensureColor2QuestionIdentity(document)
   configs.forEach((config) => {
     document.querySelectorAll(config.dialog).forEach((dialog) => bindDialog(dialog, config))
   })
@@ -348,12 +449,12 @@ function panelMarkup() {
   return `
     <div class="color2-skip-queue__head">
       <div>
-        <span>SKIP REVIEW</span>
-        <h3>意味が取りづらい問題を、保留する。</h3>
+        <span>SKIP REVIEW / ANOMALY SIGNAL</span>
+        <h3>スキップは、「何かおかしい」として残す。</h3>
       </div>
       <strong data-color2-skip-count>0問</strong>
     </div>
-    <p>「わからない / スキップ」で飛ばした問題だけを別データとして蓄積。正答率には混ぜず、あとでまとめて復習・ノア確認できます。</p>
+    <p>知識不足と決めつけず、図・文脈・Web変換・選択肢対応の異常候補として蓄積。回数と理由でノア監査の優先度を上げます。</p>
     <div class="color2-skip-queue__actions">
       <button type="button" data-color2-skip-review>保留だけ解く</button>
       <button type="button" data-color2-skip-copy>ノア確認用データをコピー</button>
@@ -363,7 +464,7 @@ function panelMarkup() {
       <summary>保留一覧を見る</summary>
       <div data-color2-skip-list></div>
     </details>
-    <small>同じ問題を何度スキップしたかも記録します。問題内容そのものは変更せず、改善時は原本・教科書を正として扱います。</small>
+    <small>問題ID・表示文・原文・図版revision・build revisionも保存。原問題データは変更しません。</small>
   `
 }
 
@@ -417,13 +518,24 @@ function refreshPanel(panel) {
   items.forEach((item) => {
     const row = document.createElement('div')
     row.className = 'color2-skip-queue__item'
+    row.dataset.auditLevel = auditLevel(item)
 
-    const copy = document.createElement('div')
+    const copyBlock = document.createElement('div')
     const title = document.createElement('strong')
     title.textContent = `${item.examLabel} · 問題(${item.groupNumber}) ${item.part}`
+
     const meta = document.createElement('span')
-    meta.textContent = `スキップ ${item.skipCount}回`
-    copy.append(title, meta)
+    meta.textContent = `スキップ ${item.skipCount}回 · 監査 ${auditLevel(item).toUpperCase()}`
+
+    copyBlock.append(title, meta)
+
+    const summary = reasonSummary(item)
+    if (summary) {
+      const reason = document.createElement('small')
+      reason.className = 'color2-skip-queue__reason'
+      reason.textContent = summary
+      copyBlock.appendChild(reason)
+    }
 
     const actions = document.createElement('div')
     const openButton = document.createElement('button')
@@ -437,7 +549,7 @@ function refreshPanel(panel) {
     removeButton.addEventListener('click', () => removeItem(item.randomKey))
 
     actions.append(openButton, removeButton)
-    row.append(copy, actions)
+    row.append(copyBlock, actions)
     list.appendChild(row)
   })
 }
@@ -456,6 +568,8 @@ const rootObserver = new MutationObserver(() => {
 })
 rootObserver.observe(document.body, { childList: true, subtree: true })
 
+window.addEventListener('qualify:color2-question-identity', scanDialogs)
+
 scanDialogs()
 scanPanels()
 refreshPanels()
@@ -464,4 +578,5 @@ window.__QUALIFY_COLOR2_SKIP_QUEUE__ = {
   getItems: () => sortedItems().map((item) => ({ ...item })),
   exportData: exportPayload,
   clear: clearQueue,
+  reasons: REASONS,
 }

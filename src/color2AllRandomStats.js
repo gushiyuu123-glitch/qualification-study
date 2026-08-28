@@ -1,4 +1,11 @@
 import './color2AllRandomStats.css'
+import {
+  ensureColor2QuestionIdentity,
+  getColor2QuestionIdentity,
+} from './color2QuestionIdentity.js'
+import {
+  stableKeyFromLegacyStatsKey,
+} from './color2QuestionRegistry.js'
 
 const STORAGE_KEY = 'qualify:color2:all-random:stats:v1'
 const DIALOG_SELECTOR =
@@ -23,15 +30,30 @@ function normalizeEntry(entry) {
   return { attempts, correct }
 }
 
+function mergeEntry(left, right) {
+  return {
+    attempts: left.attempts + right.attempts,
+    correct: left.correct + right.correct,
+  }
+}
+
 function normalizeStats(value) {
-  const questions =
+  const source =
     value?.questions && typeof value.questions === 'object' && !Array.isArray(value.questions)
-      ? Object.fromEntries(
-          Object.entries(value.questions)
-            .filter(([key]) => typeof key === 'string' && key)
-            .map(([key, entry]) => [key, normalizeEntry(entry)]),
-        )
+      ? value.questions
       : {}
+
+  const questions = {}
+  Object.entries(source)
+    .filter(([key]) => typeof key === 'string' && key)
+    .forEach(([key, entry]) => {
+      const stableKey = stableKeyFromLegacyStatsKey(key)
+      if (!stableKey) return
+      const normalized = normalizeEntry(entry)
+      questions[stableKey] = questions[stableKey]
+        ? mergeEntry(questions[stableKey], normalized)
+        : normalized
+    })
 
   const recent = Array.isArray(value?.recent)
     ? value.recent.map((item) => Boolean(item)).slice(-RECENT_WINDOW)
@@ -63,7 +85,8 @@ function setText(node, value) {
 }
 
 export function getAllRandomQuestionStats(questionKey) {
-  return normalizeEntry(stats.questions[questionKey])
+  const stableKey = stableKeyFromLegacyStatsKey(questionKey)
+  return normalizeEntry(stats.questions[stableKey])
 }
 
 export function getAllRandomStatsSummary() {
@@ -109,9 +132,10 @@ export function getAdaptiveQuestionWeight(questionKey) {
 }
 
 export function recordAllRandomAnswer(questionKey, isCorrect) {
-  if (!questionKey) return
-  const previous = getAllRandomQuestionStats(questionKey)
-  stats.questions[questionKey] = {
+  const stableKey = stableKeyFromLegacyStatsKey(questionKey)
+  if (!stableKey) return
+  const previous = getAllRandomQuestionStats(stableKey)
+  stats.questions[stableKey] = {
     attempts: previous.attempts + 1,
     correct: previous.correct + (isCorrect ? 1 : 0),
   }
@@ -125,12 +149,10 @@ function percent(value) {
 }
 
 function readQuestionIdentity(dialog) {
-  const label = dialog.querySelector('[data-all-random-question-label]')?.textContent ?? ''
-  const match = label.match(
-    /^(2026夏期|2025冬期|2025夏期)\s*·\s*問題\((\d+)\)\s+([^·\s]+)/,
-  )
-  if (!match) return null
-  return { key: `${match[1]}:${match[2]}:${match[3]}`, label }
+  const question = dialog.querySelector('[data-all-random-question]')
+  if (!question) return null
+  ensureColor2QuestionIdentity(question)
+  return getColor2QuestionIdentity(question)?.entry ?? null
 }
 
 function ensureSetupStats(dialog) {
@@ -202,23 +224,29 @@ function refreshDialog(dialog) {
 }
 
 function recordStandardDialog(dialog) {
-  const identity = readQuestionIdentity(dialog)
-  const position = dialog.querySelector('[data-all-random-question-number]')?.textContent ?? ''
-  const signature = identity ? `${identity.key}|${position}` : ''
   const feedback = dialog.querySelector('[data-all-random-feedback]')
-  const state = dialogStates.get(dialog) ?? { signature: '', recorded: false }
-
-  if (state.signature !== signature) {
-    state.signature = signature
-    state.recorded = false
-  }
+  const state = dialogStates.get(dialog) ?? { key: '', recorded: false }
 
   if (!feedback || feedback.hidden) {
+    const identity = readQuestionIdentity(dialog)
+    state.key = identity?.key ?? ''
+    state.recorded = false
     dialogStates.set(dialog, state)
     return
   }
 
-  if (!identity || state.recorded) {
+  const identity = readQuestionIdentity(dialog)
+  if (!identity) {
+    dialogStates.set(dialog, state)
+    return
+  }
+
+  if (state.key !== identity.key) {
+    state.key = identity.key
+    state.recorded = false
+  }
+
+  if (state.recorded) {
     dialogStates.set(dialog, state)
     return
   }
@@ -236,6 +264,7 @@ function recordStandardDialog(dialog) {
 }
 
 function patchDialog(dialog) {
+  ensureColor2QuestionIdentity(dialog)
   refreshDialog(dialog)
   recordStandardDialog(dialog)
 }
@@ -266,6 +295,7 @@ observer.observe(document.documentElement, {
 })
 
 window.addEventListener('qualify:color2-all-random-ready', schedulePatch)
+window.addEventListener('qualify:color2-question-identity', schedulePatch)
 schedulePatch()
 
 window.__QUALIFY_COLOR2_ALL_RANDOM_STATS__ = {

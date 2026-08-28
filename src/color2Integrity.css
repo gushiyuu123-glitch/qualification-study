@@ -1,0 +1,45 @@
+.color2-skip-toast__reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.color2-skip-toast__reasons button {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.48rem 0.62rem;
+  cursor: pointer;
+}
+
+.color2-skip-queue__item[data-audit-level="high"] {
+  box-shadow: inset 3px 0 0 #c53b32;
+}
+
+.color2-skip-queue__item[data-audit-level="watch"] {
+  box-shadow: inset 3px 0 0 #77716a;
+}
+
+.color2-skip-queue__reason {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  opacity: 0.72;
+}
+
+@media (max-width: 640px) {
+  .color2-skip-toast__reasons {
+    gap: 0.32rem;
+  }
+
+  .color2-skip-toast__reasons button {
+    font-size: 0.68rem;
+    padding: 0.44rem 0.54rem;
+  }
+}

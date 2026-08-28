@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -63,7 +64,16 @@ function exposeTextbookReaders() {
   }
 }
 
+const buildRevision =
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.GITHUB_SHA ||
+  process.env.COMMIT_SHA ||
+  'local'
+
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_QUALIFY_BUILD_SHA': JSON.stringify(buildRevision),
+  },
   plugins: [exposeTextbookReaders(), react()],
 })

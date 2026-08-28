@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/validateAppShell.mjs && node scripts/prepareBrandAssets.mjs && node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs && node scripts/validateColor2Summer2025Practice.mjs && node scripts/validateColor2Winter2025Practice.mjs && node scripts/validateColor2AllRandomPractice.mjs && node scripts/validateColor2TextbookPractice.mjs && node scripts/validateColor2NoahOriginalPractice.mjs && node scripts/validateColor2PracticeTargetGuide.mjs && node scripts/validateColor2SkipQueue.mjs",
+    "prebuild": "node scripts/validateAppShell.mjs && node scripts/prepareBrandAssets.mjs && node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs && node scripts/validateColor2Summer2025Practice.mjs && node scripts/validateColor2Winter2025Practice.mjs && node scripts/validateColor2AllRandomPractice.mjs && node scripts/validateColor2TextbookPractice.mjs && node scripts/validateColor2NoahOriginalPractice.mjs && node scripts/validateColor2FigureIntegrity.mjs && node scripts/validateColor2QuestionIdentity.mjs && node scripts/validateColor2PracticeTargetGuide.mjs && node scripts/validateColor2SkipQueue.mjs",
     "build": "eslint . && vite build",
     "lint": "eslint .",
     "validate:app": "node scripts/validateAppShell.mjs",
-    "validate:color2": "node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs && node scripts/validateColor2Summer2025Practice.mjs && node scripts/validateColor2Winter2025Practice.mjs && node scripts/validateColor2AllRandomPractice.mjs && node scripts/validateColor2TextbookPractice.mjs && node scripts/validateColor2NoahOriginalPractice.mjs && node scripts/validateColor2PracticeTargetGuide.mjs && node scripts/validateColor2SkipQueue.mjs",
+    "validate:color2": "node scripts/validateColor2ReferenceOnly.mjs && node scripts/validateColor2Summer2026Practice.mjs && node scripts/validateColor2Summer2025Practice.mjs && node scripts/validateColor2Winter2025Practice.mjs && node scripts/validateColor2AllRandomPractice.mjs && node scripts/validateColor2TextbookPractice.mjs && node scripts/validateColor2NoahOriginalPractice.mjs && node scripts/validateColor2FigureIntegrity.mjs && node scripts/validateColor2QuestionIdentity.mjs && node scripts/validateColor2PracticeTargetGuide.mjs && node scripts/validateColor2SkipQueue.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
