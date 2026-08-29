@@ -30,4 +30,10 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^openReader$' }],
     },
   },
+  {
+    files: ['src/color2TermDrill.js', 'src/color2TermDrillData.js'],
+    rules: {
+      'no-useless-escape': 'off',
+    },
+  },
 ])
