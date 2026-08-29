@@ -85,6 +85,21 @@ function candidatesFor(config) {
   return [...config.allowed].flatMap((examKey) => entriesByExam.get(examKey) ?? [])
 }
 
+function entryMatchesHost(entry, host, config) {
+  if (!entry || !config.allowed.has(entry.examKey)) return false
+
+  const prompt = host.querySelector(config.prompt)
+  const promptText = normalize(sourcePrompt(prompt))
+  if (!promptText || normalize(entry.prompt) !== promptText) return false
+
+  const choiceTexts = visibleChoices(host, config.choice)
+  if (!choiceTexts.length || !arrayEquals(entry.choices.map(normalize), choiceTexts)) return false
+
+  const imageSrc = host.querySelector('img[src]')?.getAttribute('src') ?? ''
+  if (imageSrc && entry.imageSrc !== imageSrc) return false
+  return true
+}
+
 function resolveEntry(host, config) {
   const prompt = host.querySelector(config.prompt)
   const promptText = normalize(sourcePrompt(prompt))
@@ -109,6 +124,14 @@ function resolveEntry(host, config) {
   }
 
   return candidates.length === 1 ? candidates[0] : null
+}
+
+function clearIdentity(host) {
+  delete host.dataset.color2QuestionKey
+  delete host.dataset.color2ExamKey
+  delete host.dataset.color2QuestionId
+  delete host.dataset.color2GroupNumber
+  delete host.dataset.color2Part
 }
 
 function applyIdentity(host, entry) {
@@ -143,14 +166,19 @@ function enhanceHost(host, config) {
   if (!host || host.hidden) return null
 
   const existing = getColor2QuestionEntry(host.dataset.color2QuestionKey)
-  if (existing) {
+  if (existing && entryMatchesHost(existing, host, config)) {
     applyIdentity(host, existing)
     return existing
   }
 
   const entry = resolveEntry(host, config)
-  if (entry) applyIdentity(host, entry)
-  return entry
+  if (entry) {
+    applyIdentity(host, entry)
+    return entry
+  }
+
+  if (existing) clearIdentity(host)
+  return null
 }
 
 export function ensureColor2QuestionIdentity(root = document) {

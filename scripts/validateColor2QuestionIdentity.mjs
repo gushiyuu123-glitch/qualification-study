@@ -44,6 +44,8 @@ for (const token of [
   'qualify:color2-question-identity',
   'visibleChoices',
   'sourcePrompt',
+  'entryMatchesHost',
+  'clearIdentity',
 ]) {
   if (!identity.includes(token)) throw new Error(`question identity実装が不足: ${token}`)
 }
@@ -83,4 +85,4 @@ if (index.indexOf(identityPath) > index.indexOf(skipPath)) {
   throw new Error('question identityはスキップ保留より先に読み込んでください。')
 }
 
-console.log('色彩検定2級 安定question identity検証OK: 332問 / 過去問314問 / 表示ラベル非依存 / 旧統計キー移行')
+console.log('色彩検定2級 安定question identity検証OK: 332問 / 過去問314問 / 表示ラベル非依存 / 表示中設問へ再バインド / 旧統計キー移行')
