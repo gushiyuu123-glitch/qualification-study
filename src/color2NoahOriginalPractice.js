@@ -2,12 +2,14 @@ import './color2Summer2026Practice.css'
 import './color2NoahOriginalPractice.css'
 import {
   color2NoahOriginalQuestions,
+  NOAH_ORIGINAL_GROUP_COUNT,
   NOAH_ORIGINAL_QUESTION_COUNT,
   NOAH_ORIGINAL_SUBTITLE,
   NOAH_ORIGINAL_TITLE,
+  NOAH_ORIGINAL_VARIANTS_PER_GROUP,
 } from './color2NoahOriginalData.js'
 
-const STORAGE_KEY = 'qualify:color2:noah-original-2026-winter:weakness:v1'
+const STORAGE_KEY = 'qualify:color2:noah-original-2026-winter:weakness:v2'
 const MASTERED_STREAK = 2
 const ENTRY_CLASS = 'color2-noah-entry'
 
@@ -44,7 +46,7 @@ function saveWeaknessBank() {
   try {
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ version: 1, items: weaknessBank }),
+      JSON.stringify({ version: 2, items: weaknessBank }),
     )
   } catch {
     // localStorage may be unavailable in restricted browser contexts.
@@ -69,7 +71,9 @@ function weaknessIds() {
 }
 
 function weaknessQuestions() {
-  const byId = new Map(color2NoahOriginalQuestions.map((question) => [question.id, question]))
+  const byId = new Map(
+    color2NoahOriginalQuestions.map((question) => [question.id, question]),
+  )
   return weaknessIds().map((id) => byId.get(id)).filter(Boolean)
 }
 
@@ -91,6 +95,7 @@ function recordWeaknessAnswer(question, isCorrect) {
   }
 
   if (!current || current.mastered) return
+
   const streak = current.streak + 1
   weaknessBank[question.id] = {
     ...current,
@@ -113,6 +118,10 @@ function choiceMark(choiceIndex) {
   return ['①', '②', '③', '④'][choiceIndex] ?? ''
 }
 
+function variantMark(question) {
+  return `${question.groupNumber}-${question.part}`
+}
+
 function ensureRoot() {
   if (root?.isConnected) return root
 
@@ -133,19 +142,25 @@ function ensureRoot() {
           <div class="color2-summer-quiz__lead color2-noah-quiz__lead">
             <span>UNOFFICIAL ORIGINAL PRACTICE</span>
             <h2>${NOAH_ORIGINAL_TITLE}</h2>
-            <p>${NOAH_ORIGINAL_SUBTITLE}。2025夏・2025冬・2026夏の出題領域と問い方を参考に、知識そのものは確認済み範囲だけから組み直しています。</p>
-            <small>実際の2026年度冬期試験の出題内容・難易度・合格点を予測または保証するものではありません。</small>
+            <p>${NOAH_ORIGINAL_SUBTITLE}。確認済みの色彩検定2級範囲を、基礎・標準・応用の3段階で問い直します。正答だけでなく、誤答の「どこが違うか」まで判断できる選択肢に組み直しています。</p>
+            <small>実際の2026年度冬期試験の出題内容・難易度・合格点を予測または保証するものではありません。公式問題・過去問とは別の非公式学習用問題です。</small>
           </div>
 
           <div class="color2-summer-quiz__summary">
             <div><strong>${NOAH_ORIGINAL_QUESTION_COUNT}</strong><span>QUESTIONS</span></div>
-            <div><strong>17</strong><span>GROUPS</span></div>
-            <div><strong>非公式</strong><span>ORIGINAL</span></div>
+            <div><strong>${NOAH_ORIGINAL_GROUP_COUNT}</strong><span>GROUPS</span></div>
+            <div><strong>${NOAH_ORIGINAL_VARIANTS_PER_GROUP}</strong><span>VARIANTS</span></div>
           </div>
 
           <div class="color2-summer-quiz__starts">
+            <button type="button" data-noah-start="mock">
+              <strong>本番風17問</strong><span>17領域から1問ずつ · 毎回バリエーション変更</span>
+            </button>
             <button type="button" data-noah-start="all">
-              <strong>全17問</strong><span>本番の大問順で一周</span>
+              <strong>全${NOAH_ORIGINAL_QUESTION_COUNT}問</strong><span>基礎 → 標準 → 応用まで全問</span>
+            </button>
+            <button type="button" data-noah-start="30">
+              <strong>30問</strong><span>全領域からランダム</span>
             </button>
             <button type="button" data-noah-start="10">
               <strong>10問</strong><span>ランダム標準練習</span>
@@ -162,7 +177,7 @@ function ensureRoot() {
               <button type="button" data-noah-start-weak disabled>ミスだけ解く</button>
               <button type="button" data-noah-clear-weak hidden>履歴をリセット</button>
             </div>
-            <small>あとから2回連続で正解すると克服扱い。バックアップ対象にも含まれます。</small>
+            <small>あとから2回連続で正解すると克服扱い。バリエーションごとに別問題として記録します。</small>
           </section>
         </section>
 
@@ -197,15 +212,27 @@ function ensureRoot() {
 
   root = wrapper.firstElementChild
   document.body.appendChild(root)
+
   root.querySelector('[data-noah-close]')?.addEventListener('click', close)
   root.querySelectorAll('[data-noah-start]').forEach((button) => {
     button.addEventListener('click', () => start(button.dataset.noahStart))
   })
-  root.querySelector('[data-noah-start-weak]')?.addEventListener('click', () => startQuestions(shuffle(weaknessQuestions())))
-  root.querySelector('[data-noah-clear-weak]')?.addEventListener('click', clearWeaknessBank)
+  root
+    .querySelector('[data-noah-start-weak]')
+    ?.addEventListener('click', () =>
+      startQuestions(shuffle(weaknessQuestions())),
+    )
+  root
+    .querySelector('[data-noah-clear-weak]')
+    ?.addEventListener('click', clearWeaknessBank)
   root.querySelector('[data-noah-next]')?.addEventListener('click', next)
-  root.querySelector('[data-noah-retry-misses]')?.addEventListener('click', retryMisses)
-  root.querySelector('[data-noah-back-setup]')?.addEventListener('click', showSetup)
+  root
+    .querySelector('[data-noah-retry-misses]')
+    ?.addEventListener('click', retryMisses)
+  root
+    .querySelector('[data-noah-back-setup]')
+    ?.addEventListener('click', showSetup)
+
   refreshWeaknessUI()
   return root
 }
@@ -226,24 +253,47 @@ function showSetup() {
 
 function refreshWeaknessUI() {
   if (!root) return
+
   const questions = weaknessQuestions()
   const count = root.querySelector('[data-noah-weak-count]')
   const list = root.querySelector('[data-noah-weak-list]')
   const startButton = root.querySelector('[data-noah-start-weak]')
   const clearButton = root.querySelector('[data-noah-clear-weak]')
+
   if (count) count.textContent = `${questions.length}問`
   if (startButton) startButton.disabled = questions.length === 0
   if (clearButton) clearButton.hidden = questions.length === 0
   if (list) {
     list.textContent = questions.length
-      ? questions.map((question) => `(${question.groupNumber})`).join('・')
+      ? questions.map((question) => `(${variantMark(question)})`).join('・')
       : 'まだなし。間違えた問題はここに自動で残ります。'
   }
 }
 
+function buildMockSession() {
+  const byGroup = new Map()
+
+  color2NoahOriginalQuestions.forEach((question) => {
+    const bucket = byGroup.get(question.groupNumber) ?? []
+    bucket.push(question)
+    byGroup.set(question.groupNumber, bucket)
+  })
+
+  return Array.from({ length: NOAH_ORIGINAL_GROUP_COUNT }, (_, offset) => {
+    const groupNumber = offset + 1
+    const bucket = byGroup.get(groupNumber) ?? []
+    return bucket[Math.floor(Math.random() * bucket.length)] ?? null
+  }).filter(Boolean)
+}
+
 function buildSession(requestedCount) {
+  if (requestedCount === 'mock') return buildMockSession()
   if (requestedCount === 'all') return [...color2NoahOriginalQuestions]
-  const count = Math.min(Number(requestedCount) || 5, color2NoahOriginalQuestions.length)
+
+  const count = Math.min(
+    Number(requestedCount) || 5,
+    color2NoahOriginalQuestions.length,
+  )
   return shuffle(color2NoahOriginalQuestions).slice(0, count)
 }
 
@@ -253,11 +303,13 @@ function start(requestedCount) {
 
 function startQuestions(questions) {
   if (!questions.length) return
+
   session = questions
   index = 0
   correctCount = 0
   answered = false
   misses = []
+
   setVisible('[data-noah-setup]', false)
   setVisible('[data-noah-result]', false)
   setVisible('[data-noah-question]', true)
@@ -270,48 +322,66 @@ function renderQuestion() {
     showResult()
     return
   }
+
   answered = false
+
   const label = root.querySelector('[data-noah-question-label]')
   const number = root.querySelector('[data-noah-question-number]')
   const prompt = root.querySelector('[data-noah-prompt]')
   const choices = root.querySelector('[data-noah-choices]')
   const progress = root.querySelector('[data-noah-progress]')
-  if (label) label.textContent = `問題(${question.groupNumber}) · ${question.domain}`
+
+  if (label) {
+    label.textContent = `問題(${question.groupNumber}) · ${question.domain} · ${question.difficulty}`
+  }
   if (number) number.textContent = `${index + 1} / ${session.length}`
   if (prompt) prompt.textContent = question.prompt
   if (progress) progress.textContent = `${index + 1}/${session.length}`
+
   if (choices) {
     choices.replaceChildren()
     question.choices.forEach((choice, choiceIndex) => {
       const button = document.createElement('button')
       button.type = 'button'
       button.dataset.noahChoiceIndex = String(choiceIndex)
+
       const mark = document.createElement('b')
       mark.textContent = choiceMark(choiceIndex)
       const text = document.createElement('span')
       text.textContent = choice
+
       button.append(mark, text)
       button.addEventListener('click', () => answer(choiceIndex))
       choices.appendChild(button)
     })
   }
+
   setVisible('[data-noah-feedback]', false)
 }
 
 function answer(choiceIndex) {
   if (answered) return
+
   const question = session[index]
   const isCorrect = choiceIndex === question.correctIndex
   answered = true
+
   if (isCorrect) correctCount += 1
   else misses.push(question)
+
   recordWeaknessAnswer(question, isCorrect)
 
   root.querySelectorAll('[data-noah-choice-index]').forEach((button) => {
     const buttonIndex = Number(button.dataset.noahChoiceIndex)
     button.disabled = true
-    button.classList.toggle('is-correct', buttonIndex === question.correctIndex)
-    button.classList.toggle('is-wrong', buttonIndex === choiceIndex && !isCorrect)
+    button.classList.toggle(
+      'is-correct',
+      buttonIndex === question.correctIndex,
+    )
+    button.classList.toggle(
+      'is-wrong',
+      buttonIndex === choiceIndex && !isCorrect,
+    )
   })
 
   const title = root.querySelector('[data-noah-feedback-title]')
@@ -319,14 +389,23 @@ function answer(choiceIndex) {
   const explanation = root.querySelector('[data-noah-explanation]')
   const caution = root.querySelector('[data-noah-caution]')
   const nextButton = root.querySelector('[data-noah-next]')
+
   if (title) {
     title.textContent = isCorrect ? '正解' : '不正解'
     title.dataset.result = isCorrect ? 'correct' : 'wrong'
   }
-  if (answerText) answerText.textContent = `正解：${choiceMark(question.correctIndex)} ${question.choices[question.correctIndex]}`
+  if (answerText) {
+    answerText.textContent = `正解：${choiceMark(question.correctIndex)} ${
+      question.choices[question.correctIndex]
+    }`
+  }
   if (explanation) explanation.textContent = question.explanation
   if (caution) caution.textContent = `判断ポイント：${question.caution}`
-  if (nextButton) nextButton.textContent = index >= session.length - 1 ? '結果を見る' : '次へ'
+  if (nextButton) {
+    nextButton.textContent =
+      index >= session.length - 1 ? '結果を見る' : '次へ'
+  }
+
   setVisible('[data-noah-feedback]', true)
 }
 
@@ -347,15 +426,22 @@ function retryMisses() {
 function showResult() {
   setVisible('[data-noah-question]', false)
   setVisible('[data-noah-result]', true)
+
   const score = root.querySelector('[data-noah-result-score]')
   const detail = root.querySelector('[data-noah-result-detail]')
   const retryButton = root.querySelector('[data-noah-retry-misses]')
   const progress = root.querySelector('[data-noah-progress]')
-  const percent = session.length ? Math.round((correctCount / session.length) * 1000) / 10 : 0
+  const percent = session.length
+    ? Math.round((correctCount / session.length) * 1000) / 10
+    : 0
+
   if (score) score.textContent = `${correctCount} / ${session.length}問正解`
-  if (detail) detail.textContent = `正答率 ${percent}% · ミス ${misses.length}問。これは非公式オリジナル練習の結果です。`
+  if (detail) {
+    detail.textContent = `正答率 ${percent}% · ミス ${misses.length}問。これは非公式オリジナル練習の結果です。`
+  }
   if (retryButton) retryButton.disabled = misses.length === 0
   if (progress) progress.textContent = 'RESULT'
+
   refreshWeaknessUI()
 }
 
@@ -375,22 +461,33 @@ function close() {
 
 function injectEntry(screen) {
   if (!screen || screen.querySelector(`.${ENTRY_CLASS}`)) return
+
   const entry = document.createElement('section')
   entry.className = ENTRY_CLASS
   entry.innerHTML = `
     <div class="${ENTRY_CLASS}__copy">
       <span>NOAH ORIGINAL / 2026 WINTER STYLE</span>
       <h2>${NOAH_ORIGINAL_TITLE}</h2>
-      <p>2025夏・2025冬・2026夏の出題領域と、2026夏で強まった「ほぼ正しい文章に1語だけ誤りを混ぜる」型を参考にした非公式17問。</p>
+      <p>確認済みの2級範囲を17領域×3バリエーションに再構成した非公式${NOAH_ORIGINAL_QUESTION_COUNT}問。基礎暗記だけでなく、似た用語の区別・条件判定・複合判断まで段階的に練習できます。</p>
       <small>過去問・公式問題とは完全に分離。実際の冬期出題を断定しません。</small>
     </div>
     <div class="${ENTRY_CLASS}__actions">
-      <button type="button" data-noah-original-open><span>オリジナル問題を解く</span><b>${NOAH_ORIGINAL_QUESTION_COUNT}問</b></button>
+      <button type="button" data-noah-original-open>
+        <span>オリジナル問題を解く</span>
+        <b>${NOAH_ORIGINAL_QUESTION_COUNT}問</b>
+      </button>
     </div>
   `
-  entry.querySelector('[data-noah-original-open]')?.addEventListener('click', open)
+
+  entry
+    .querySelector('[data-noah-original-open]')
+    ?.addEventListener('click', open)
+
   const conventional = screen.querySelector('.color2-conventional-entry')
-  const library = screen.querySelector('#color2-reference-library, .color2-reference-library')
+  const library = screen.querySelector(
+    '#color2-reference-library, .color2-reference-library',
+  )
+
   if (conventional) conventional.before(entry)
   else if (library) library.before(entry)
   else screen.appendChild(entry)
