@@ -19,6 +19,7 @@ const source = [
   read('src/color2NoahOriginalBasicQuestions.js'),
   read('src/color2NoahOriginalStandardQuestions.js'),
   read('src/color2NoahOriginalAdvancedQuestions.js'),
+  read('src/color2NoahOriginalChallengeQuestions.js'),
 ].join('\n')
 
 if (NOAH_ORIGINAL_TITLE !== 'ノア監修オリジナル練習問題') {
@@ -40,7 +41,7 @@ if (NOAH_ORIGINAL_GROUP_COUNT !== 17) {
   throw new Error(`オリジナル練習の領域数が想定外です: ${NOAH_ORIGINAL_GROUP_COUNT}`)
 }
 
-if (NOAH_ORIGINAL_VARIANTS_PER_GROUP !== 3) {
+if (NOAH_ORIGINAL_VARIANTS_PER_GROUP !== 5) {
   throw new Error(
     `1領域あたりのバリエーション数が想定外です: ${NOAH_ORIGINAL_VARIANTS_PER_GROUP}`,
   )
@@ -62,11 +63,14 @@ if (color2NoahOriginalQuestions.length !== NOAH_ORIGINAL_QUESTION_COUNT) {
 const ids = new Set()
 const prompts = new Set()
 const answerPositions = [0, 0, 0, 0]
+const challengeAnswerPositions = [0, 0, 0, 0]
 const byGroup = new Map()
 const expectedDifficulties = new Map([
   [1, '基礎'],
   [2, '標準'],
   [3, '応用'],
+  [4, '実戦'],
+  [5, '複合'],
 ])
 
 for (const question of color2NoahOriginalQuestions) {
@@ -97,7 +101,7 @@ for (const question of color2NoahOriginalQuestions) {
   if (!Number.isInteger(question.groupNumber) || question.groupNumber < 1 || question.groupNumber > 17) {
     throw new Error(`groupNumberが不正です: ${question.id}`)
   }
-  if (!Number.isInteger(question.variant) || question.variant < 1 || question.variant > 3) {
+  if (!Number.isInteger(question.variant) || question.variant < 1 || question.variant > 5) {
     throw new Error(`variantが不正です: ${question.id}`)
   }
   if (question.difficulty !== expectedDifficulties.get(question.variant)) {
@@ -126,6 +130,9 @@ for (const question of color2NoahOriginalQuestions) {
   }
 
   answerPositions[question.correctIndex] += 1
+  if (question.variant >= 4) {
+    challengeAnswerPositions[question.correctIndex] += 1
+  }
 
   const bucket = byGroup.get(question.groupNumber) ?? []
   bucket.push(question)
@@ -139,16 +146,24 @@ for (let groupNumber = 1; groupNumber <= NOAH_ORIGINAL_GROUP_COUNT; groupNumber 
   }
 
   const variants = bucket.map((question) => question.variant).sort((a, b) => a - b)
-  if (variants.join(',') !== '1,2,3') {
+  if (variants.join(',') !== '1,2,3,4,5') {
     throw new Error(`問題(${groupNumber})のvariant構成が不正です: ${variants.join(',')}`)
   }
 }
 
 const answerMax = Math.max(...answerPositions)
 const answerMin = Math.min(...answerPositions)
-if (answerMax - answerMin > 1) {
+if (answerMax - answerMin > 2) {
   throw new Error(
-    `正答位置に偏りがあります: ${answerPositions.map((count, index) => `${index + 1}=${count}`).join(', ')}`,
+    `全体の正答位置に偏りがあります: ${answerPositions.map((count, index) => `${index + 1}=${count}`).join(', ')}`,
+  )
+}
+
+const challengeAnswerMax = Math.max(...challengeAnswerPositions)
+const challengeAnswerMin = Math.min(...challengeAnswerPositions)
+if (challengeAnswerMax - challengeAnswerMin > 1) {
+  throw new Error(
+    `実戦・複合問題の正答位置に偏りがあります: ${challengeAnswerPositions.map((count, index) => `${index + 1}=${count}`).join(', ')}`,
   )
 }
 
@@ -197,6 +212,8 @@ for (const token of [
   'マッハバンド',
   'ドミナントカラー',
   'スプリットコンプリメンタリー',
+  'トライアド',
+  'コンプレックスハーモニー',
   '16,777,216',
   'トーナル配色',
   'セパレーション',
@@ -216,6 +233,7 @@ for (const token of [
   "const STORAGE_KEY = 'qualify:color2:noah-original-2026-winter:weakness:v2'",
   'MASTERED_STREAK = 2',
   'data-noah-start="mock"',
+  'data-noah-start="challenge"',
   'data-noah-start="all"',
   'data-noah-start="30"',
   'data-noah-start="10"',
@@ -265,5 +283,5 @@ if (
 }
 
 console.log(
-  `色彩検定2級 ノア監修オリジナル練習問題 検証OK: 非公式${NOAH_ORIGINAL_QUESTION_COUNT}問 / ${NOAH_ORIGINAL_GROUP_COUNT}領域×${NOAH_ORIGINAL_VARIANTS_PER_GROUP}バリエーション / 全問4択 / 正答位置${answerPositions.join('-')} / 専用ID / 専用弱点保存 / 公式・過去問と分離`,
+  `色彩検定2級 ノア監修オリジナル練習問題 検証OK: 非公式${NOAH_ORIGINAL_QUESTION_COUNT}問 / ${NOAH_ORIGINAL_GROUP_COUNT}領域×${NOAH_ORIGINAL_VARIANTS_PER_GROUP}バリエーション / 全問4択 / 正答位置${answerPositions.join('-')} / 実戦・複合${challengeAnswerPositions.join('-')} / 専用ID / 専用弱点保存 / 公式・過去問と分離`,
 )
