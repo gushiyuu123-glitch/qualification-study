@@ -142,7 +142,7 @@ function ensureRoot() {
           <div class="color2-summer-quiz__lead color2-noah-quiz__lead">
             <span>UNOFFICIAL ORIGINAL PRACTICE</span>
             <h2>${NOAH_ORIGINAL_TITLE}</h2>
-            <p>${NOAH_ORIGINAL_SUBTITLE}。確認済みの色彩検定2級範囲を、基礎・標準・応用の3段階で問い直します。正答だけでなく、誤答の「どこが違うか」まで判断できる選択肢に組み直しています。</p>
+            <p>${NOAH_ORIGINAL_SUBTITLE}。確認済みの色彩検定2級範囲を、基礎・標準・応用・実戦・複合の5層で問い直します。単語当てだけでなく、ケース判断・誤り選択・複数条件の照合まで含めています。</p>
             <small>実際の2026年度冬期試験の出題内容・難易度・合格点を予測または保証するものではありません。公式問題・過去問とは別の非公式学習用問題です。</small>
           </div>
 
@@ -156,8 +156,11 @@ function ensureRoot() {
             <button type="button" data-noah-start="mock">
               <strong>本番風17問</strong><span>17領域から1問ずつ · 毎回バリエーション変更</span>
             </button>
+            <button type="button" data-noah-start="challenge">
+              <strong>実戦・複合34問</strong><span>ケース判断・誤り選択・複数条件に集中</span>
+            </button>
             <button type="button" data-noah-start="all">
-              <strong>全${NOAH_ORIGINAL_QUESTION_COUNT}問</strong><span>基礎 → 標準 → 応用まで全問</span>
+              <strong>全${NOAH_ORIGINAL_QUESTION_COUNT}問</strong><span>基礎 → 標準 → 応用 → 実戦 → 複合まで全問</span>
             </button>
             <button type="button" data-noah-start="30">
               <strong>30問</strong><span>全領域からランダム</span>
@@ -288,6 +291,9 @@ function buildMockSession() {
 
 function buildSession(requestedCount) {
   if (requestedCount === 'mock') return buildMockSession()
+  if (requestedCount === 'challenge') {
+    return color2NoahOriginalQuestions.filter((question) => question.variant >= 4)
+  }
   if (requestedCount === 'all') return [...color2NoahOriginalQuestions]
 
   const count = Math.min(
@@ -468,7 +474,7 @@ function injectEntry(screen) {
     <div class="${ENTRY_CLASS}__copy">
       <span>NOAH ORIGINAL / 2026 WINTER STYLE</span>
       <h2>${NOAH_ORIGINAL_TITLE}</h2>
-      <p>確認済みの2級範囲を17領域×3バリエーションに再構成した非公式${NOAH_ORIGINAL_QUESTION_COUNT}問。基礎暗記だけでなく、似た用語の区別・条件判定・複合判断まで段階的に練習できます。</p>
+      <p>確認済みの2級範囲を17領域×5バリエーションに再構成した非公式${NOAH_ORIGINAL_QUESTION_COUNT}問。基礎暗記だけでなく、ケース判断・誤り選択・複数条件・複合判断まで段階的に練習できます。</p>
       <small>過去問・公式問題とは完全に分離。実際の冬期出題を断定しません。</small>
     </div>
     <div class="${ENTRY_CLASS}__actions">
